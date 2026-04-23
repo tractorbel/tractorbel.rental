@@ -167,6 +167,19 @@
       background: #f5f7f9;
     }
 
+    .card tbody tr {
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .card tbody tr:hover {
+      background: #eef7ec;
+    }
+
+    .card tbody tr.selected {
+      background: #d9f2dc;
+    }
+
     canvas {
       max-height: 280px;
       cursor: pointer;
@@ -377,6 +390,36 @@
 
 let dadosGlobais = [];
 let grafico, g1, g2, g3, g4, g5;
+let selectedTipo = "";
+
+function aplicarFiltros(){
+    const tecnico = document.getElementById("filtroTecnico").value;
+    let filtrado = dadosGlobais;
+
+    if(tecnico){
+        filtrado = filtrado.filter(linha =>
+            (linha["TÉCNICO DESIGNADO"] || "Não informado") === tecnico
+        );
+    }
+
+    if(selectedTipo){
+        filtrado = filtrado.filter(linha =>
+            (linha["TIPO DA SS"] || "Não informado") === selectedTipo
+        );
+    }
+
+    calcularTotais(filtrado);
+}
+
+function filtrarPorTipo(tipo){
+    if(selectedTipo === tipo){
+        selectedTipo = "";
+    } else {
+        selectedTipo = tipo;
+    }
+
+    aplicarFiltros();
+}
 
 document.getElementById('upload').addEventListener('change', function(e){
 
@@ -399,19 +442,7 @@ document.getElementById('upload').addEventListener('change', function(e){
 });
 
 document.getElementById("filtroTecnico").addEventListener("change", function(){
-
-    const tecnico = this.value;
-
-    if(!tecnico){
-        calcularTotais(dadosGlobais);
-        return;
-    }
-
-    const filtrado = dadosGlobais.filter(linha =>
-        (linha["TÉCNICO DESIGNADO"] || "Não informado") === tecnico
-    );
-
-    calcularTotais(filtrado);
+    aplicarFiltros();
 });
 
 function popularFiltro(dados){
@@ -508,7 +539,17 @@ function calcularTotais(dados){
     const tbody = document.getElementById("tabelaModelos");
     tbody.innerHTML = "";
     for(const tipo in totaisTipo){
-        tbody.innerHTML += `<tr><td>${tipo}</td><td>${totaisTipo[tipo]}</td></tr>`;
+        const row = document.createElement('tr');
+        row.className = tipo === selectedTipo ? 'selected' : '';
+        row.tabIndex = 0;
+        row.innerHTML = `<td>${tipo}</td><td>${totaisTipo[tipo].toLocaleString('pt-BR')}</td>`;
+        row.addEventListener('click', () => filtrarPorTipo(tipo));
+        row.addEventListener('keyup', (event) => {
+            if(event.key === 'Enter' || event.key === ' ') {
+                filtrarPorTipo(tipo);
+            }
+        });
+        tbody.appendChild(row);
     }
 
     let horasUteis = 0;
