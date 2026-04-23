@@ -33,7 +33,7 @@
 
         #login input {
             width: 100%;
-            max-width: 320px;
+            max-width: 300px;
             padding: 14px 16px;
             margin-bottom: 14px;
             border: 2px solid rgba(255,255,255,0.3);
@@ -58,7 +58,7 @@
 
         #login .btn-login {
             width: 100%;
-            max-width: 320px;
+            max-width: 300px;
             margin-top: 20px;
         }
 
@@ -70,14 +70,7 @@
             max-width: 400px;
             width: 100%;
         }
-
-        .login-container h2 {
-            color: #2e7d32;
-            background: none;
-            margin: 0 0 30px 0;
-            text-shadow: none;
-        }
-
+      
         .login-container input {
             background: white;
             border: 1px solid #ddd;
@@ -85,15 +78,21 @@
             margin-bottom: 14px;
         }
 
-        .login-container input:focus {
-            border-color: #2e7d32;
-            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
-        }
-
-        .login-container .btn-login {
-            background: #2e7d32;
-            border: none;
-            max-width: 100%;
+    .login-container .btn-login {
+    display: inline-block;
+    width: auto;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+    border: 2px solid #34A853;
+    border-radius: 24px;
+    background-color: white;
+    color: #34A853; 
+    padding: 10px 20px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
