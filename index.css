@@ -10,7 +10,6 @@ body{
     background: #2e7d32;
     display:flex;
     justify-content: center; /* CENTRALIZA MENU */
-    align-items: center;
     padding: 15px 20px;
     position: fixed;
     top:0;
