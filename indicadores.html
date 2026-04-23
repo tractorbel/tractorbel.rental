@@ -352,6 +352,13 @@
     </select>
   </div>
 
+  <div class="filtro-box">
+    <label class="titulo-filtro" for="filtroSolicitante">Filtrar por Solicitante</label>
+    <select id="filtroSolicitante" class="filtro-seletor">
+      <option value="">Todos</option>
+    </select>
+  </div>
+
   <div>
     <label for="upload" class="btn-google">Enviar Planilha</label>
     <input type="file" id="upload" accept=".xls,.xlsx" style="display:none;">
@@ -390,6 +397,8 @@
     <canvas id="graficoTecnico"></canvas>
   </div>
 
+  <div class="card grafico-card"><h3>Total de atendimento por Cliente</h3><canvas id="graficoSolicitante"></canvas></div>
+
   <div class="card grafico-card"><h3>Total de Horas x Horas Úteis</h3><canvas id="graficoTotalHoras"></canvas></div>
   <div class="card grafico-card"><h3>Horas Trabalhadas</h3><canvas id="graficoTrabalhadas"></canvas></div>
   <div class="card grafico-card"><h3>Horas Aguardando</h3><canvas id="graficoAguardando"></canvas></div>
@@ -402,16 +411,23 @@
 <script>
 
 let dadosGlobais = [];
-let grafico, g1, g2, g3, g4, g5;
+let grafico, g1, g2, g3, g4, g5, g6;
 let selectedTipo = "";
 
 function aplicarFiltros(){
     const tecnico = document.getElementById("filtroTecnico").value;
+    const solicitante = document.getElementById("filtroSolicitante").value;
     let filtrado = dadosGlobais;
 
     if(tecnico){
         filtrado = filtrado.filter(linha =>
             (linha["TÉCNICO DESIGNADO"] || "Não informado") === tecnico
+        );
+    }
+
+    if(solicitante){
+        filtrado = filtrado.filter(linha =>
+            (linha["SOLICITANTE"] || "Não informado") === solicitante
         );
     }
 
@@ -458,15 +474,27 @@ document.getElementById("filtroTecnico").addEventListener("change", function(){
     aplicarFiltros();
 });
 
+document.getElementById("filtroSolicitante").addEventListener("change", function(){
+    aplicarFiltros();
+});
+
 function popularFiltro(dados){
 
-    const select = document.getElementById("filtroTecnico");
-    select.innerHTML = '<option value="">Todos</option>';
+    const selectTecnico = document.getElementById("filtroTecnico");
+    const selectSolicitante = document.getElementById("filtroSolicitante");
 
-    const tecnicos = [...new Set(dados.map(l => l["TÉCNICO DESIGNADO"] || "Não informado"))];
+    selectTecnico.innerHTML = '<option value="">Todos</option>';
+    selectSolicitante.innerHTML = '<option value="">Todos</option>';
+
+    const tecnicos = [...new Set(dados.map(l => l["TÉCNICO DESIGNADO"] || "Não informado"))].sort((a,b) => a.localeCompare(b, 'pt-BR'));
+    const solicitantes = [...new Set(dados.map(l => l["SOLICITANTE"] || "Não informado"))].sort((a,b) => a.localeCompare(b, 'pt-BR'));
 
     tecnicos.forEach(t => {
-        select.innerHTML += `<option value="${t}">${t}</option>`;
+        selectTecnico.innerHTML += `<option value="${t}">${t}</option>`;
+    });
+
+    solicitantes.forEach(s => {
+        selectSolicitante.innerHTML += `<option value="${s}">${s}</option>`;
     });
 }
 
@@ -522,6 +550,7 @@ function calcularTotais(dados){
 
     const totaisTipo = {};
     const totaisTecnico = {};
+    const ssPorSolicitante = {};
 
     let totalHoras = 0;
     let horasTrab = 0;
@@ -538,6 +567,11 @@ function calcularTotais(dados){
 
         const tecnico = linha["TÉCNICO DESIGNADO"] || "Não informado";
         totaisTecnico[tecnico] = (totaisTecnico[tecnico] || 0) + 1;
+
+        const solicitante = linha["SOLICITANTE"] || "Não informado";
+        const numeroSS = String(linha["N° DA SS"] || linha["Numero SS"] || linha["Nº DA SS"] || linha["NUMERO DA SS"] || linha["A"] || linha["SS"] || "").trim() || `${tipo}_${tecnico}_${solicitante}_${dados.length}`;
+        if(!ssPorSolicitante[solicitante]) ssPorSolicitante[solicitante] = new Set();
+        ssPorSolicitante[solicitante].add(numeroSS);
 
         totalHoras += toHoras(linha["TOTAL DE HORAS"]);
         horasTrab += toHoras(linha["HORAS TRABALHADAS"]);
@@ -565,6 +599,10 @@ function calcularTotais(dados){
         tbody.appendChild(row);
     }
 
+    const totaisSolicitante = Object.fromEntries(
+        Object.entries(ssPorSolicitante).map(([sol, set]) => [sol, set.size])
+    );
+
     let horasUteis = 0;
 
     if(datas.length){
@@ -586,6 +624,19 @@ function calcularTotais(dados){
     }
 
     criarGrafico("graficoTecnico","Atendimentos",Object.keys(totaisTecnico),Object.values(totaisTecnico),grafico,v=>grafico=v,true);
+
+    const solicitanteEntradas = Object.entries(totaisSolicitante)
+      .sort((a,b) => b[1] - a[1])
+      .slice(0, 12);
+    criarGrafico(
+      "graficoSolicitante",
+      "Atendimentos",
+      solicitanteEntradas.map(entry => entry[0]),
+      solicitanteEntradas.map(entry => entry[1]),
+      g6,
+      v => g6 = v,
+      false
+    );
 
     criarGrafico("graficoTotalHoras","Horas",
         ["Trabalhadas","Horas Úteis"],
