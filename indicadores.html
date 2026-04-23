@@ -112,7 +112,7 @@
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 10px;
       position: sticky;
-      top: 0;
+      top: 80px;
       z-index: 10;
       background: #f5f7f9;
       padding: 14px 10px 10px;
@@ -597,6 +597,10 @@ function filtrarPorTecnico(tecnico){
     );
 
     calcularTotais(filtrado);
+}
+
+function toggleMenu() {
+    document.getElementById("menu").classList.toggle("active");
 }
 
 </script>
