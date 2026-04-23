@@ -297,6 +297,7 @@ body{
 
     .cards {
         position: static;
+        text-align: center;        
     }
 }
 .navbar-logo-img {
