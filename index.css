@@ -112,7 +112,7 @@ h3{
     .navbar ul{
         display:none;
         flex-direction: column;
-        background: 2e7d32;
+        background: #2e7d32;
         position:absolute;
         top:60px;
         right:20px;
