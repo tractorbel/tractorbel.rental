@@ -162,8 +162,8 @@
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 10px;
       position: sticky;
-      top: 80px;
-      z-index: 10;
+      top: 0;
+      z-index: 20;
       background: #f5f7f9;
       padding-bottom: 8px;
       margin-bottom: 14px;
@@ -196,12 +196,20 @@
     }
 
     canvas {
-      max-height: 280px;
+      width: 100% !important;
+      max-width: 100%;
+      height: auto !important;
+      max-height: 420px;
     }
 
     #acoes-filtros {
       text-align: right;
       margin: 10px 0 16px;
+    }
+
+    .grafico-card {
+      display: none;
+      width: 100%;
     }
 
     #statusCarga {
@@ -223,10 +231,6 @@
     @media (max-width: 768px) {
       body {
         margin: 12px;
-      }
-
-      .cards {
-        position: static;
       }
 
       .filtros-container {
