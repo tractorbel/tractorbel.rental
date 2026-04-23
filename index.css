@@ -7,7 +7,7 @@ body{
 
 /* ===== MENU INTELIGENTE ===== */
 .navbar{
-    background: green;
+    background: #2e7d32;
     display:flex;
     justify-content: center; /* CENTRALIZA MENU */
     align-items: center;
@@ -100,7 +100,7 @@ h3{
 }
 
 /* ===== RESPONSIVO INTELIGENTE ===== */
-@media (max-width: 300px){
+@media (max-width: 400px){
     .navbar{
         justify-content: space-between; /* volta para hamburguer */
     }
@@ -112,7 +112,7 @@ h3{
     .navbar ul{
         display:none;
         flex-direction: column;
-        background: green;
+        background: 2e7d32;
         position:absolute;
         top:60px;
         right:20px;
