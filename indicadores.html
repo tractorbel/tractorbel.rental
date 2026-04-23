@@ -219,6 +219,82 @@
         grid-template-columns: 1fr;
       }
     }
+.footer {
+  background: #1f2937;
+  color: #fff;
+  margin-top: 20px;
+  padding: 25px 0 10px 0;
+  font-size: 13px;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  max-width: 1000px;
+  margin: auto;
+  flex-wrap: wrap;
+  padding: 10px;
+}
+
+.footer-col {
+  flex: 1;
+  min-width: 200px;
+  margin: 10px 5px;
+  text-align: center;
+}
+
+.footer-col h3 {
+  margin-bottom: 8px;
+  font-size: 15px;
+  border-bottom: 2px solid #22c55e;
+  display: inline-block;
+  padding-bottom: 3px;
+  color: white;
+}
+
+.footer-col p {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #d1d5db;
+  margin: 2px 0;
+}
+
+.footer-social {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.footer-social img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #22c55e;
+  transition: 0.3s;
+  text-decoration: none;
+}
+
+.footer-social img:hover {
+  transform: scale(1.1);
+}
+
+.footer-bottom {
+  background: #111827;
+  text-align: center;
+  padding: 8px;
+  font-size: 11px;
+  margin-top: 10px;
+  color: #d1d5db;
+}
+
+@media (max-width: 768px) {
+  .footer-container {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
 </style>
 
 </head>
