@@ -1,9 +1,24 @@
 body{
-    color: black;
-    background:#f5f6fa;
-    margin:0;
+    color: #222;
+    background:#f5f7f9;
+    margin:20px;
     font-family:Arial, Helvetica, sans-serif;
-    padding:10px;
+}
+
+#conteudo {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    display: block;
+}
+
+.topo-controles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    align-items: end;
+    margin-bottom: 14px;
 }
 
 /* ===== MENU INTELIGENTE ===== */
@@ -260,23 +275,115 @@ body{
 h2{margin-bottom:10px;}
 #login input, #login button{margin-right:5px; margin-bottom:5px;}
 .card{
-    background:white;
-    text-align:center;
-    padding:10px;
-    border-radius:5px;
-    box-shadow:0 1px 3px rgba(0,0,0,0.1);
-    margin-bottom:10px;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    border-left: 6px solid #2e7d32;
+    margin-bottom: 12px;
 }
+
+.card h3 {
+    margin: 0 0 8px 0;
+}
+
+.logo-topo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 18px;
+}
+
+.logo-topo img {
+    width: 220px;
+    height: 70px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 10px;
+    display: block;
+}
+
+.grafico-card {
+    display: block;
+}
+
+.btn-google {
+    display: inline-block;
+    padding: 10px 20px;
+    border: 2px solid #34a853;
+    border-radius: 24px;
+    background-color: white;
+    color: #34a853;
+    font-weight: 600;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    text-align: center;
+}
+
+.btn-google:hover {
+    background-color: #34a853;
+    color: white;
+}
+
+.filtro-box {
+    background: #ffffff;
+    border: 1px solid #d8e8da;
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 120px;
+    box-shadow: 0 2px 8px rgba(46, 125, 50, 0.08);
+}
+
+.filtro-box .titulo-filtro {
+    font-size: 13px;
+    font-weight: 700;
+    color: #2e7d32;
+    margin: 0;
+}
+
+.filtro-seletor {
+    width: 100%;
+    min-height: 48px;
+    border: 1px solid #cfd8dc;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: #111;
+    background: linear-gradient(180deg, #ffffff 0%, #f7faf8 100%);
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.filtro-seletor:focus {
+    border-color: #34a853;
+    box-shadow: 0 0 0 3px rgba(52, 168, 83, 0.12);
+}
+
 .cards{
-    display:grid;
-    grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
-    gap:10px;   
-    margin-bottom:10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #f5f7f9;
+    padding: 14px 10px 10px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid rgba(46, 125, 50, 0.12);
+}
+
+.cards .card h3 {
+    color: white;
 }
 .total{
     font-size:18px;
     font-weight:bold;
-    color:green;
+    color:#2e7d32;
+    margin-top:4px;
 }
 select, input{
     margin-right:5px;
@@ -285,9 +392,7 @@ select, input{
 }
 
 canvas{
-    background:white;
-    padding:10px;
-    border-radius:5px;
+    max-height:280px;
 }
 .multi{
     width: 100%;       
@@ -366,6 +471,17 @@ canvas{
     margin-top: 12px;
     font-size: 14px;
     color: #4b5563;
+}
+
+/* Media queries for responsive design */
+@media (max-width: 768px) {
+    body {
+        margin: 12px;
+    }
+
+    .cards {
+        position: static;
+    }
 }
 
 

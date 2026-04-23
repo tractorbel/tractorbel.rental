@@ -16,17 +16,29 @@
 
 <body>
 
+<div class="logo-topo">
+  <img src="png/logo.png" alt="Logo" />
+</div>
+
+<div id="conteudo">
+
 <h2>Análise de Atendimento SS</h2>
 
-<input type="file" id="upload" accept=".xls,.xlsx">
+<div class="topo-controles">
+  <div class="filtro-box">
+    <label class="titulo-filtro" for="filtroTecnico">Filtrar por Técnico</label>
+    <select id="filtroTecnico" class="filtro-seletor">
+      <option value="">Todos</option>
+    </select>
+  </div>
 
-<br><br>
+  <div>
+    <label for="upload" class="btn-google">Enviar Planilha</label>
+    <input type="file" id="upload" accept=".xls,.xlsx" style="display:none;">
+  </div>
+</div>
 
-<label><b>Filtrar por Técnico:</b></label>
-<select id="filtroTecnico">
-<option value="">Todos</option>
-</select>
-
+<div class="cards">
 <div class="card">
 <h3>Total de atendimento</h3>
 <div class="total" id="totalAtendimento">0</div>
@@ -50,17 +62,20 @@
 <tbody id="tabelaModelos"></tbody>
 </table>
 </div>
+</div>
 
-<div class="card">
+<div class="card grafico-card">
 <h3>Total de atendimento por Técnico</h3>
 <canvas id="graficoTecnico"></canvas>
 </div>
 
-<div class="card"><h3>Total de Horas x Horas Úteis</h3><canvas id="graficoTotalHoras"></canvas></div>
-<div class="card"><h3>Horas Trabalhadas</h3><canvas id="graficoTrabalhadas"></canvas></div>
-<div class="card"><h3>Horas Aguardando</h3><canvas id="graficoAguardando"></canvas></div>
-<div class="card"><h3>Horas Deslocamento</h3><canvas id="graficoDeslocamento"></canvas></div>
-<div class="card"><h3>Total Máquina Parada</h3><canvas id="graficoMaquina"></canvas></div>
+<div class="card grafico-card"><h3>Total de Horas x Horas Úteis</h3><canvas id="graficoTotalHoras"></canvas></div>
+<div class="card grafico-card"><h3>Horas Trabalhadas</h3><canvas id="graficoTrabalhadas"></canvas></div>
+<div class="card grafico-card"><h3>Horas Aguardando</h3><canvas id="graficoAguardando"></canvas></div>
+<div class="card grafico-card"><h3>Horas Deslocamento</h3><canvas id="graficoDeslocamento"></canvas></div>
+<div class="card grafico-card"><h3>Total Máquina Parada</h3><canvas id="graficoMaquina"></canvas></div>
+
+</div>
 
 <script>
 
