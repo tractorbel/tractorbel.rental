@@ -217,7 +217,7 @@ header img{
 
 .footer-col {
     flex: 1;
-    min-width: 200px;
+    min-width: 20px;
     margin: 10px 5px;
     text-align: center; /* CENTRALIZA TUDO */
 }
