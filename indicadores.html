@@ -198,7 +198,7 @@
 
     .graficos {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: 1fr;
       gap: 20px;
       margin-bottom: 20px;
     }
@@ -437,6 +437,30 @@ function aplicarFiltros(){
     }
 
     calcularTotais(filtrado);
+    popularFiltro(dadosGlobais);
+}
+
+function atualizarOpcoesFiltros(dadosFiltrados){
+    // Para cascata: as opções dos filtros devem ser baseadas nos dados filtrados pelos outros filtros
+    // Mas como aplicamos filtros sequencialmente, vamos recalcular as opções baseadas nos dados atuais
+
+    // Para filtroTecnico: opções são todos os técnicos nos dadosFiltrados
+    const selectTecnico = document.getElementById("filtroTecnico");
+    const tecnicoAtual = selectTecnico.value;
+    selectTecnico.innerHTML = '<option value="">Todos</option>';
+    const tecnicos = [...new Set(dadosFiltrados.map(l => l["TÉCNICO DESIGNADO"] || "Não informado"))].sort((a,b) => a.localeCompare(b, 'pt-BR'));
+    tecnicos.forEach(t => {
+        selectTecnico.innerHTML += `<option value="${t}" ${t === tecnicoAtual ? 'selected' : ''}>${t}</option>`;
+    });
+
+    // Para filtroSolicitante: opções são todos os solicitantes nos dadosFiltrados
+    const selectSolicitante = document.getElementById("filtroSolicitante");
+    const solicitanteAtual = selectSolicitante.value;
+    selectSolicitante.innerHTML = '<option value="">Todos</option>';
+    const solicitantes = [...new Set(dadosFiltrados.map(l => l["SOLICITANTE"] || "Não informado"))].sort((a,b) => a.localeCompare(b, 'pt-BR'));
+    solicitantes.forEach(s => {
+        selectSolicitante.innerHTML += `<option value="${s}" ${s === solicitanteAtual ? 'selected' : ''}>${s}</option>`;
+    });
 }
 
 function filtrarPorTipo(tipo){
@@ -477,23 +501,40 @@ document.getElementById("filtroSolicitante").addEventListener("change", function
     aplicarFiltros();
 });
 
-function popularFiltro(dados){
-
+function popularFiltro(dadosGlobaisParaOpcoes){
     const selectTecnico = document.getElementById("filtroTecnico");
     const selectSolicitante = document.getElementById("filtroSolicitante");
 
+    const tecnicoAtual = selectTecnico.value;
+    const solicitanteAtual = selectSolicitante.value;
+
+    // Para cascata: opções baseadas nos outros filtros
+    // Opções de técnico: filtrar por solicitante se selecionado
+    let dadosParaTecnico = dadosGlobaisParaOpcoes;
+    if(solicitanteAtual){
+        dadosParaTecnico = dadosGlobaisParaOpcoes.filter(linha =>
+            (linha["SOLICITANTE"] || "Não informado") === solicitanteAtual
+        );
+    }
+    const tecnicos = [...new Set(dadosParaTecnico.map(l => l["TÉCNICO DESIGNADO"] || "Não informado"))].sort((a,b) => a.localeCompare(b, 'pt-BR'));
+
     selectTecnico.innerHTML = '<option value="">Todos</option>';
-    selectSolicitante.innerHTML = '<option value="">Todos</option>';
-
-    const tecnicos = [...new Set(dados.map(l => l["TÉCNICO DESIGNADO"] || "Não informado"))].sort((a,b) => a.localeCompare(b, 'pt-BR'));
-    const solicitantes = [...new Set(dados.map(l => l["SOLICITANTE"] || "Não informado"))].sort((a,b) => a.localeCompare(b, 'pt-BR'));
-
     tecnicos.forEach(t => {
-        selectTecnico.innerHTML += `<option value="${t}">${t}</option>`;
+        selectTecnico.innerHTML += `<option value="${t}" ${t === tecnicoAtual ? 'selected' : ''}>${t}</option>`;
     });
 
+    // Opções de solicitante: filtrar por técnico se selecionado
+    let dadosParaSolicitante = dadosGlobaisParaOpcoes;
+    if(tecnicoAtual){
+        dadosParaSolicitante = dadosGlobaisParaOpcoes.filter(linha =>
+            (linha["TÉCNICO DESIGNADO"] || "Não informado") === tecnicoAtual
+        );
+    }
+    const solicitantes = [...new Set(dadosParaSolicitante.map(l => l["SOLICITANTE"] || "Não informado"))].sort((a,b) => a.localeCompare(b, 'pt-BR'));
+
+    selectSolicitante.innerHTML = '<option value="">Todos</option>';
     solicitantes.forEach(s => {
-        selectSolicitante.innerHTML += `<option value="${s}">${s}</option>`;
+        selectSolicitante.innerHTML += `<option value="${s}" ${s === solicitanteAtual ? 'selected' : ''}>${s}</option>`;
     });
 }
 
