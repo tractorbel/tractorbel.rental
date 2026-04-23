@@ -299,5 +299,9 @@ body{
         position: static;
     }
 }
-
-
+.navbar-logo-img {
+    width: 70px;       /* Define uma largura fixa */
+    height: auto;     /* Mantém a proporção */
+    margin: 5px;      /* Espaçamento ao redor */
+    border-radius: 80%; /* Deixa a imagem circular */
+}
