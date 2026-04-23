@@ -194,12 +194,14 @@
     }
 
     .grafico-card {
-      display: block;
       width: 100%;
     }
 
-    .grafico-card {
-      display: block;
+    .graficos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
     }
 
     .logo-topo {
@@ -224,6 +226,10 @@
 
       .topo-controles {
         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      }
+
+      .graficos {
+        grid-template-columns: 1fr;
       }
     }
 
@@ -378,16 +384,18 @@
 </div>
 </div>
 
-<div class="card grafico-card">
-<h3>Total de atendimento por Técnico</h3>
-<canvas id="graficoTecnico"></canvas>
-</div>
+<div class="graficos">
+  <div class="card grafico-card">
+    <h3>Total de atendimento por Técnico</h3>
+    <canvas id="graficoTecnico"></canvas>
+  </div>
 
-<div class="card grafico-card"><h3>Total de Horas x Horas Úteis</h3><canvas id="graficoTotalHoras"></canvas></div>
-<div class="card grafico-card"><h3>Horas Trabalhadas</h3><canvas id="graficoTrabalhadas"></canvas></div>
-<div class="card grafico-card"><h3>Horas Aguardando</h3><canvas id="graficoAguardando"></canvas></div>
-<div class="card grafico-card"><h3>Horas Deslocamento</h3><canvas id="graficoDeslocamento"></canvas></div>
-<div class="card grafico-card"><h3>Total Máquina Parada</h3><canvas id="graficoMaquina"></canvas></div>
+  <div class="card grafico-card"><h3>Total de Horas x Horas Úteis</h3><canvas id="graficoTotalHoras"></canvas></div>
+  <div class="card grafico-card"><h3>Horas Trabalhadas</h3><canvas id="graficoTrabalhadas"></canvas></div>
+  <div class="card grafico-card"><h3>Horas Aguardando</h3><canvas id="graficoAguardando"></canvas></div>
+  <div class="card grafico-card"><h3>Horas Deslocamento</h3><canvas id="graficoDeslocamento"></canvas></div>
+  <div class="card grafico-card"><h3>Total Máquina Parada</h3><canvas id="graficoMaquina"></canvas></div>
+</div>
 
 </div>
 
