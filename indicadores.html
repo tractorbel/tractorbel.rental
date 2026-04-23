@@ -9,7 +9,209 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
+    * {
+      box-sizing: border-box;
+    }
 
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f5f7f9;
+      color: #222;
+    }
+
+    h2 {
+      margin-bottom: 16px;
+    }
+
+    #conteudo {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      display: block;
+    }
+
+    .topo-controles {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      align-items: end;
+      margin-bottom: 14px;
+    }
+
+    .filtro-box {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #d8e8da;
+      border-radius: 12px;
+      padding: 14px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(46, 125, 50, 0.08);
+      min-width: 0;
+    }
+
+    .filtro-box label.titulo-filtro {
+      font-size: 13px;
+      font-weight: 700;
+      color: #2e7d32;
+      margin: 0 0 6px 0;
+    }
+
+    .filtro-seletor {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid #cfd8dc;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      color: #111;
+      background: linear-gradient(180deg, #ffffff 0%, #f7faf8 100%);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .filtro-seletor:focus {
+      border-color: #34a853;
+      box-shadow: 0 0 0 3px rgba(52, 168, 83, 0.12);
+    }
+
+    .btn-google {
+      display: inline-block;
+      padding: 10px 20px;
+      border: 2px solid #34a853;
+      border-radius: 24px;
+      background-color: white;
+      color: #34a853;
+      font-weight: 600;
+      font-size: 0.9em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+      text-align: center;
+    }
+
+    .btn-google:hover {
+      background-color: #34a853;
+      color: white;
+    }
+
+    .btn-google:active {
+      transform: scale(0.98);
+    }
+
+    label.btn-google {
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #f5f7f9;
+      padding: 14px 10px 10px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid rgba(46, 125, 50, 0.12);
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      border-left: 6px solid #2e7d32;
+      margin-bottom: 12px;
+    }
+
+    .card h3,
+    .card h4 {
+      margin: 0 0 8px 0;
+      color: #333;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .card h4 {
+      font-size: 13px;
+      color: #555;
+    }
+
+    .card .total {
+      font-size: 18px;
+      font-weight: bold;
+      color: #2e7d32;
+      margin-top: 4px;
+    }
+
+    .card table {
+      width: 100%;
+      font-size: 12px;
+      border-collapse: collapse;
+    }
+
+    .card table th,
+    .card table td {
+      padding: 6px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    .card table th {
+      font-weight: 600;
+      color: #2e7d32;
+      background: #f5f7f9;
+    }
+
+    canvas {
+      max-height: 280px;
+    }
+
+    .grafico-card {
+      display: block;
+    }
+
+    .logo-topo {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+
+    .logo-topo img {
+      width: 220px;
+      height: 70px;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 10px;
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        margin: 12px;
+      }
+
+      .cards {
+        position: static;
+      }
+
+      .topo-controles {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      }
+    }
+
+    @media (max-width: 520px) {
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .topo-controles {
+        grid-template-columns: 1fr;
+      }
+    }
 </style>
 
 </head>
