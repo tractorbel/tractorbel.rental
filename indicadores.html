@@ -168,6 +168,11 @@
 
     canvas {
       max-height: 280px;
+      cursor: pointer;
+    }
+
+    #graficoTecnico {
+      cursor: pointer;
     }
 
     .grafico-card {
@@ -437,24 +442,41 @@ function calcularTotais(dados){
         horasUteis = diasUteis * 8.8; // 8h48 = 8.8
     }
 
-    criarGrafico("graficoTecnico","Atendimentos",Object.keys(totaisTecnico),Object.values(totaisTecnico),grafico,v=>grafico=v);
+    criarGrafico("graficoTecnico","Atendimentos",Object.keys(totaisTecnico),Object.values(totaisTecnico),grafico,v=>grafico=v,true);
 
     criarGrafico("graficoTotalHoras","Horas",
         ["Trabalhadas","Horas Úteis"],
         [horasTrab, horasUteis],
-        g1,v=>g1=v
+        g1,v=>g1=v,false
     );
 
-    criarGrafico("graficoTrabalhadas","Horas Trabalhadas",["Total"],[horasTrab],g2,v=>g2=v);
-    criarGrafico("graficoAguardando","Horas Aguardando",["Total"],[horasAguard],g3,v=>g3=v);
-    criarGrafico("graficoDeslocamento","Horas Deslocamento",["Total"],[horasDesloc],g4,v=>g4=v);
-    criarGrafico("graficoMaquina","Máquina Parada",["Total"],[maquinaParada],g5,v=>g5=v);
+    criarGrafico("graficoTrabalhadas","Horas Trabalhadas",["Total"],[horasTrab],g2,v=>g2=v,false);
+    criarGrafico("graficoAguardando","Horas Aguardando",["Total"],[horasAguard],g3,v=>g3=v,false);
+    criarGrafico("graficoDeslocamento","Horas Deslocamento",["Total"],[horasDesloc],g4,v=>g4=v,false);
+    criarGrafico("graficoMaquina","Máquina Parada",["Total"],[maquinaParada],g5,v=>g5=v,false);
 }
 
-function criarGrafico(id,label,labels,data,graficoAtual,salvar){
+function criarGrafico(id,label,labels,data,graficoAtual,salvar,comClickable){
 
     if(graficoAtual){
         graficoAtual.destroy();
+    }
+
+    const opcoes = {
+        responsive:true,
+        plugins:{
+            legend:{display:false}
+        }
+    };
+
+    if(comClickable){
+        opcoes.onClick = (event, elements) => {
+            if(elements.length > 0){
+                const index = elements[0].index;
+                const tecnico = labels[index];
+                filtrarPorTecnico(tecnico);
+            }
+        };
     }
 
     const novo = new Chart(document.getElementById(id),{
@@ -466,15 +488,25 @@ function criarGrafico(id,label,labels,data,graficoAtual,salvar){
                 data:data
             }]
         },
-        options:{
-            responsive:true,
-            plugins:{
-                legend:{display:false}
-            }
-        }
+        options:opcoes
     });
 
     salvar(novo);
+}
+
+function filtrarPorTecnico(tecnico){
+    document.getElementById("filtroTecnico").value = tecnico;
+
+    if(!tecnico || tecnico === ""){
+        calcularTotais(dadosGlobais);
+        return;
+    }
+
+    const filtrado = dadosGlobais.filter(linha =>
+        (linha["TÉCNICO DESIGNADO"] || "Não informado") === tecnico
+    );
+
+    calcularTotais(filtrado);
 }
 
 </script>
