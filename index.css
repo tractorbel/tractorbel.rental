@@ -95,9 +95,9 @@ h3{
 }
 
 /* ===== RESPONSIVO INTELIGENTE ===== */
-@media (max-width: 768px){
+@media (max-width: 400px){
     .navbar{
-        justify-content: space-between; /* show hamburger on smaller screens */
+        justify-content: space-between; /* volta para hamburguer */
     }
 
     .menu-toggle{
