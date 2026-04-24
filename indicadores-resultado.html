@@ -583,8 +583,24 @@
     }
 
     function destruirGraficos() {
-      graficos.forEach((g) => g.destroy());
+      graficos.forEach((g) => {
+        if (g && typeof g.destroy === 'function') {
+          g.destroy();
+        }
+      });
       graficos = [];
+
+      // Também destruir gráficos que podem ter sido criados diretamente
+      const canvasIds = ['graficoMes', 'graficoClienteMes', 'graficoEquipamento', 'graficoCliente', 'graficoManutencao', 'graficoDeficit'];
+      canvasIds.forEach(id => {
+        const canvas = document.getElementById(id);
+        if (canvas) {
+          const chart = Chart.getChart(canvas);
+          if (chart) {
+            chart.destroy();
+          }
+        }
+      });
     }
 
     function esconderTodosGraficos() {
@@ -793,7 +809,23 @@
     }
 
     function criarGraficoBarra(canvasId, labels, valores, cor, onClick, horizontal = false, tooltipOriginal = null, datasetLabel = "") {
-      const chart = new Chart(document.getElementById(canvasId), {
+      if (!labels || labels.length === 0 || !valores || valores.length === 0) {
+        return; // Não criar gráfico se não houver dados
+      }
+
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) {
+        console.warn(`Canvas ${canvasId} não encontrado`);
+        return;
+      }
+
+      // Destruir gráfico existente se houver
+      const existingChart = Chart.getChart(canvas);
+      if (existingChart) {
+        existingChart.destroy();
+      }
+
+      const chart = new Chart(canvas, {
         type: "bar",
         data: {
           labels,
@@ -838,7 +870,7 @@
         }
       });
 
-      graficos.push(chart);
+      return chart;
     }
 
     function gerarGraficos(dados) {
@@ -880,33 +912,43 @@
 
       if (!ocultarGraficoEquip && exibirOuOcultarGrafico("cardGraficoEquipamento", fatEquipFiltrado)) {
         const labels = Object.keys(fatEquipFiltrado);
-        criarGraficoBarra("graficoEquipamento", labels, Object.values(fatEquipFiltrado), "#1e88e5", (idx) => {
-          marcarFiltroPorGrafico("filtroEquipamento", labels[idx]);
-        });
+        const valores = Object.values(fatEquipFiltrado);
+        if (labels.length > 0 && valores.length > 0) {
+          criarGraficoBarra("graficoEquipamento", labels, valores, "#1e88e5", (idx) => {
+            marcarFiltroPorGrafico("filtroEquipamento", labels[idx]);
+          });
+        }
       }
 
       if (exibirOuOcultarGrafico("cardGraficoCliente", fatClienteFiltrado)) {
         const labels = Object.keys(fatClienteFiltrado);
-        criarGraficoBarra("graficoCliente", labels, Object.values(fatClienteFiltrado), "#2e7d32", (idx) => {
-          marcarFiltroPorGrafico("filtroCliente", labels[idx]);
-        });
+        const valores = Object.values(fatClienteFiltrado);
+        if (labels.length > 0 && valores.length > 0) {
+          criarGraficoBarra("graficoCliente", labels, valores, "#2e7d32", (idx) => {
+            marcarFiltroPorGrafico("filtroCliente", labels[idx]);
+          });
+        }
       }
 
       if (exibirOuOcultarGrafico("cardGraficoManutencao", manClienteFiltrado)) {
         const labels = Object.keys(manClienteFiltrado);
-        criarGraficoBarra("graficoManutencao", labels, Object.values(manClienteFiltrado), "#fb8c00", (idx) => {
-          marcarFiltroPorGrafico("filtroCliente", labels[idx]);
-        });
+        const valores = Object.values(manClienteFiltrado);
+        if (labels.length > 0 && valores.length > 0) {
+          criarGraficoBarra("graficoManutencao", labels, valores, "#fb8c00", (idx) => {
+            marcarFiltroPorGrafico("filtroCliente", labels[idx]);
+          });
+        }
       }
 
       if (exibirOuOcultarGrafico("cardGraficoDeficit", deficitClienteFiltrado)) {
         const labels = Object.keys(deficitClienteFiltrado);
         const valoresOriginais = Object.values(deficitClienteFiltrado);
         const valoresAbsolutos = valoresOriginais.map((v) => Math.abs(v));
-
-        criarGraficoBarra("graficoDeficit", labels, valoresAbsolutos, "#e53935", (idx) => {
-          marcarFiltroPorGrafico("filtroCliente", labels[idx]);
-        }, true, valoresOriginais);
+        if (labels.length > 0 && valoresAbsolutos.length > 0) {
+          criarGraficoBarra("graficoDeficit", labels, valoresAbsolutos, "#e53935", (idx) => {
+            marcarFiltroPorGrafico("filtroCliente", labels[idx]);
+          }, true, valoresOriginais);
+        }
       }
 
       const mesInicioVal = mesInicio.value;
@@ -1005,9 +1047,7 @@
       } else {
         document.getElementById("cardGraficoClienteMes").style.display = "none";
       }
-
-        document.getElementById("cardGraficoClienteMes").style.display = "none";
-      }
+    }
 
     
     function gerarRelatorio() {
