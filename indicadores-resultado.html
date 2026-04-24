@@ -525,15 +525,14 @@
     </div>
   </div>
 
+  <script src="teste-debug.js"></script>
   <script>
     let dadosGlobais = [];
     let graficos = [];
     let atualizandoFiltros = false;
     const scrollFiltros = {};
-
-    const mesInicio = document.getElementById("mesInicio");
-    const mesFim = document.getElementById("mesFim");
-    const upload = document.getElementById("upload");
+let gerandoRelatorio = false;
+let buscaTimeout = null;
     const btnLimpar = document.getElementById("btnLimpar");
     const statusCarga = document.getElementById("statusCarga");
 
@@ -585,7 +584,11 @@
     function destruirGraficos() {
       graficos.forEach((g) => {
         if (g && typeof g.destroy === 'function') {
-          g.destroy();
+          try {
+            g.destroy();
+          } catch (e) {
+            console.warn('Erro ao destruir gráfico:', e);
+          }
         }
       });
       graficos = [];
@@ -595,9 +598,13 @@
       canvasIds.forEach(id => {
         const canvas = document.getElementById(id);
         if (canvas) {
-          const chart = Chart.getChart(canvas);
-          if (chart) {
-            chart.destroy();
+          try {
+            const chart = Chart.getChart(canvas);
+            if (chart) {
+              chart.destroy();
+            }
+          } catch (e) {
+            console.warn(`Erro ao destruir gráfico ${id}:`, e);
           }
         }
       });
@@ -676,7 +683,12 @@
 
         checkbox.addEventListener("change", () => {
           if (atualizandoFiltros) return;
-          gerarRelatorio();
+
+          // Debounce para evitar chamadas excessivas
+          clearTimeout(checkbox.dataset.timeout);
+          checkbox.dataset.timeout = setTimeout(() => {
+            gerarRelatorio();
+          }, 100);
         });
 
         const span = document.createElement("span");
@@ -717,8 +729,10 @@
     }
 
     function atualizarFiltrosDinamicamente() {
-      salvarScrollFiltros();
+      if (atualizandoFiltros) return;
       atualizandoFiltros = true;
+
+      salvarScrollFiltros();
 
       filtrosIds.forEach((id) => {
         const dadosBase = filtrarDados(id);
@@ -739,8 +753,8 @@
         preencherFiltroLista(id, listaFinal, selecionados);
       });
 
-      atualizandoFiltros = false;
       restaurarScrollFiltros();
+      atualizandoFiltros = false;
     }
 
     function atualizarFiltros() {
@@ -750,23 +764,44 @@
     }
 
     function marcarFiltroPorGrafico(id, valor) {
-      const selecionados = new Set(getMultiValues(id));
-      selecionados.add(valor);
-      aplicarSelecaoFiltro(id, [...selecionados]);
+      if (atualizandoFiltros) return;
+
+      console.log(`Marcando filtro ${id} com valor: ${valor}`);
+      aplicarSelecaoFiltro(id, [valor]);
     }
 
     function aplicarSelecaoFiltro(id, valores) {
+      if (atualizandoFiltros) return;
+
       const container = document.getElementById(id);
       if (!container) return;
 
+      console.log(`Aplicando seleção no filtro ${id}:`, valores);
+
+      // Primeiro, desmarcar todos
       container.querySelectorAll('input[type="checkbox"]').forEach(check => {
-        check.checked = valores.includes(check.value);
+        check.checked = false;
       });
 
-      gerarRelatorio();
+      // Depois, marcar apenas os selecionados
+      valores.forEach(valor => {
+        const checkbox = container.querySelector(`input[type="checkbox"][value="${valor}"]`);
+        if (checkbox) {
+          checkbox.checked = true;
+        }
+      });
+
+      // Aguardar um pouco antes de gerar relatório para evitar loops
+      setTimeout(() => {
+        gerarRelatorio();
+      }, 50);
     }
 
     function limparFiltros() {
+      if (atualizandoFiltros) return;
+
+      console.log('Limpando filtros...');
+
       filtrosIds.forEach((id) => {
         document.querySelectorAll(`#${id} input[type="checkbox"]`).forEach(el => {
           el.checked = false;
@@ -774,7 +809,11 @@
       });
 
       atualizarFiltrosDinamicamente();
-      gerarRelatorio();
+
+      // Aguardar antes de gerar relatório
+      setTimeout(() => {
+        gerarRelatorio();
+      }, 100);
     }
 
     function calcularTotais(dados) {
@@ -809,254 +848,324 @@
     }
 
     function criarGraficoBarra(canvasId, labels, valores, cor, onClick, horizontal = false, tooltipOriginal = null, datasetLabel = "") {
-      if (!labels || labels.length === 0 || !valores || valores.length === 0) {
-        return; // Não criar gráfico se não houver dados
+      // Validações rigorosas
+      if (!labels || !Array.isArray(labels) || labels.length === 0) {
+        console.warn(`Gráfico ${canvasId}: labels inválidos`);
+        return null;
+      }
+
+      if (!valores || !Array.isArray(valores) || valores.length === 0) {
+        console.warn(`Gráfico ${canvasId}: valores inválidos`);
+        return null;
+      }
+
+      if (labels.length !== valores.length) {
+        console.warn(`Gráfico ${canvasId}: labels e valores têm tamanhos diferentes`);
+        return null;
       }
 
       const canvas = document.getElementById(canvasId);
       if (!canvas) {
         console.warn(`Canvas ${canvasId} não encontrado`);
-        return;
+        return null;
       }
 
       // Destruir gráfico existente se houver
-      const existingChart = Chart.getChart(canvas);
-      if (existingChart) {
-        existingChart.destroy();
+      try {
+        const existingChart = Chart.getChart(canvas);
+        if (existingChart) {
+          existingChart.destroy();
+        }
+      } catch (e) {
+        console.warn(`Erro ao destruir gráfico existente em ${canvasId}:`, e);
       }
 
-      const chart = new Chart(canvas, {
-        type: "bar",
-        data: {
-          labels,
-          datasets: [{
-            label: datasetLabel,
-            data: valores,
-            backgroundColor: cor
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          indexAxis: horizontal ? "y" : "x",
-          scales: {
-            y: horizontal ? { beginAtZero: true } : {
-              beginAtZero: true,
-              ticks: { callback: (v) => formatarMoeda(v) }
-            },
-            x: horizontal ? {
-              beginAtZero: true,
-              ticks: { callback: (v) => formatarMoeda(v) }
-            } : {}
+      try {
+        const chart = new Chart(canvas, {
+          type: "bar",
+          data: {
+            labels,
+            datasets: [{
+              label: datasetLabel,
+              data: valores,
+              backgroundColor: cor
+            }]
           },
-          plugins: {
-            legend: { display: !!datasetLabel },
-            tooltip: {
-              callbacks: {
-                label: (ctx) => {
-                  const valor = tooltipOriginal ? tooltipOriginal[ctx.dataIndex] : ctx.raw;
-                  return datasetLabel
-                    ? `${datasetLabel}: ${formatarMoeda(valor)}`
-                    : formatarMoeda(valor);
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: horizontal ? "y" : "x",
+            scales: {
+              y: horizontal ? { beginAtZero: true } : {
+                beginAtZero: true,
+                ticks: { callback: (v) => formatarMoeda(v) }
+              },
+              x: horizontal ? {
+                beginAtZero: true,
+                ticks: { callback: (v) => formatarMoeda(v) }
+              } : {}
+            },
+            plugins: {
+              legend: { display: !!datasetLabel },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => {
+                    const valor = tooltipOriginal ? tooltipOriginal[ctx.dataIndex] : ctx.raw;
+                    return datasetLabel
+                      ? `${datasetLabel}: ${formatarMoeda(valor)}`
+                      : formatarMoeda(valor);
+                  }
+                }
+              }
+            },
+            onClick: (evt, elements) => {
+              if (elements.length > 0 && typeof onClick === "function") {
+                try {
+                  onClick(elements[0].index);
+                } catch (e) {
+                  console.warn(`Erro no onClick do gráfico ${canvasId}:`, e);
                 }
               }
             }
-          },
-          onClick: (evt, elements) => {
-            if (elements.length > 0 && typeof onClick === "function") {
-              onClick(elements[0].index);
-            }
           }
-        }
-      });
+        });
 
-      return chart;
+        graficos.push(chart);
+        return chart;
+      } catch (e) {
+        console.error(`Erro ao criar gráfico ${canvasId}:`, e);
+        return null;
+      }
     }
 
     function gerarGraficos(dados) {
-      destruirGraficos();
-      esconderTodosGraficos();
+      try {
+        destruirGraficos();
+        esconderTodosGraficos();
 
-      const patrimonioSelecionado = getMultiValues("filtroPatrimonio");
-      const serieSelecionada = getMultiValues("filtroSerie");
-      const ocultarGraficoEquip = patrimonioSelecionado.length === 1 || serieSelecionada.length === 1;
-
-      const fatEquip = {};
-      const fatCliente = {};
-      const manCliente = {};
-      const deficitCliente = {};
-
-      dados.forEach((d) => {
-        if (d.equipamento) {
-          fatEquip[d.equipamento] = (fatEquip[d.equipamento] || 0) + d.faturamento;
+        if (!dados || !Array.isArray(dados) || dados.length === 0) {
+          console.warn('Nenhum dado para gerar gráficos');
+          return;
         }
 
-        if (d.cliente) {
-          fatCliente[d.cliente] = (fatCliente[d.cliente] || 0) + d.faturamento;
-          manCliente[d.cliente] = (manCliente[d.cliente] || 0) + d.manutencao;
-          if (d.resultado < 0) {
-            deficitCliente[d.cliente] = (deficitCliente[d.cliente] || 0) + d.resultado;
+        const patrimonioSelecionado = getMultiValues("filtroPatrimonio");
+        const serieSelecionada = getMultiValues("filtroSerie");
+        const ocultarGraficoEquip = patrimonioSelecionado.length === 1 || serieSelecionada.length === 1;
+
+        const fatEquip = {};
+        const fatCliente = {};
+        const manCliente = {};
+        const deficitCliente = {};
+
+        dados.forEach((d) => {
+          if (!d) return;
+
+          if (d.equipamento && typeof d.equipamento === 'string' && d.equipamento.trim()) {
+            fatEquip[d.equipamento.trim()] = (fatEquip[d.equipamento.trim()] || 0) + (d.faturamento || 0);
+          }
+
+          if (d.cliente && typeof d.cliente === 'string' && d.cliente.trim()) {
+            const cliente = d.cliente.trim();
+            fatCliente[cliente] = (fatCliente[cliente] || 0) + (d.faturamento || 0);
+            manCliente[cliente] = (manCliente[cliente] || 0) + (d.manutencao || 0);
+            if ((d.resultado || 0) < 0) {
+              deficitCliente[cliente] = (deficitCliente[cliente] || 0) + (d.resultado || 0);
+            }
+          }
+        });
+
+        const filtrarPositivos = (obj) =>
+          Object.fromEntries(Object.entries(obj).filter(([, v]) => v > 0));
+
+        const fatEquipFiltrado = filtrarPositivos(fatEquip);
+        const fatClienteFiltrado = filtrarPositivos(fatCliente);
+        const manClienteFiltrado = filtrarPositivos(manCliente);
+        const deficitClienteFiltrado = Object.fromEntries(
+          Object.entries(deficitCliente).filter(([, v]) => v < 0)
+        );
+
+        // Gráfico de Equipamento
+        if (!ocultarGraficoEquip && exibirOuOcultarGrafico("cardGraficoEquipamento", fatEquipFiltrado)) {
+          const labels = Object.keys(fatEquipFiltrado);
+          const valores = Object.values(fatEquipFiltrado);
+          if (labels.length > 0 && valores.length > 0) {
+            criarGraficoBarra("graficoEquipamento", labels, valores, "#1e88e5", (idx) => {
+              marcarFiltroPorGrafico("filtroEquipamento", labels[idx]);
+            });
           }
         }
-      });
 
-      const filtrarPositivos = (obj) =>
-        Object.fromEntries(Object.entries(obj).filter(([, v]) => v > 0));
-
-      const fatEquipFiltrado = filtrarPositivos(fatEquip);
-      const fatClienteFiltrado = filtrarPositivos(fatCliente);
-      const manClienteFiltrado = filtrarPositivos(manCliente);
-      const deficitClienteFiltrado = Object.fromEntries(
-        Object.entries(deficitCliente).filter(([, v]) => v < 0)
-      );
-
-      if (!ocultarGraficoEquip && exibirOuOcultarGrafico("cardGraficoEquipamento", fatEquipFiltrado)) {
-        const labels = Object.keys(fatEquipFiltrado);
-        const valores = Object.values(fatEquipFiltrado);
-        if (labels.length > 0 && valores.length > 0) {
-          criarGraficoBarra("graficoEquipamento", labels, valores, "#1e88e5", (idx) => {
-            marcarFiltroPorGrafico("filtroEquipamento", labels[idx]);
-          });
+        // Gráfico de Cliente (Faturamento)
+        if (exibirOuOcultarGrafico("cardGraficoCliente", fatClienteFiltrado)) {
+          const labels = Object.keys(fatClienteFiltrado);
+          const valores = Object.values(fatClienteFiltrado);
+          if (labels.length > 0 && valores.length > 0) {
+            criarGraficoBarra("graficoCliente", labels, valores, "#2e7d32", (idx) => {
+              marcarFiltroPorGrafico("filtroCliente", labels[idx]);
+            });
+          }
         }
-      }
 
-      if (exibirOuOcultarGrafico("cardGraficoCliente", fatClienteFiltrado)) {
-        const labels = Object.keys(fatClienteFiltrado);
-        const valores = Object.values(fatClienteFiltrado);
-        if (labels.length > 0 && valores.length > 0) {
-          criarGraficoBarra("graficoCliente", labels, valores, "#2e7d32", (idx) => {
-            marcarFiltroPorGrafico("filtroCliente", labels[idx]);
-          });
+        // Gráfico de Manutenção
+        if (exibirOuOcultarGrafico("cardGraficoManutencao", manClienteFiltrado)) {
+          const labels = Object.keys(manClienteFiltrado);
+          const valores = Object.values(manClienteFiltrado);
+          if (labels.length > 0 && valores.length > 0) {
+            criarGraficoBarra("graficoManutencao", labels, valores, "#fb8c00", (idx) => {
+              marcarFiltroPorGrafico("filtroCliente", labels[idx]);
+            });
+          }
         }
-      }
 
-      if (exibirOuOcultarGrafico("cardGraficoManutencao", manClienteFiltrado)) {
-        const labels = Object.keys(manClienteFiltrado);
-        const valores = Object.values(manClienteFiltrado);
-        if (labels.length > 0 && valores.length > 0) {
-          criarGraficoBarra("graficoManutencao", labels, valores, "#fb8c00", (idx) => {
-            marcarFiltroPorGrafico("filtroCliente", labels[idx]);
-          });
+        // Gráfico de Déficit
+        if (exibirOuOcultarGrafico("cardGraficoDeficit", deficitClienteFiltrado)) {
+          const labels = Object.keys(deficitClienteFiltrado);
+          const valoresOriginais = Object.values(deficitClienteFiltrado);
+          const valoresAbsolutos = valoresOriginais.map((v) => Math.abs(v));
+          if (labels.length > 0 && valoresAbsolutos.length > 0) {
+            criarGraficoBarra("graficoDeficit", labels, valoresAbsolutos, "#e53935", (idx) => {
+              marcarFiltroPorGrafico("filtroCliente", labels[idx]);
+            }, true, valoresOriginais);
+          }
         }
-      }
 
-      if (exibirOuOcultarGrafico("cardGraficoDeficit", deficitClienteFiltrado)) {
-        const labels = Object.keys(deficitClienteFiltrado);
-        const valoresOriginais = Object.values(deficitClienteFiltrado);
-        const valoresAbsolutos = valoresOriginais.map((v) => Math.abs(v));
-        if (labels.length > 0 && valoresAbsolutos.length > 0) {
-          criarGraficoBarra("graficoDeficit", labels, valoresAbsolutos, "#e53935", (idx) => {
-            marcarFiltroPorGrafico("filtroCliente", labels[idx]);
-          }, true, valoresOriginais);
-        }
-      }
+        // Gráfico por Mês (para patrimônio/série específica)
+        const mesInicioVal = mesInicio.value;
+        const mesFimVal = mesFim.value;
+        const mostrarGraficoMes =
+          (patrimonioSelecionado.length === 1 || serieSelecionada.length === 1) &&
+          mesInicioVal &&
+          mesFimVal;
 
-      const mesInicioVal = mesInicio.value;
-      const mesFimVal = mesFim.value;
-      const mostrarGraficoMes =
-        (patrimonioSelecionado.length === 1 || serieSelecionada.length === 1) &&
-        mesInicioVal &&
-        mesFimVal;
+        if (mostrarGraficoMes) {
+          const dtIni = new Date(mesInicioVal + "-01T00:00:00");
+          const dtFim = new Date(mesFimVal + "-01T00:00:00");
 
-            if (mostrarGraficoMes) {
-        const dtIni = new Date(mesInicioVal + "-01T00:00:00");
-        const dtFim = new Date(mesFimVal + "-01T00:00:00");
+          const mesesNoPeriodo =
+            (dtFim.getFullYear() - dtIni.getFullYear()) * 12 +
+            (dtFim.getMonth() - dtIni.getMonth()) + 1;
 
-        const mesesNoPeriodo =
-          (dtFim.getFullYear() - dtIni.getFullYear()) * 12 +
-          (dtFim.getMonth() - dtIni.getMonth()) + 1;
+          if (mesesNoPeriodo > 1) {
+            const faturamentoMes = {};
 
-        if (mesesNoPeriodo > 1) {
-          const faturamentoMes = {};
+            dados.forEach((d) => {
+              if (d.data && d.data instanceof Date) {
+                const chaveMes = `${d.data.getFullYear()}-${String(d.data.getMonth() + 1).padStart(2, "0")}`;
+                faturamentoMes[chaveMes] = (faturamentoMes[chaveMes] || 0) + (d.faturamento || 0);
+              }
+            });
 
-          dados.forEach((d) => {
-            const chaveMes = `${d.data.getFullYear()}-${String(d.data.getMonth() + 1).padStart(2, "0")}`;
-            faturamentoMes[chaveMes] = (faturamentoMes[chaveMes] || 0) + d.faturamento;
-          });
+            const labelsMes = Object.keys(faturamentoMes).sort();
+            const valoresMes = labelsMes.map((mes) => faturamentoMes[mes]);
+            const temValorMes = valoresMes.some((valor) => valor !== 0);
 
-          const labelsMes = Object.keys(faturamentoMes).sort();
-          const valoresMes = labelsMes.map((mes) => faturamentoMes[mes]);
-          const temValorMes = valoresMes.some((valor) => valor !== 0);
-
-          if (labelsMes.length > 0 && temValorMes) {
-            document.getElementById("cardGraficoMes").style.display = "block";
-            criarGraficoBarra(
-              "graficoMes",
-              labelsMes,
-              valoresMes,
-              "#8e24aa",
-              null,
-              false,
-              null,
-              "Faturamento"
-            );
+            if (labelsMes.length > 0 && temValorMes) {
+              document.getElementById("cardGraficoMes").style.display = "block";
+              criarGraficoBarra(
+                "graficoMes",
+                labelsMes,
+                valoresMes,
+                "#8e24aa",
+                null,
+                false,
+                null,
+                "Faturamento"
+              );
+            } else {
+              document.getElementById("cardGraficoMes").style.display = "none";
+            }
           } else {
             document.getElementById("cardGraficoMes").style.display = "none";
           }
         } else {
           document.getElementById("cardGraficoMes").style.display = "none";
         }
-      } else {
-        document.getElementById("cardGraficoMes").style.display = "none";
-      }
-            const clienteSelecionado = getMultiValues("filtroCliente");
-      const mostrarGraficoClienteMes =
-        clienteSelecionado.length === 1 &&
-        mesInicioVal &&
-        mesFimVal;
 
-            if (mostrarGraficoClienteMes) {
-        const dtIniCliente = new Date(mesInicioVal + "-01T00:00:00");
-        const dtFimCliente = new Date(mesFimVal + "-01T00:00:00");
+        // Gráfico Cliente x Mês
+        const clienteSelecionado = getMultiValues("filtroCliente");
+        const mostrarGraficoClienteMes =
+          clienteSelecionado.length === 1 &&
+          mesInicioVal &&
+          mesFimVal;
 
-        const mesesNoPeriodoCliente =
-          (dtFimCliente.getFullYear() - dtIniCliente.getFullYear()) * 12 +
-          (dtFimCliente.getMonth() - dtIniCliente.getMonth()) + 1;
+        if (mostrarGraficoClienteMes) {
+          const dtIniCliente = new Date(mesInicioVal + "-01T00:00:00");
+          const dtFimCliente = new Date(mesFimVal + "-01T00:00:00");
 
-        if (mesesNoPeriodoCliente > 1) {
-          const faturamentoClienteMes = {};
+          const mesesNoPeriodoCliente =
+            (dtFimCliente.getFullYear() - dtIniCliente.getFullYear()) * 12 +
+            (dtFimCliente.getMonth() - dtIniCliente.getMonth()) + 1;
 
-          dados.forEach((d) => {
-            const chaveMes = `${d.data.getFullYear()}-${String(d.data.getMonth() + 1).padStart(2, "0")}`;
-            faturamentoClienteMes[chaveMes] = (faturamentoClienteMes[chaveMes] || 0) + d.faturamento;
-          });
+          if (mesesNoPeriodoCliente > 1) {
+            const faturamentoClienteMes = {};
 
-          const labelsClienteMes = Object.keys(faturamentoClienteMes).sort();
-          const valoresClienteMes = labelsClienteMes.map((mes) => faturamentoClienteMes[mes]);
-          const temValorClienteMes = valoresClienteMes.some((valor) => valor !== 0);
+            dados.forEach((d) => {
+              if (d.data && d.data instanceof Date) {
+                const chaveMes = `${d.data.getFullYear()}-${String(d.data.getMonth() + 1).padStart(2, "0")}`;
+                faturamentoClienteMes[chaveMes] = (faturamentoClienteMes[chaveMes] || 0) + (d.faturamento || 0);
+              }
+            });
 
-          if (labelsClienteMes.length > 0 && temValorClienteMes) {
-            document.getElementById("cardGraficoClienteMes").style.display = "block";
+            const labelsClienteMes = Object.keys(faturamentoClienteMes).sort();
+            const valoresClienteMes = labelsClienteMes.map((mes) => faturamentoClienteMes[mes]);
+            const temValorClienteMes = valoresClienteMes.some((valor) => valor !== 0);
 
-            criarGraficoBarra(
-              "graficoClienteMes",
-              labelsClienteMes,
-              valoresClienteMes,
-              "#1565c0",
-              null,
-              false,
-              null,
-              "Faturamento"
-            );
+            if (labelsClienteMes.length > 0 && temValorClienteMes) {
+              document.getElementById("cardGraficoClienteMes").style.display = "block";
+              criarGraficoBarra(
+                "graficoClienteMes",
+                labelsClienteMes,
+                valoresClienteMes,
+                "#1565c0",
+                null,
+                false,
+                null,
+                "Faturamento"
+              );
+            } else {
+              document.getElementById("cardGraficoClienteMes").style.display = "none";
+            }
           } else {
             document.getElementById("cardGraficoClienteMes").style.display = "none";
           }
         } else {
           document.getElementById("cardGraficoClienteMes").style.display = "none";
         }
-      } else {
-        document.getElementById("cardGraficoClienteMes").style.display = "none";
+
+      } catch (e) {
+        console.error('Erro ao gerar gráficos:', e);
       }
     }
 
     
     function gerarRelatorio() {
-      if (!dadosGlobais.length) return;
-      atualizarFiltrosDinamicamente();
-      const dadosFiltrados = filtrarDados();
-      calcularTotais(dadosFiltrados);
-      gerarGraficos(dadosFiltrados);
-      btnLimpar.style.display = existeFiltroAtivo() ? "inline-block" : "none";
+      if (!dadosGlobais.length) {
+        console.warn('Nenhum dado global disponível');
+        return;
+      }
+
+      if (gerandoRelatorio) {
+        console.warn('Relatório já está sendo gerado, ignorando chamada');
+        return;
+      }
+
+      gerandoRelatorio = true;
+      console.log('Iniciando geração de relatório...');
+
+      try {
+        const dadosFiltrados = filtrarDados();
+        console.log(`Dados filtrados: ${dadosFiltrados.length} registros`);
+
+        calcularTotais(dadosFiltrados);
+        gerarGraficos(dadosFiltrados);
+        btnLimpar.style.display = existeFiltroAtivo() ? "inline-block" : "none";
+
+        console.log('Relatório gerado com sucesso');
+      } catch (e) {
+        console.error('Erro ao gerar relatório:', e);
+      } finally {
+        gerandoRelatorio = false;
+      }
     }
 
     function sugerirPeriodoInicial() {
@@ -1140,7 +1249,12 @@
             const buscaId = "busca" + id.charAt(0).toUpperCase() + id.slice(1);
             const inputBusca = document.getElementById(buscaId);
             if (inputBusca && !inputBusca.dataset.binded) {
-              inputBusca.addEventListener("input", () => atualizarFiltrosDinamicamente());
+              inputBusca.addEventListener("input", () => {
+                clearTimeout(buscaTimeout);
+                buscaTimeout = setTimeout(() => {
+                  gerarRelatorio();
+                }, 300);
+              });
               inputBusca.dataset.binded = "1";
             }
           });
