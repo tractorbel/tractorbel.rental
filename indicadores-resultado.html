@@ -198,18 +198,17 @@
     canvas {
       width: 100% !important;
       max-width: 100%;
-      height: auto !important;
+      height: 400px !important;
+      max-height: 400px !important;
       cursor: pointer;
-    }
-
-    #acoes-filtros {
-      text-align: right;
-      margin: 10px 0 16px;
+      display: block !important;
     }
 
     .grafico-card {
       display: none;
       width: 100%;
+      overflow: hidden !important;
+      contain: layout style paint !important;
     }
 
     .graficos {
@@ -527,12 +526,9 @@
 
   <script src="teste-debug.js"></script>
   <script>
-    let dadosGlobais = [];
-    let graficos = [];
-    let atualizandoFiltros = false;
-    const scrollFiltros = {};
-let gerandoRelatorio = false;
-let buscaTimeout = null;
+    let dadosGraficosCache = {};
+    let gerandoRelatorio = false;
+    let buscaTimeout = null;
     const btnLimpar = document.getElementById("btnLimpar");
     const statusCarga = document.getElementById("statusCarga");
 
@@ -797,7 +793,10 @@ let buscaTimeout = null;
       }, 50);
     }
 
-    function limparFiltros() {
+    function limparCacheGraficos() {
+      dadosGraficosCache = {};
+      console.log('🗑️ Cache de gráficos limpo');
+    }
       if (atualizandoFiltros) return;
 
       console.log('Limpando filtros...');
@@ -894,6 +893,16 @@ let buscaTimeout = null;
           options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: {
+              duration: 0 // Desabilitar animações que podem causar scroll
+            },
+            transitions: {
+              active: {
+                animation: {
+                  duration: 0
+                }
+              }
+            },
             indexAxis: horizontal ? "y" : "x",
             scales: {
               y: horizontal ? { beginAtZero: true } : {
@@ -930,6 +939,10 @@ let buscaTimeout = null;
           }
         });
 
+        // Prevenir scroll automático causado pelo gráfico
+        canvas.style.height = '400px';
+        canvas.style.maxHeight = '400px';
+
         graficos.push(chart);
         return chart;
       } catch (e) {
@@ -940,13 +953,38 @@ let buscaTimeout = null;
 
     function gerarGraficos(dados) {
       try {
-        destruirGraficos();
-        esconderTodosGraficos();
-
         if (!dados || !Array.isArray(dados) || dados.length === 0) {
           console.warn('Nenhum dado para gerar gráficos');
           return;
         }
+
+        // Criar hash dos dados para verificar se mudou
+        const dadosHash = JSON.stringify(dados.map(d => ({
+          equipamento: d.equipamento,
+          cliente: d.cliente,
+          faturamento: d.faturamento,
+          manutencao: d.manutencao,
+          resultado: d.resultado,
+          data: d.data ? d.data.toISOString() : null
+        })));
+
+        // Se os dados não mudaram, não recriar gráficos
+        if (dadosGraficosCache.hash === dadosHash && dadosGraficosCache.dados) {
+          console.log('📊 Dados não mudaram, mantendo gráficos existentes');
+          return;
+        }
+
+        console.log('📊 Dados mudaram, recriando gráficos...');
+
+        // Prevenir scroll durante criação dos gráficos
+        const originalScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        document.body.style.overflow = 'hidden';
+
+        destruirGraficos();
+        esconderTodosGraficos();
+
+        dadosGraficosCache.hash = dadosHash;
+        dadosGraficosCache.dados = dados;
 
         const patrimonioSelecionado = getMultiValues("filtroPatrimonio");
         const serieSelecionada = getMultiValues("filtroSerie");
@@ -1132,8 +1170,17 @@ let buscaTimeout = null;
           document.getElementById("cardGraficoClienteMes").style.display = "none";
         }
 
+        // Restaurar scroll após criação dos gráficos
+        setTimeout(() => {
+          document.body.style.overflow = '';
+          window.scrollTo(0, originalScrollTop);
+          console.log('✅ Gráficos criados, scroll restaurado');
+        }, 100);
+
       } catch (e) {
         console.error('Erro ao gerar gráficos:', e);
+        // Garantir que o scroll seja restaurado mesmo em caso de erro
+        document.body.style.overflow = '';
       }
     }
 
@@ -1186,6 +1233,9 @@ let buscaTimeout = null;
 
       btnLimpar.style.display = "none";
       statusCarga.innerText = "Carregando planilha...";
+
+      // Limpar cache de gráficos ao carregar nova planilha
+      limparCacheGraficos();
 
       const reader = new FileReader();
 
