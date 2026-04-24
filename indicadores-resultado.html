@@ -847,19 +847,25 @@
     }
 
     function criarGraficoBarra(canvasId, labels, valores, cor, onClick, horizontal = false, tooltipOriginal = null, datasetLabel = "") {
-      // Validações rigorosas
-      if (!labels || !Array.isArray(labels) || labels.length === 0) {
-        console.warn(`Gráfico ${canvasId}: labels inválidos`);
+      // Validações mais flexíveis para debug
+      if (!labels || !Array.isArray(labels)) {
+        console.warn(`Gráfico ${canvasId}: labels inválidos`, labels);
         return null;
       }
 
-      if (!valores || !Array.isArray(valores) || valores.length === 0) {
-        console.warn(`Gráfico ${canvasId}: valores inválidos`);
+      if (!valores || !Array.isArray(valores)) {
+        console.warn(`Gráfico ${canvasId}: valores inválidos`, valores);
+        return null;
+      }
+
+      // Permitir gráficos com dados vazios para debug
+      if (labels.length === 0 || valores.length === 0) {
+        console.log(`Gráfico ${canvasId}: sem dados para exibir`);
         return null;
       }
 
       if (labels.length !== valores.length) {
-        console.warn(`Gráfico ${canvasId}: labels e valores têm tamanhos diferentes`);
+        console.warn(`Gráfico ${canvasId}: labels (${labels.length}) e valores (${valores.length}) têm tamanhos diferentes`);
         return null;
       }
 
@@ -868,6 +874,8 @@
         console.warn(`Canvas ${canvasId} não encontrado`);
         return null;
       }
+
+      console.log(`📊 Criando gráfico ${canvasId} com ${labels.length} itens`);
 
       // Destruir gráfico existente se houver
       try {
@@ -944,9 +952,10 @@
         canvas.style.maxHeight = '400px';
 
         graficos.push(chart);
+        console.log(`✅ Gráfico ${canvasId} criado com sucesso`);
         return chart;
       } catch (e) {
-        console.error(`Erro ao criar gráfico ${canvasId}:`, e);
+        console.error(`❌ Erro ao criar gráfico ${canvasId}:`, e);
         return null;
       }
     }
@@ -976,9 +985,9 @@
 
         console.log('📊 Dados mudaram, recriando gráficos...');
 
-        // Prevenir scroll durante criação dos gráficos
-        const originalScrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        document.body.style.overflow = 'hidden';
+        // REMOVIDO: Bloqueio de scroll temporariamente para debug
+        // const originalScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        // document.body.style.overflow = 'hidden';
 
         destruirGraficos();
         esconderTodosGraficos();
@@ -1170,46 +1179,55 @@
           document.getElementById("cardGraficoClienteMes").style.display = "none";
         }
 
-        // Restaurar scroll após criação dos gráficos
-        setTimeout(() => {
-          document.body.style.overflow = '';
-          window.scrollTo(0, originalScrollTop);
-          console.log('✅ Gráficos criados, scroll restaurado');
-        }, 100);
+        // REMOVIDO: Restauração de scroll temporariamente para debug
+        // setTimeout(() => {
+        //   document.body.style.overflow = '';
+        //   window.scrollTo(0, originalScrollTop);
+        //   console.log('✅ Gráficos criados, scroll restaurado');
+        // }, 100);
 
       } catch (e) {
         console.error('Erro ao gerar gráficos:', e);
-        // Garantir que o scroll seja restaurado mesmo em caso de erro
-        document.body.style.overflow = '';
+        // REMOVIDO: Restauração de scroll em caso de erro
+        // document.body.style.overflow = '';
       }
     }
 
     
     function gerarRelatorio() {
+      console.log('🔄 gerarRelatorio() chamado');
+
       if (!dadosGlobais.length) {
-        console.warn('Nenhum dado global disponível');
+        console.warn('⚠️ Nenhum dado global disponível');
         return;
       }
 
       if (gerandoRelatorio) {
-        console.warn('Relatório já está sendo gerado, ignorando chamada');
+        console.warn('⚠️ Relatório já está sendo gerado, ignorando chamada');
         return;
       }
 
       gerandoRelatorio = true;
-      console.log('Iniciando geração de relatório...');
+      console.log('📋 Iniciando geração de relatório...');
 
       try {
         const dadosFiltrados = filtrarDados();
-        console.log(`Dados filtrados: ${dadosFiltrados.length} registros`);
+        console.log(`📊 Dados filtrados: ${dadosFiltrados.length} registros`);
 
         calcularTotais(dadosFiltrados);
-        gerarGraficos(dadosFiltrados);
-        btnLimpar.style.display = existeFiltroAtivo() ? "inline-block" : "none";
+        console.log('💰 Totais calculados');
 
-        console.log('Relatório gerado com sucesso');
+        gerarGraficos(dadosFiltrados);
+        console.log('📈 Gráficos gerados');
+
+        btnLimpar.style.display = existeFiltroAtivo() ? "inline-block" : "none";
+        console.log('🧹 Botão limpar atualizado');
+
+        console.log('✅ Relatório gerado com sucesso');
       } catch (e) {
-        console.error('Erro ao gerar relatório:', e);
+        console.error('❌ Erro ao gerar relatório:', e);
+        // Tentar recuperar o estado
+        gerandoRelatorio = false;
       } finally {
         gerandoRelatorio = false;
       }
@@ -1229,8 +1247,12 @@
     }
 
     function carregarDados(file) {
-      if (!file) return;
+      if (!file) {
+        console.error('Nenhum arquivo fornecido');
+        return;
+      }
 
+      console.log('📁 Iniciando carregamento da planilha:', file.name);
       btnLimpar.style.display = "none";
       statusCarga.innerText = "Carregando planilha...";
 
@@ -1240,11 +1262,14 @@
       const reader = new FileReader();
 
       reader.onload = function (e) {
+        console.log('📖 Arquivo lido, processando dados...');
         try {
           const data = new Uint8Array(e.target.result);
           const workbook = XLSX.read(data, { type: "array" });
           const sheet = workbook.Sheets[workbook.SheetNames[0]];
           const json = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+
+          console.log(`📊 Planilha carregada: ${json.length} linhas encontradas`);
 
           dadosGlobais = [];
 
@@ -1284,6 +1309,8 @@
             });
           }
 
+          console.log(`✅ ${dadosGlobais.length} registros válidos processados`);
+
           if (!dadosGlobais.length) {
             statusCarga.innerText = "Nenhum dado válido encontrado.";
             return;
@@ -1309,6 +1336,7 @@
             }
           });
 
+          console.log('🚀 Gerando relatório inicial...');
           gerarRelatorio();
 
           statusCarga.innerText = "Dados carregados com sucesso.";
@@ -1316,9 +1344,14 @@
             statusCarga.innerText = "";
           }, 2000);
         } catch (error) {
-          console.error(error);
+          console.error('❌ Erro ao processar planilha:', error);
           statusCarga.innerText = "Erro ao carregar planilha.";
         }
+      };
+
+      reader.onerror = function(e) {
+        console.error('❌ Erro ao ler arquivo:', e);
+        statusCarga.innerText = "Erro ao ler arquivo.";
       };
 
       reader.readAsArrayBuffer(file);
