@@ -198,7 +198,7 @@
 
     .graficos {
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
       gap: 20px;
       margin-bottom: 20px;
     }
@@ -412,8 +412,12 @@
 let dadosGlobais = [];
 let grafico, g1, g2, g3, g4, g5, g6;
 let selectedTipo = "";
+let atualizandoFiltros = false;
 
 function aplicarFiltros(){
+    if(atualizandoFiltros) return;
+    atualizandoFiltros = true;
+
     const tecnico = document.getElementById("filtroTecnico").value;
     const solicitante = document.getElementById("filtroSolicitante").value;
     let filtrado = dadosGlobais;
@@ -438,6 +442,8 @@ function aplicarFiltros(){
 
     calcularTotais(filtrado);
     popularFiltro(dadosGlobais);
+
+    atualizandoFiltros = false;
 }
 
 function atualizarOpcoesFiltros(dadosFiltrados){
@@ -494,11 +500,15 @@ document.getElementById('upload').addEventListener('change', function(e){
 });
 
 document.getElementById("filtroTecnico").addEventListener("change", function(){
-    aplicarFiltros();
+    if(!atualizandoFiltros){
+        aplicarFiltros();
+    }
 });
 
 document.getElementById("filtroSolicitante").addEventListener("change", function(){
-    aplicarFiltros();
+    if(!atualizandoFiltros){
+        aplicarFiltros();
+    }
 });
 
 function popularFiltro(dadosGlobaisParaOpcoes){
@@ -523,6 +533,11 @@ function popularFiltro(dadosGlobaisParaOpcoes){
         selectTecnico.innerHTML += `<option value="${t}" ${t === tecnicoAtual ? 'selected' : ''}>${t}</option>`;
     });
 
+    // Se o técnico atual não estiver nas opções, limpar
+    if(tecnicoAtual && !tecnicos.includes(tecnicoAtual)){
+        selectTecnico.value = '';
+    }
+
     // Opções de solicitante: filtrar por técnico se selecionado
     let dadosParaSolicitante = dadosGlobaisParaOpcoes;
     if(tecnicoAtual){
@@ -536,6 +551,11 @@ function popularFiltro(dadosGlobaisParaOpcoes){
     solicitantes.forEach(s => {
         selectSolicitante.innerHTML += `<option value="${s}" ${s === solicitanteAtual ? 'selected' : ''}>${s}</option>`;
     });
+
+    // Se o solicitante atual não estiver nas opções, limpar
+    if(solicitanteAtual && !solicitantes.includes(solicitanteAtual)){
+        selectSolicitante.value = '';
+    }
 }
 
 function toHoras(valor){
