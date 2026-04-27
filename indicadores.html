@@ -17,6 +17,7 @@
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
+      padding-top: 70px;
       background: #f5f7f9;
       color: #222;
     }
@@ -106,51 +107,44 @@
       cursor: pointer;
     }
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 8px;
-      position: sticky;
-      top: 0;
-<<<<<<< HEAD
-      z-index: 20;
-=======
-      z-index: 10;
->>>>>>> parent of 246311b (aa)
-      background: #f5f7f9;
-      padding: 8px 10px 10px;
-      margin-bottom: 14px;
-      border-bottom: 1px solid rgba(46, 125, 50, 0.12);
-      max-height: 240px;
-      overflow-y: auto;
-    }
+.cards {
+  display: none;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #f5f7f9;
+  padding: 14px 10px 10px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid rgba(46, 125, 50, 0.12);
+}
+
 
     .card {
       background: #ffffff;
       border-radius: 10px;
-      padding: 10px;
-      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+      padding: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
       border-left: 6px solid #2e7d32;
-      margin-bottom: 8px;
-      width: 100%;
-      min-height: 100px;
+      margin-bottom: 12px;
     }
 
     .card h3,
     .card h4 {
-      margin: 0 0 6px 0;
+      margin: 0 0 8px 0;
       color: #333;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
     }
 
     .card h4 {
-      font-size: 12px;
+      font-size: 13px;
       color: #555;
     }
 
     .card .total {
-      font-size: 16px;
+      font-size: 18px;
       font-weight: bold;
       color: #2e7d32;
       margin-top: 4px;
@@ -160,8 +154,6 @@
       width: 100%;
       font-size: 12px;
       border-collapse: collapse;
-      max-height: 170px;
-      overflow: hidden;
     }
 
     .card table th,
@@ -177,23 +169,8 @@
       background: #f5f7f9;
     }
 
-    .card tbody tr {
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
-
-    .card tbody tr:hover {
-      background: #eef7ec;
-    }
-
-    .card tbody tr.selected {
-      background: #d9f2dc;
-    }
-
     canvas {
-      width: 100% !important;
-      max-width: 100%;
-      height: auto !important;
+      max-height: 280px;
       cursor: pointer;
     }
 
@@ -201,24 +178,10 @@
       cursor: pointer;
     }
 
-    .grafico-card {
-      width: 100%;
-      min-height: 360px;
-      max-height: 520px;
-      overflow: hidden;
-      padding: 12px;
-    }
+.grafico-card {
+  display: none;
+}
 
-    .graficos {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-      gap: 16px;
-      margin-bottom: 16px;
-    }
-
-    .grafico-card canvas {
-      min-height: 280px;
-    }
 
     .logo-topo {
       display: flex;
@@ -240,12 +203,12 @@
         margin: 12px;
       }
 
-      .topo-controles {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      .cards {
+        position: static;
       }
 
-      .graficos {
-        grid-template-columns: 1fr;
+      .topo-controles {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       }
     }
 
@@ -348,7 +311,7 @@
         <li><a href="indicadores.html">KPI MANUT.</a></li>
         <li><a href="indicadores-resultado.html">KPI FINAN.</a></li>
         <li><a href="veiculos.html">KPI VEICULOS</a></li>
-        <li style="margin-left: auto;"><a href="#" onclick="logout(); return false;" class="logout-btn">SAIR</a></li>
+        <li><a href="#" onclick="logout(); return false;" class="logout-btn">SAIR</a></li>
     </ul>
 </nav>
 
@@ -364,13 +327,6 @@
   <div class="filtro-box">
     <label class="titulo-filtro" for="filtroTecnico">Filtrar por Técnico</label>
     <select id="filtroTecnico" class="filtro-seletor">
-      <option value="">Todos</option>
-    </select>
-  </div>
-
-  <div class="filtro-box">
-    <label class="titulo-filtro" for="filtroSolicitante">Filtrar por Cliente</label>
-    <select id="filtroSolicitante" class="filtro-seletor">
       <option value="">Todos</option>
     </select>
   </div>
@@ -407,94 +363,23 @@
 </div>
 </div>
 
-<div class="graficos">
-  <div class="card grafico-card">
-    <h3>Total de atendimento por Técnico</h3>
-    <canvas id="graficoTecnico"></canvas>
-  </div>
-
-  <div class="card grafico-card"><h3>Total de atendimento por Cliente</h3><canvas id="graficoSolicitante"></canvas></div>
-
-  <div class="card grafico-card"><h3>Total de Horas x Horas Úteis</h3><canvas id="graficoTotalHoras"></canvas></div>
-  <div class="card grafico-card"><h3>Horas Trabalhadas</h3><canvas id="graficoTrabalhadas"></canvas></div>
-  <div class="card grafico-card"><h3>Horas Aguardando</h3><canvas id="graficoAguardando"></canvas></div>
-  <div class="card grafico-card"><h3>Horas Deslocamento</h3><canvas id="graficoDeslocamento"></canvas></div>
-  <div class="card grafico-card"><h3>Total Máquina Parada</h3><canvas id="graficoMaquina"></canvas></div>
+<div class="card grafico-card">
+<h3>Total de atendimento por Técnico</h3>
+<canvas id="graficoTecnico"></canvas>
 </div>
+
+<div class="card grafico-card"><h3>Total de Horas x Horas Úteis</h3><canvas id="graficoTotalHoras"></canvas></div>
+<div class="card grafico-card"><h3>Horas Trabalhadas</h3><canvas id="graficoTrabalhadas"></canvas></div>
+<div class="card grafico-card"><h3>Horas Aguardando</h3><canvas id="graficoAguardando"></canvas></div>
+<div class="card grafico-card"><h3>Horas Deslocamento</h3><canvas id="graficoDeslocamento"></canvas></div>
+<div class="card grafico-card"><h3>Total Máquina Parada</h3><canvas id="graficoMaquina"></canvas></div>
 
 </div>
 
 <script>
 
 let dadosGlobais = [];
-let grafico, g1, g2, g3, g4, g5, g6;
-let selectedTipo = "";
-let atualizandoFiltros = false;
-
-function aplicarFiltros(){
-    if(atualizandoFiltros) return;
-    atualizandoFiltros = true;
-
-    const tecnico = document.getElementById("filtroTecnico").value;
-    const solicitante = document.getElementById("filtroSolicitante").value;
-    let filtrado = dadosGlobais;
-
-    if(tecnico){
-        filtrado = filtrado.filter(linha =>
-            (linha["TÉCNICO DESIGNADO"] || "Não informado") === tecnico
-        );
-    }
-
-    if(solicitante){
-        filtrado = filtrado.filter(linha =>
-            (linha["SOLICITANTE"] || "Não informado") === solicitante
-        );
-    }
-
-    if(selectedTipo){
-        filtrado = filtrado.filter(linha =>
-            (linha["TIPO DA SS"] || "Não informado") === selectedTipo
-        );
-    }
-
-    calcularTotais(filtrado);
-    popularFiltro(dadosGlobais);
-
-    atualizandoFiltros = false;
-}
-
-function atualizarOpcoesFiltros(dadosFiltrados){
-    // Para cascata: as opções dos filtros devem ser baseadas nos dados filtrados pelos outros filtros
-    // Mas como aplicamos filtros sequencialmente, vamos recalcular as opções baseadas nos dados atuais
-
-    // Para filtroTecnico: opções são todos os técnicos nos dadosFiltrados
-    const selectTecnico = document.getElementById("filtroTecnico");
-    const tecnicoAtual = selectTecnico.value;
-    selectTecnico.innerHTML = '<option value="">Todos</option>';
-    const tecnicos = [...new Set(dadosFiltrados.map(l => l["TÉCNICO DESIGNADO"] || "Não informado"))].sort((a,b) => a.localeCompare(b, 'pt-BR'));
-    tecnicos.forEach(t => {
-        selectTecnico.innerHTML += `<option value="${t}" ${t === tecnicoAtual ? 'selected' : ''}>${t}</option>`;
-    });
-
-    // Para filtroSolicitante: opções são todos os solicitantes nos dadosFiltrados
-    const selectSolicitante = document.getElementById("filtroSolicitante");
-    const solicitanteAtual = selectSolicitante.value;
-    selectSolicitante.innerHTML = '<option value="">Todos</option>';
-    const solicitantes = [...new Set(dadosFiltrados.map(l => l["SOLICITANTE"] || "Não informado"))].sort((a,b) => a.localeCompare(b, 'pt-BR'));
-    solicitantes.forEach(s => {
-        selectSolicitante.innerHTML += `<option value="${s}" ${s === solicitanteAtual ? 'selected' : ''}>${s}</option>`;
-    });
-}
-
-function filtrarPorTipo(tipo){
-    if(selectedTipo === tipo){
-        selectedTipo = "";
-    } else {
-        selectedTipo = tipo;
-    }
-
-    aplicarFiltros();
-}
+let grafico, g1, g2, g3, g4, g5;
 
 document.getElementById('upload').addEventListener('change', function(e){
 
@@ -509,6 +394,10 @@ document.getElementById('upload').addEventListener('change', function(e){
         const json = XLSX.utils.sheet_to_json(sheet);
 
         dadosGlobais = json;
+        document.querySelector(".cards").style.display = "grid";
+        document.querySelectorAll(".grafico-card").forEach(card => {
+            card.style.display = "block";
+        });
         popularFiltro(json);
         calcularTotais(json);
     };
@@ -516,63 +405,33 @@ document.getElementById('upload').addEventListener('change', function(e){
     reader.readAsArrayBuffer(file);
 });
 
+
 document.getElementById("filtroTecnico").addEventListener("change", function(){
-    if(!atualizandoFiltros){
-        aplicarFiltros();
+
+    const tecnico = this.value;
+
+    if(!tecnico){
+        calcularTotais(dadosGlobais);
+        return;
     }
+
+    const filtrado = dadosGlobais.filter(linha =>
+        (linha["TÉCNICO DESIGNADO"] || "Não informado") === tecnico
+    );
+
+    calcularTotais(filtrado);
 });
 
-document.getElementById("filtroSolicitante").addEventListener("change", function(){
-    if(!atualizandoFiltros){
-        aplicarFiltros();
-    }
-});
+function popularFiltro(dados){
 
-function popularFiltro(dadosGlobaisParaOpcoes){
-    const selectTecnico = document.getElementById("filtroTecnico");
-    const selectSolicitante = document.getElementById("filtroSolicitante");
+    const select = document.getElementById("filtroTecnico");
+    select.innerHTML = '<option value="">Todos</option>';
 
-    const tecnicoAtual = selectTecnico.value;
-    const solicitanteAtual = selectSolicitante.value;
+    const tecnicos = [...new Set(dados.map(l => l["TÉCNICO DESIGNADO"] || "Não informado"))];
 
-    // Para cascata: opções baseadas nos outros filtros
-    // Opções de técnico: filtrar por solicitante se selecionado
-    let dadosParaTecnico = dadosGlobaisParaOpcoes;
-    if(solicitanteAtual){
-        dadosParaTecnico = dadosGlobaisParaOpcoes.filter(linha =>
-            (linha["SOLICITANTE"] || "Não informado") === solicitanteAtual
-        );
-    }
-    const tecnicos = [...new Set(dadosParaTecnico.map(l => l["TÉCNICO DESIGNADO"] || "Não informado"))].sort((a,b) => a.localeCompare(b, 'pt-BR'));
-
-    selectTecnico.innerHTML = '<option value="">Todos</option>';
     tecnicos.forEach(t => {
-        selectTecnico.innerHTML += `<option value="${t}" ${t === tecnicoAtual ? 'selected' : ''}>${t}</option>`;
+        select.innerHTML += `<option value="${t}">${t}</option>`;
     });
-
-    // Se o técnico atual não estiver nas opções, limpar
-    if(tecnicoAtual && !tecnicos.includes(tecnicoAtual)){
-        selectTecnico.value = '';
-    }
-
-    // Opções de solicitante: filtrar por técnico se selecionado
-    let dadosParaSolicitante = dadosGlobaisParaOpcoes;
-    if(tecnicoAtual){
-        dadosParaSolicitante = dadosGlobaisParaOpcoes.filter(linha =>
-            (linha["TÉCNICO DESIGNADO"] || "Não informado") === tecnicoAtual
-        );
-    }
-    const solicitantes = [...new Set(dadosParaSolicitante.map(l => l["SOLICITANTE"] || "Não informado"))].sort((a,b) => a.localeCompare(b, 'pt-BR'));
-
-    selectSolicitante.innerHTML = '<option value="">Todos</option>';
-    solicitantes.forEach(s => {
-        selectSolicitante.innerHTML += `<option value="${s}" ${s === solicitanteAtual ? 'selected' : ''}>${s}</option>`;
-    });
-
-    // Se o solicitante atual não estiver nas opções, limpar
-    if(solicitanteAtual && !solicitantes.includes(solicitanteAtual)){
-        selectSolicitante.value = '';
-    }
 }
 
 function toHoras(valor){
@@ -627,7 +486,6 @@ function calcularTotais(dados){
 
     const totaisTipo = {};
     const totaisTecnico = {};
-    const ssPorSolicitante = {};
 
     let totalHoras = 0;
     let horasTrab = 0;
@@ -645,11 +503,6 @@ function calcularTotais(dados){
         const tecnico = linha["TÉCNICO DESIGNADO"] || "Não informado";
         totaisTecnico[tecnico] = (totaisTecnico[tecnico] || 0) + 1;
 
-        const solicitante = linha["SOLICITANTE"] || "Não informado";
-        const numeroSS = String(linha["N° DA SS"] || linha["Numero SS"] || linha["Nº DA SS"] || linha["NUMERO DA SS"] || linha["A"] || linha["SS"] || "").trim() || `${tipo}_${tecnico}_${solicitante}_${dados.length}`;
-        if(!ssPorSolicitante[solicitante]) ssPorSolicitante[solicitante] = new Set();
-        ssPorSolicitante[solicitante].add(numeroSS);
-
         totalHoras += toHoras(linha["TOTAL DE HORAS"]);
         horasTrab += toHoras(linha["HORAS TRABALHADAS"]);
         horasAguard += toHoras(linha["HORAS AGUARDANDO"]);
@@ -663,22 +516,8 @@ function calcularTotais(dados){
     const tbody = document.getElementById("tabelaModelos");
     tbody.innerHTML = "";
     for(const tipo in totaisTipo){
-        const row = document.createElement('tr');
-        row.className = tipo === selectedTipo ? 'selected' : '';
-        row.tabIndex = 0;
-        row.innerHTML = `<td>${tipo}</td><td>${totaisTipo[tipo].toLocaleString('pt-BR')}</td>`;
-        row.addEventListener('click', () => filtrarPorTipo(tipo));
-        row.addEventListener('keyup', (event) => {
-            if(event.key === 'Enter' || event.key === ' ') {
-                filtrarPorTipo(tipo);
-            }
-        });
-        tbody.appendChild(row);
+        tbody.innerHTML += `<tr><td>${tipo}</td><td>${totaisTipo[tipo]}</td></tr>`;
     }
-
-    const totaisSolicitante = Object.fromEntries(
-        Object.entries(ssPorSolicitante).map(([sol, set]) => [sol, set.size])
-    );
 
     let horasUteis = 0;
 
@@ -702,29 +541,16 @@ function calcularTotais(dados){
 
     criarGrafico("graficoTecnico","Atendimentos",Object.keys(totaisTecnico),Object.values(totaisTecnico),grafico,v=>grafico=v,true);
 
-    const solicitanteEntradas = Object.entries(totaisSolicitante)
-      .sort((a,b) => b[1] - a[1])
-      .slice(0, 12);
-    criarGrafico(
-      "graficoSolicitante",
-      "Atendimentos",
-      solicitanteEntradas.map(entry => entry[0]),
-      solicitanteEntradas.map(entry => entry[1]),
-      g6,
-      v => g6 = v,
-      true
-    );
-
     criarGrafico("graficoTotalHoras","Horas",
         ["Trabalhadas","Horas Úteis"],
         [horasTrab, horasUteis],
-        g1,v=>g1=v,true
+        g1,v=>g1=v,false
     );
 
-    criarGrafico("graficoTrabalhadas","Horas Trabalhadas",["Total"],[horasTrab],g2,v=>g2=v,true);
-    criarGrafico("graficoAguardando","Horas Aguardando",["Total"],[horasAguard],g3,v=>g3=v,true);
-    criarGrafico("graficoDeslocamento","Horas Deslocamento",["Total"],[horasDesloc],g4,v=>g4=v,true);
-    criarGrafico("graficoMaquina","Máquina Parada",["Total"],[maquinaParada],g5,v=>g5=v,true);
+    criarGrafico("graficoTrabalhadas","Horas Trabalhadas",["Total"],[horasTrab],g2,v=>g2=v,false);
+    criarGrafico("graficoAguardando","Horas Aguardando",["Total"],[horasAguard],g3,v=>g3=v,false);
+    criarGrafico("graficoDeslocamento","Horas Deslocamento",["Total"],[horasDesloc],g4,v=>g4=v,false);
+    criarGrafico("graficoMaquina","Máquina Parada",["Total"],[maquinaParada],g5,v=>g5=v,false);
 }
 
 function criarGrafico(id,label,labels,data,graficoAtual,salvar,comClickable){
@@ -740,22 +566,12 @@ function criarGrafico(id,label,labels,data,graficoAtual,salvar,comClickable){
         }
     };
 
-    opcoes.onHover = (event, elements) => {
-        const target = event.native ? event.native.target : event.target;
-        if(target) target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
-    };
-
     if(comClickable){
         opcoes.onClick = (event, elements) => {
             if(elements.length > 0){
                 const index = elements[0].index;
-                const valor = labels[index];
-
-                if(id === 'graficoTecnico'){
-                    filtrarPorTecnico(valor);
-                } else if(id === 'graficoSolicitante'){
-                    filtrarPorSolicitante(valor);
-                }
+                const tecnico = labels[index];
+                filtrarPorTecnico(tecnico);
             }
         };
     }
@@ -766,10 +582,7 @@ function criarGrafico(id,label,labels,data,graficoAtual,salvar,comClickable){
             labels:labels,
             datasets:[{
                 label:label,
-                data:data,
-                backgroundColor: 'rgba(46, 125, 50, 0.7)',
-                borderColor: 'rgba(46, 125, 50, 0.9)',
-                borderWidth: 1
+                data:data
             }]
         },
         options:opcoes
@@ -779,13 +592,18 @@ function criarGrafico(id,label,labels,data,graficoAtual,salvar,comClickable){
 }
 
 function filtrarPorTecnico(tecnico){
-    document.getElementById("filtroTecnico").value = tecnico || "";
-    aplicarFiltros();
-}
+    document.getElementById("filtroTecnico").value = tecnico;
 
-function filtrarPorSolicitante(solicitante){
-    document.getElementById("filtroSolicitante").value = solicitante || "";
-    aplicarFiltros();
+    if(!tecnico || tecnico === ""){
+        calcularTotais(dadosGlobais);
+        return;
+    }
+
+    const filtrado = dadosGlobais.filter(linha =>
+        (linha["TÉCNICO DESIGNADO"] || "Não informado") === tecnico
+    );
+
+    calcularTotais(filtrado);
 }
 
 </script>
