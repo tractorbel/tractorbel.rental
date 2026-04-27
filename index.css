@@ -308,3 +308,12 @@ body{
     max-width: 400px;
     margin: 100px auto; /* centraliza verticalmente e horizontalmente */
 }
+    .logo-topo img {
+      width: 220px;
+      height: 70px;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 10px;
+      display: block;
+      margin: 20px auto;
+    }
