@@ -23,7 +23,7 @@ const auth = getAuth(app);
 function mostrarConteudo(user){
   const login = document.getElementById("login");
   const conteudo = document.getElementById("conteudo");
-  if(!login || !conteudo) return;
+  if(!login || !conteudo) return; // Só executar se os elementos existirem
   if(user){
     login.style.display = "none";
     conteudo.style.display = "block";
@@ -45,7 +45,17 @@ window.logout = function() {
   signOut(auth);
 };
 
-onAuthStateChanged(auth, user => mostrarConteudo(user));
+// Só executar verificação de estado se os elementos existirem (página index.html)
+if(document.getElementById("login") && document.getElementById("conteudo")) {
+  onAuthStateChanged(auth, user => mostrarConteudo(user));
+} else {
+  // Para outras páginas, verificar se usuário está logado e redirecionar se não estiver
+  onAuthStateChanged(auth, user => {
+    if(!user) {
+      window.location.href = "index.html";
+    }
+  });
+}
 
 // ------------------- VARIÁVEIS GLOBAIS -------------------
 let dadosGlobais = [];
