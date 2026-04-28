@@ -60,7 +60,7 @@ body{
 /* ===== HEADER ===== */
 header img{
     border-radius: 50%;
-    border:3px solid green;
+    border:3px solid #2e7d32;
     width: 150px;
     height:150px;
 }
@@ -76,9 +76,9 @@ h1{
 
 /* ===== H3 PADRÃO ===== */
 h3{
-    text-align: center;
+    text-align: left;
     white-space: pre-wrap;
-    color: #696969;
+    color: #4b5563;
     margin:0;
 }
 
@@ -87,7 +87,7 @@ h3{
     max-width: 500px;      /* largura máxima do bloco */
     margin: 0 auto;         /* centraliza horizontalmente */
     padding: 20px;          /* espaço interno */
-    text-align: left;       /* alinhamento do texto */
+    text-align: right;       /* alinhamento do texto */
 }
 
 @media (max-width: 900px) {
@@ -99,7 +99,7 @@ h3{
 @media (max-width: 600px) {
     .texto-container {
         max-width: 100%;
-        padding: 10px;
+        padding: 5px;
     }
 }
 
