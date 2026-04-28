@@ -325,6 +325,10 @@
     <label for="upload" class="btn-google">Enviar Planilha</label>
     <input type="file" id="upload" accept=".xls,.xlsx" style="display:none;">
   </div>
+
+  <div>
+    <button id="btnLimpar" class="btn-google" style="display:none;">Limpar Filtros</button>
+  </div>
 </div>
 
 <div class="cards">
@@ -362,6 +366,11 @@
 
 let dadosGlobais = [];
 let grafico, graficoTipos, g1, g2, g3, g4, g5;
+
+const btnLimpar = document.getElementById("btnLimpar");
+
+// Garantir que o botão comece oculto
+btnLimpar.style.display = "none";
 
 document.getElementById('upload').addEventListener('change', function(e){
 
@@ -403,6 +412,8 @@ document.getElementById("filtroTecnico").addEventListener("change", function(){
 
     calcularTotais(filtrado);
 });
+
+btnLimpar.addEventListener("click", limparFiltros);
 
 function popularFiltro(dados){
 
@@ -530,6 +541,9 @@ function calcularTotais(dados){
     criarGrafico("graficoAguardando","Horas Aguardando",["Total"],[horasAguard],g3,v=>g3=v,false);
     criarGrafico("graficoDeslocamento","Horas Deslocamento",["Total"],[horasDesloc],g4,v=>g4=v,false);
     criarGrafico("graficoMaquina","Máquina Parada",["Total"],[maquinaParada],g5,v=>g5=v,false);
+
+    // Mostrar/ocultar botão limpar filtros
+    btnLimpar.style.display = existeFiltroAtivo() ? "inline-block" : "none";
 }
 
 function criarGrafico(id,label,labels,data,graficoAtual,salvar,comClickable){
@@ -651,6 +665,19 @@ function filtrarPorTipo(tipo){
     );
 
     calcularTotais(filtrado);
+}
+
+function existeFiltroAtivo(){
+    const filtroTecnico = document.getElementById("filtroTecnico").value;
+    return filtroTecnico && filtroTecnico !== "";
+}
+
+function limparFiltros(){
+    // Resetar filtro de técnico
+    document.getElementById("filtroTecnico").value = "";
+
+    // Recalcular totais com todos os dados
+    calcularTotais(dadosGlobais);
 }
 
 function toggleMenu() {
