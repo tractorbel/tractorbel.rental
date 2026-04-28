@@ -24,6 +24,7 @@ function mostrarConteudo(user){
   const login = document.getElementById("login");
   const conteudo = document.getElementById("conteudo");
   if(!login || !conteudo) return; // Só executar se os elementos existirem
+  
   if(user){
     login.style.display = "none";
     conteudo.style.display = "block";
@@ -31,6 +32,17 @@ function mostrarConteudo(user){
     login.style.display = "block";
     conteudo.style.display = "none";
   }
+}
+
+// Função para inicializar a página - mostrar conteúdo por padrão para evitar "piscar"
+function inicializarPagina(){
+  const login = document.getElementById("login");
+  const conteudo = document.getElementById("conteudo");
+  if(!login || !conteudo) return; // Só executar se os elementos existirem
+  
+  // Mostrar conteúdo por padrão para evitar "piscar" da tela de login
+  login.style.display = "none";
+  conteudo.style.display = "block";
 }
 
 window.login = function() {
@@ -47,6 +59,10 @@ window.logout = function() {
 
 // Só executar verificação de estado se os elementos existirem (página index.html)
 if(document.getElementById("login") && document.getElementById("conteudo")) {
+  // Inicializar mostrando conteúdo para evitar "piscar"
+  inicializarPagina();
+  
+  // Verificar estado de autenticação
   onAuthStateChanged(auth, user => mostrarConteudo(user));
 } else {
   // Para outras páginas, verificar se usuário está logado e redirecionar se não estiver
