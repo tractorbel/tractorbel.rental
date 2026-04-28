@@ -1024,45 +1024,122 @@ body {
           const data = new Uint8Array(e.target.result);
           const workbook = XLSX.read(data, { type: "array" });
           const sheet = workbook.Sheets[workbook.SheetNames[0]];
-          const json = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+
+          // Tentar ler como objetos primeiro
+          let json = XLSX.utils.sheet_to_json(sheet);
+
+          console.log("Tentativa 1 - Como objetos:", json.length, "linhas");
+          if (json.length === 0) {
+            // Se não conseguiu ler como objetos, tentar como array
+            json = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+            console.log("Tentativa 2 - Como array:", json.length, "linhas");
+          }
 
           dadosGlobais = [];
 
-          for (let i = 1; i < json.length; i++) {
-            const l = json[i];
-            if (!l || l.length === 0) continue;
+          if (json.length > 0 && typeof json[0] === 'object' && !Array.isArray(json[0])) {
+            // Formato objeto
+            console.log("Processando como objetos");
+            for (let i = 0; i < json.length; i++) {
+              const linha = json[i];
 
-            let dataLinha = l[15];
-            if (!dataLinha) continue;
+              // Tentar encontrar a data em diferentes colunas possíveis
+              let dataLinha = linha['Data'] || linha['DATA'] || linha['data'] || linha['Date'];
+              if (!dataLinha) {
+                // Procurar por colunas que contenham "data" no nome
+                for (const key in linha) {
+                  if (key.toLowerCase().includes('data') || key.toLowerCase().includes('date')) {
+                    dataLinha = linha[key];
+                    break;
+                  }
+                }
+              }
 
-            if (typeof dataLinha === "number") {
-              dataLinha = excelDateToJSDate(dataLinha);
-            } else {
-              dataLinha = new Date(dataLinha);
+              if (!dataLinha) continue;
+
+              if (typeof dataLinha === "number") {
+                dataLinha = excelDateToJSDate(dataLinha);
+              } else {
+                dataLinha = new Date(dataLinha);
+              }
+
+              if (isNaN(dataLinha.getTime())) continue;
+              dataLinha.setHours(0, 0, 0, 0);
+
+              dadosGlobais.push({
+                filial: normalizarTexto(linha['Filial'] || linha['FILIAL'] || linha['filial']),
+                patrimonio: normalizarTexto(linha['Patrimonio'] || linha['PATRIMONIO'] || linha['patrimonio']),
+                serie: normalizarTexto(linha['Serie'] || linha['SERIE'] || linha['serie']),
+                equipamento: normalizarTexto(linha['Equipamento'] || linha['EQUIPAMENTO'] || linha['equipamento']),
+                marca: normalizarTexto(linha['Marca'] || linha['MARCA'] || linha['marca']),
+                modelo: normalizarTexto(linha['Modelo'] || linha['MODELO'] || linha['modelo']),
+                ano: normalizarTexto(linha['Ano'] || linha['ANO'] || linha['ano']),
+                faturamento: converterNumero(linha['Faturamento'] || linha['FATURAMENTO'] || linha['faturamento']),
+                manutencao: converterNumero(linha['Manutencao'] || linha['MANUTENCAO'] || linha['manutencao'] || linha['Manutenção']),
+                financiamento: converterNumero(linha['Financiamento'] || linha['FINANCIAMENTO'] || linha['financiamento']),
+                impostos: converterNumero(linha['Impostos'] || linha['IMPOSTOS'] || linha['impostos']),
+                tx: converterNumero(linha['TX'] || linha['Tx'] || linha['tx'] || linha['Taxa']),
+                resultado: converterNumero(linha['Resultado'] || linha['RESULTADO'] || linha['resultado']),
+                mau: converterNumero(linha['Mau'] || linha['MAU'] || linha['mau'] || linha['Avaria']),
+                cliente: normalizarTexto(linha['Cliente'] || linha['CLIENTE'] || linha['cliente']),
+                data: dataLinha
+              });
             }
+          } else {
+            // Formato array (código original)
+            console.log("Processando como array");
+            for (let i = 1; i < json.length; i++) {
+              const l = json[i];
+              if (!l || l.length < 16) {
+                console.log(`Linha ${i} pulada: dados insuficientes`, l);
+                continue;
+              }
 
-            if (isNaN(dataLinha)) continue;
-            dataLinha.setHours(0, 0, 0, 0);
+              let dataLinha = l[15];
+              console.log(`Linha ${i}, data coluna 15:`, dataLinha, typeof dataLinha);
 
-            dadosGlobais.push({
-              filial: normalizarTexto(l[0]),
-              patrimonio: normalizarTexto(l[1]),
-              serie: normalizarTexto(l[2]),
-              equipamento: normalizarTexto(l[3]),
-              marca: normalizarTexto(l[4]),
-              modelo: normalizarTexto(l[5]),
-              ano: normalizarTexto(l[6]),
-              faturamento: converterNumero(l[7]),
-              manutencao: converterNumero(l[8]),
-              financiamento: converterNumero(l[9]),
-              impostos: converterNumero(l[10]),
-              tx: converterNumero(l[11]),
-              resultado: converterNumero(l[12]),
-              mau: converterNumero(l[13]),
-              cliente: normalizarTexto(l[14]),
-              data: dataLinha
-            });
+              if (dataLinha === null || dataLinha === undefined || dataLinha === "") {
+                console.log(`Linha ${i} pulada: data vazia`);
+                continue;
+              }
+
+              if (typeof dataLinha === "number") {
+                dataLinha = excelDateToJSDate(dataLinha);
+                console.log(`Data convertida de número:`, dataLinha);
+              } else {
+                dataLinha = new Date(dataLinha);
+                console.log(`Data convertida de string:`, dataLinha);
+              }
+
+              if (isNaN(dataLinha.getTime())) {
+                console.log(`Linha ${i} pulada: data inválida`, dataLinha);
+                continue;
+              }
+
+              dataLinha.setHours(0, 0, 0, 0);
+
+              dadosGlobais.push({
+                filial: normalizarTexto(l[0]),
+                patrimonio: normalizarTexto(l[1]),
+                serie: normalizarTexto(l[2]),
+                equipamento: normalizarTexto(l[3]),
+                marca: normalizarTexto(l[4]),
+                modelo: normalizarTexto(l[5]),
+                ano: normalizarTexto(l[6]),
+                faturamento: converterNumero(l[7]),
+                manutencao: converterNumero(l[8]),
+                financiamento: converterNumero(l[9]),
+                impostos: converterNumero(l[10]),
+                tx: converterNumero(l[11]),
+                resultado: converterNumero(l[12]),
+                mau: converterNumero(l[13]),
+                cliente: normalizarTexto(l[14]),
+                data: dataLinha
+              });
+            }
           }
+
+          console.log("Dados processados:", dadosGlobais.length);
 
           if (!dadosGlobais.length) {
             statusCarga.innerText = "Nenhum dado válido encontrado.";
@@ -1091,7 +1168,7 @@ body {
             statusCarga.innerText = "";
           }, 2000);
         } catch (error) {
-          console.error(error);
+          console.error("Erro ao processar planilha:", error);
           statusCarga.innerText = "Erro ao carregar planilha.";
         }
       };
