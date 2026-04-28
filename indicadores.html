@@ -115,10 +115,10 @@
     .card {
       background: #ffffff;
       border-radius: 10px;
-      padding: 6px;
+      padding: 12px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
       border-left: 6px solid #2e7d32;
-      margin-bottom: 6px;
+      margin-bottom: 12px;
       text-align: center;
     }
 
@@ -162,6 +162,7 @@
     }
 
     canvas {
+      max-height: 400px;
       cursor: pointer;
     }
 
@@ -313,13 +314,6 @@
     </select>
   </div>
 
-  <div class="filtro-box">
-    <label class="titulo-filtro" for="filtroTipo">Filtrar por Tipo de Atendimento</label>
-    <select id="filtroTipo" class="filtro-seletor">
-      <option value="">Todos</option>
-    </select>
-  </div>
-
   <div>
     <label for="upload" class="btn-google">Enviar Planilha</label>
     <input type="file" id="upload" accept=".xls,.xlsx" style="display:none;">
@@ -397,74 +391,33 @@ document.getElementById('upload').addEventListener('change', function(e){
 
 
 document.getElementById("filtroTecnico").addEventListener("change", function(){
-    aplicarFiltros();
-});
 
-document.getElementById("filtroTipo").addEventListener("change", function(){
-    aplicarFiltros();
+    const tecnico = this.value;
+
+    if(!tecnico){
+        calcularTotais(dadosGlobais);
+        return;
+    }
+
+    const filtrado = dadosGlobais.filter(linha =>
+        (linha["TÉCNICO DESIGNADO"] || "Não informado") === tecnico
+    );
+
+    calcularTotais(filtrado);
 });
 
 btnLimpar.addEventListener("click", limparFiltros);
 
 function popularFiltro(dados){
-    document.getElementById("filtroTecnico").value = "";
-    document.getElementById("filtroTipo").value = "";
-    atualizarFiltrosOptions();
-}
 
-function filtrarDados(excluirFiltroId = null){
-    let dados = dadosGlobais;
-    const tecnicoSelecionado = document.getElementById("filtroTecnico").value;
-    const tipoSelecionado = document.getElementById("filtroTipo").value;
+    const select = document.getElementById("filtroTecnico");
+    select.innerHTML = '<option value="">Todos</option>';
 
-    if(excluirFiltroId !== "filtroTecnico" && tecnicoSelecionado){
-        dados = dados.filter(linha =>
-            (linha["TÉCNICO DESIGNADO"] || "Não informado") === tecnicoSelecionado
-        );
-    }
+    const tecnicos = [...new Set(dados.map(l => l["TÉCNICO DESIGNADO"] || "Não informado"))];
 
-    if(excluirFiltroId !== "filtroTipo" && tipoSelecionado){
-        dados = dados.filter(linha =>
-            (linha["TIPO DA SS"] || "Não informado") === tipoSelecionado
-        );
-    }
-
-    return dados;
-}
-
-function atualizarFiltrosOptions(){
-    const filtroTecnico = document.getElementById("filtroTecnico");
-    const filtroTipo = document.getElementById("filtroTipo");
-    const tecnicoSelecionado = filtroTecnico.value;
-    const tipoSelecionado = filtroTipo.value;
-
-    const dadosParaTecnico = filtrarDados("filtroTecnico");
-    const tecnicos = [...new Set(dadosParaTecnico.map(l => (l["TÉCNICO DESIGNADO"] || "Não informado").trim()))]
-        .filter(v => v !== "")
-        .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
-
-    filtroTecnico.innerHTML = '<option value="">Todos</option>';
     tecnicos.forEach(t => {
-        filtroTecnico.innerHTML += `<option value="${t}">${t}</option>`;
+        select.innerHTML += `<option value="${t}">${t}</option>`;
     });
-    filtroTecnico.value = tecnicos.includes(tecnicoSelecionado) ? tecnicoSelecionado : "";
-
-    const dadosParaTipo = filtrarDados("filtroTipo");
-    const tipos = [...new Set(dadosParaTipo.map(l => (l["TIPO DA SS"] || "Não informado").trim()))]
-        .filter(v => v !== "")
-        .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
-
-    filtroTipo.innerHTML = '<option value="">Todos</option>';
-    tipos.forEach(t => {
-        filtroTipo.innerHTML += `<option value="${t}">${t}</option>`;
-    });
-    filtroTipo.value = tipos.includes(tipoSelecionado) ? tipoSelecionado : "";
-}
-
-function aplicarFiltros(){
-    const dadosFiltrados = filtrarDados();
-    atualizarFiltrosOptions();
-    calcularTotais(dadosFiltrados);
 }
 
 function toHoras(valor){
@@ -649,15 +602,10 @@ function criarGraficoPizza(totaisTipo){
             responsive:true,
             plugins:{
                 legend:{
-                    display:true,
                     position:'bottom',
                     labels:{
                         padding: 20,
-                        usePointStyle: true,
-                        boxWidth: 14,
-                        font:{
-                            size: 12
-                        }
+                        usePointStyle: true
                     }
                 },
                 tooltip:{
@@ -683,24 +631,43 @@ function criarGraficoPizza(totaisTipo){
 
 function filtrarPorTecnico(tecnico){
     document.getElementById("filtroTecnico").value = tecnico;
-    aplicarFiltros();
+
+    if(!tecnico || tecnico === ""){
+        calcularTotais(dadosGlobais);
+        return;
+    }
+
+    const filtrado = dadosGlobais.filter(linha =>
+        (linha["TÉCNICO DESIGNADO"] || "Não informado") === tecnico
+    );
+
+    calcularTotais(filtrado);
 }
 
 function filtrarPorTipo(tipo){
-    document.getElementById("filtroTipo").value = tipo;
-    aplicarFiltros();
+    if(!tipo || tipo === ""){
+        calcularTotais(dadosGlobais);
+        return;
+    }
+
+    // Resetar filtro de técnico quando filtrar por tipo
+    document.getElementById("filtroTecnico").value = "";
+
+    const filtrado = dadosGlobais.filter(linha =>
+        linha["TIPO DA SS"] === tipo
+    );
+
+    calcularTotais(filtrado);
 }
 
 function existeFiltroAtivo(){
     const filtroTecnico = document.getElementById("filtroTecnico").value;
-    const filtroTipo = document.getElementById("filtroTipo").value;
-    return (filtroTecnico && filtroTecnico !== "") || (filtroTipo && filtroTipo !== "");
+    return filtroTecnico && filtroTecnico !== "";
 }
 
 function limparFiltros(){
-    // Resetar filtros
+    // Resetar filtro de técnico
     document.getElementById("filtroTecnico").value = "";
-    document.getElementById("filtroTipo").value = "";
 
     // Recalcular totais com todos os dados
     calcularTotais(dadosGlobais);
