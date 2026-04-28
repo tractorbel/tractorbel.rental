@@ -49,6 +49,7 @@ body{
     height: 400px !important;
     margin: 0 auto;
     display: block;
+    cursor: pointer;
 }
 
 /* espaço padrão abaixo do menu */

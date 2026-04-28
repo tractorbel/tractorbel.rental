@@ -610,6 +610,13 @@ function criarGraficoPizza(totaisTipo){
                         }
                     }
                 }
+            },
+            onClick: (event, elements) => {
+                if(elements.length > 0){
+                    const index = elements[0].index;
+                    const tipo = labels[index];
+                    filtrarPorTipo(tipo);
+                }
             }
         }
     });
@@ -625,6 +632,22 @@ function filtrarPorTecnico(tecnico){
 
     const filtrado = dadosGlobais.filter(linha =>
         (linha["TÉCNICO DESIGNADO"] || "Não informado") === tecnico
+    );
+
+    calcularTotais(filtrado);
+}
+
+function filtrarPorTipo(tipo){
+    if(!tipo || tipo === ""){
+        calcularTotais(dadosGlobais);
+        return;
+    }
+
+    // Resetar filtro de técnico quando filtrar por tipo
+    document.getElementById("filtroTecnico").value = "";
+
+    const filtrado = dadosGlobais.filter(linha =>
+        linha["TIPO DA SS"] === tipo
     );
 
     calcularTotais(filtrado);
