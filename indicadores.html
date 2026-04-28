@@ -314,6 +314,13 @@
     </select>
   </div>
 
+  <div class="filtro-box">
+    <label class="titulo-filtro" for="filtroTipo">Filtrar por Tipo de Atendimento</label>
+    <select id="filtroTipo" class="filtro-seletor">
+      <option value="">Todos</option>
+    </select>
+  </div>
+
   <div>
     <label for="upload" class="btn-google">Enviar Planilha</label>
     <input type="file" id="upload" accept=".xls,.xlsx" style="display:none;">
@@ -391,33 +398,74 @@ document.getElementById('upload').addEventListener('change', function(e){
 
 
 document.getElementById("filtroTecnico").addEventListener("change", function(){
+    aplicarFiltros();
+});
 
-    const tecnico = this.value;
-
-    if(!tecnico){
-        calcularTotais(dadosGlobais);
-        return;
-    }
-
-    const filtrado = dadosGlobais.filter(linha =>
-        (linha["TÉCNICO DESIGNADO"] || "Não informado") === tecnico
-    );
-
-    calcularTotais(filtrado);
+document.getElementById("filtroTipo").addEventListener("change", function(){
+    aplicarFiltros();
 });
 
 btnLimpar.addEventListener("click", limparFiltros);
 
 function popularFiltro(dados){
+    document.getElementById("filtroTecnico").value = "";
+    document.getElementById("filtroTipo").value = "";
+    atualizarFiltrosOptions();
+}
 
-    const select = document.getElementById("filtroTecnico");
-    select.innerHTML = '<option value="">Todos</option>';
+function filtrarDados(excluirFiltroId = null){
+    let dados = dadosGlobais;
+    const tecnicoSelecionado = document.getElementById("filtroTecnico").value;
+    const tipoSelecionado = document.getElementById("filtroTipo").value;
 
-    const tecnicos = [...new Set(dados.map(l => l["TÉCNICO DESIGNADO"] || "Não informado"))];
+    if(excluirFiltroId !== "filtroTecnico" && tecnicoSelecionado){
+        dados = dados.filter(linha =>
+            (linha["TÉCNICO DESIGNADO"] || "Não informado") === tecnicoSelecionado
+        );
+    }
 
+    if(excluirFiltroId !== "filtroTipo" && tipoSelecionado){
+        dados = dados.filter(linha =>
+            (linha["TIPO DA SS"] || "Não informado") === tipoSelecionado
+        );
+    }
+
+    return dados;
+}
+
+function atualizarFiltrosOptions(){
+    const filtroTecnico = document.getElementById("filtroTecnico");
+    const filtroTipo = document.getElementById("filtroTipo");
+    const tecnicoSelecionado = filtroTecnico.value;
+    const tipoSelecionado = filtroTipo.value;
+
+    const dadosParaTecnico = filtrarDados("filtroTecnico");
+    const tecnicos = [...new Set(dadosParaTecnico.map(l => (l["TÉCNICO DESIGNADO"] || "Não informado").trim()))]
+        .filter(v => v !== "")
+        .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
+
+    filtroTecnico.innerHTML = '<option value="">Todos</option>';
     tecnicos.forEach(t => {
-        select.innerHTML += `<option value="${t}">${t}</option>`;
+        filtroTecnico.innerHTML += `<option value="${t}">${t}</option>`;
     });
+    filtroTecnico.value = tecnicos.includes(tecnicoSelecionado) ? tecnicoSelecionado : "";
+
+    const dadosParaTipo = filtrarDados("filtroTipo");
+    const tipos = [...new Set(dadosParaTipo.map(l => (l["TIPO DA SS"] || "Não informado").trim()))]
+        .filter(v => v !== "")
+        .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
+
+    filtroTipo.innerHTML = '<option value="">Todos</option>';
+    tipos.forEach(t => {
+        filtroTipo.innerHTML += `<option value="${t}">${t}</option>`;
+    });
+    filtroTipo.value = tipos.includes(tipoSelecionado) ? tipoSelecionado : "";
+}
+
+function aplicarFiltros(){
+    const dadosFiltrados = filtrarDados();
+    atualizarFiltrosOptions();
+    calcularTotais(dadosFiltrados);
 }
 
 function toHoras(valor){
@@ -602,10 +650,15 @@ function criarGraficoPizza(totaisTipo){
             responsive:true,
             plugins:{
                 legend:{
+                    display:true,
                     position:'bottom',
                     labels:{
                         padding: 20,
-                        usePointStyle: true
+                        usePointStyle: true,
+                        boxWidth: 14,
+                        font:{
+                            size: 12
+                        }
                     }
                 },
                 tooltip:{
@@ -631,43 +684,24 @@ function criarGraficoPizza(totaisTipo){
 
 function filtrarPorTecnico(tecnico){
     document.getElementById("filtroTecnico").value = tecnico;
-
-    if(!tecnico || tecnico === ""){
-        calcularTotais(dadosGlobais);
-        return;
-    }
-
-    const filtrado = dadosGlobais.filter(linha =>
-        (linha["TÉCNICO DESIGNADO"] || "Não informado") === tecnico
-    );
-
-    calcularTotais(filtrado);
+    aplicarFiltros();
 }
 
 function filtrarPorTipo(tipo){
-    if(!tipo || tipo === ""){
-        calcularTotais(dadosGlobais);
-        return;
-    }
-
-    // Resetar filtro de técnico quando filtrar por tipo
-    document.getElementById("filtroTecnico").value = "";
-
-    const filtrado = dadosGlobais.filter(linha =>
-        linha["TIPO DA SS"] === tipo
-    );
-
-    calcularTotais(filtrado);
+    document.getElementById("filtroTipo").value = tipo;
+    aplicarFiltros();
 }
 
 function existeFiltroAtivo(){
     const filtroTecnico = document.getElementById("filtroTecnico").value;
-    return filtroTecnico && filtroTecnico !== "";
+    const filtroTipo = document.getElementById("filtroTipo").value;
+    return (filtroTecnico && filtroTecnico !== "") || (filtroTipo && filtroTipo !== "");
 }
 
 function limparFiltros(){
-    // Resetar filtro de técnico
+    // Resetar filtros
     document.getElementById("filtroTecnico").value = "";
+    document.getElementById("filtroTipo").value = "";
 
     // Recalcular totais com todos os dados
     calcularTotais(dadosGlobais);
