@@ -341,15 +341,7 @@
 
 <div class="card">
 <h3>Total de atendimento por tipo</h3>
-<table>
-<thead>
-<tr>
-<th>Tipo de atendimento</th>
-<th>Quantidade</th>
-</tr>
-</thead>
-<tbody id="tabelaModelos"></tbody>
-</table>
+<canvas id="graficoTipos"></canvas>
 </div>
 </div>
 
@@ -369,7 +361,7 @@
 <script>
 
 let dadosGlobais = [];
-let grafico, g1, g2, g3, g4, g5;
+let grafico, graficoTipos, g1, g2, g3, g4, g5;
 
 document.getElementById('upload').addEventListener('change', function(e){
 
@@ -503,11 +495,8 @@ function calcularTotais(dados){
         if(data) datas.push(data);
     });
 
-    const tbody = document.getElementById("tabelaModelos");
-    tbody.innerHTML = "";
-    for(const tipo in totaisTipo){
-        tbody.innerHTML += `<tr><td>${tipo}</td><td>${totaisTipo[tipo]}</td></tr>`;
-    }
+    // Criar gráfico de pizza para tipos de atendimento
+    criarGraficoPizza(totaisTipo);
 
     let horasUteis = 0;
 
@@ -579,6 +568,51 @@ function criarGrafico(id,label,labels,data,graficoAtual,salvar,comClickable){
     });
 
     salvar(novo);
+}
+
+function criarGraficoPizza(totaisTipo){
+    if(graficoTipos){
+        graficoTipos.destroy();
+    }
+
+    const labels = Object.keys(totaisTipo);
+    const data = Object.values(totaisTipo);
+    const total = data.reduce((sum, val) => sum + val, 0);
+
+    graficoTipos = new Chart(document.getElementById("graficoTipos"),{
+        type:'pie',
+        data:{
+            labels:labels,
+            datasets:[{
+                data:data,
+                backgroundColor: [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                    '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384'
+                ]
+            }]
+        },
+        options:{
+            responsive:true,
+            plugins:{
+                legend:{
+                    position:'bottom',
+                    labels:{
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                },
+                tooltip:{
+                    callbacks:{
+                        label: function(context){
+                            const valor = context.raw;
+                            const porcentagem = ((valor / total) * 100).toFixed(1);
+                            return `${context.label}: ${valor} (${porcentagem}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
 }
 
 function filtrarPorTecnico(tecnico){
