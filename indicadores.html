@@ -22,14 +22,36 @@
     }
 
     h2 {
-      margin-bottom: 16px;
+      margin: 0;
+    }
+
+    .cabecalho-analise {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .periodo-cabecalho {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2e7d32;
+      text-align: center;
+    }
+
+    .acoes-cabecalho {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
     }
 
     .topo-controles {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(5, minmax(160px, 1fr));
       gap: 10px;
-      align-items: center;
+      align-items: start;
       margin-bottom: 14px;
     }
 
@@ -38,7 +60,7 @@
       flex-direction: column;
       border: 1px solid #d8e8da;
       border-radius: 12px;
-      padding: 14px;
+      padding: 10px;
       background: #fff;
       box-shadow: 0 2px 8px rgba(46, 125, 50, 0.08);
       min-width: 0;
@@ -68,6 +90,30 @@
       border-color: #34a853;
       box-shadow: 0 0 0 3px rgba(52, 168, 83, 0.12);
     }
+
+.filtro-checkboxes {
+  width: 100%;
+  max-height: 130px;
+  overflow-y: auto;
+  border: 1px solid #cfd8dc;
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: linear-gradient(180deg, #ffffff 0%, #f7faf8 100%);
+}
+
+.filtro-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  padding: 4px 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.filtro-checkbox-item input {
+  accent-color: #34a853;
+}
 
     .btn-google {
       display: inline-block;
@@ -110,7 +156,6 @@
   margin-bottom: 18px;
   border-bottom: 1px solid rgba(46, 125, 50, 0.12);
 }
-
 
     .card {
       background: #ffffff;
@@ -162,7 +207,7 @@
     }
 
     canvas {
-      max-height: 400px;
+      max-height: 350px;
       cursor: pointer;
     }
 
@@ -173,7 +218,6 @@
 .grafico-card {
   display: none;
 }
-
 
     .logo-topo {
       display: flex;
@@ -190,8 +234,17 @@
         position: static;
       }
 
+      .cabecalho-analise {
+        grid-template-columns: 1fr;
+        align-items: flex-start;
+      }
+
+      .periodo-cabecalho {
+        text-align: left;
+      }
+
       .topo-controles {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        grid-template-columns: repeat(2, minmax(140px, 1fr));
       }
     }
 
@@ -204,6 +257,7 @@
         grid-template-columns: 1fr;
       }
     }
+
 .footer {
   background: #1f2937;
   color: #fff;
@@ -304,23 +358,44 @@
 
 <div id="conteudo">
 
-<h2>Análise de Atendimento SS</h2>
+<div class="cabecalho-analise">
+  <h2>Análise de Atendimento SS</h2>
+
+  <div class="periodo-cabecalho" id="periodoAnalisado">
+    Período analisado: -
+  </div>
+
+  <div class="acoes-cabecalho">
+    <label for="upload" class="btn-google">Enviar Planilha</label>
+    <input type="file" id="upload" accept=".xls,.xlsx" style="display:none;">
+    <button id="btnLimpar" class="btn-google" style="display:none;">Limpar Filtros</button>
+  </div>
+</div>
 
 <div class="topo-controles">
   <div class="filtro-box">
-    <label class="titulo-filtro" for="filtroTecnico">Filtrar por Técnico</label>
-    <select id="filtroTecnico" class="filtro-seletor">
-      <option value="">Todos</option>
-    </select>
+    <label class="titulo-filtro">Filtrar por Técnico</label>
+    <div id="filtroTecnico" class="filtro-checkboxes"></div>
   </div>
 
-  <div>
-    <label for="upload" class="btn-google">Enviar Planilha</label>
-    <input type="file" id="upload" accept=".xls,.xlsx" style="display:none;">
+  <div class="filtro-box">
+    <label class="titulo-filtro">Filtrar por Tipo de Atendimento</label>
+    <div id="filtroTipo" class="filtro-checkboxes"></div>
   </div>
 
-  <div>
-    <button id="btnLimpar" class="btn-google" style="display:none;">Limpar Filtros</button>
+  <div class="filtro-box">
+    <label class="titulo-filtro">Filtrar por Tipo do Equipamento</label>
+    <div id="filtroEquipamento" class="filtro-checkboxes"></div>
+  </div>
+
+  <div class="filtro-box">
+    <label class="titulo-filtro">Filtrar por Marca</label>
+    <div id="filtroMarca" class="filtro-checkboxes"></div>
+  </div>
+
+  <div class="filtro-box">
+    <label class="titulo-filtro">Filtrar por Modelo</label>
+    <div id="filtroModelo" class="filtro-checkboxes"></div>
   </div>
 </div>
 
@@ -331,9 +406,18 @@
 </div>
 
 <div class="card">
-<h3>Período analisado</h3>
-<p><b>Data inicial:</b> <span id="dataMin">-</span></p>
-<p><b>Data final:</b> <span id="dataMax">-</span></p>
+<h3>Total de Preventivas Realizadas</h3>
+<div class="total" id="totalPreventivas">0</div>
+</div>
+
+<div class="card">
+<h3>Total de Corretivas</h3>
+<div class="total" id="totalCorretivas">0</div>
+</div>
+
+<div class="card">
+<h3>Total de Avarias</h3>
+<div class="total" id="totalAvarias">0</div>
 </div>
 </div>
 
@@ -360,10 +444,67 @@
 let dadosGlobais = [];
 let grafico, graficoTipos, g1, g2, g3, g4, g5;
 
+const STORAGE_KEY = "indicadores_ss_estado";
 const btnLimpar = document.getElementById("btnLimpar");
 
-// Garantir que o botão comece oculto
 btnLimpar.style.display = "none";
+
+function getEstadoFiltros(){
+    return {
+        filtroTecnico: getSelecionados("filtroTecnico"),
+        filtroTipo: getSelecionados("filtroTipo"),
+        filtroEquipamento: getSelecionados("filtroEquipamento"),
+        filtroMarca: getSelecionados("filtroMarca"),
+        filtroModelo: getSelecionados("filtroModelo")
+    };
+}
+
+function aplicarEstadoFiltros(filtros){
+    if(!filtros) return;
+
+    Object.keys(filtros).forEach(id => {
+        const valores = filtros[id] || [];
+
+        document.querySelectorAll(`#${id} input`).forEach(input => {
+            input.checked = valores.includes(input.value);
+        });
+    });
+}
+
+function salvarEstadoPagina(){
+    if(!dadosGlobais.length) return;
+
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+        dados: dadosGlobais,
+        filtros: getEstadoFiltros()
+    }));
+}
+
+function restaurarEstadoPagina(){
+    const estadoSalvo = sessionStorage.getItem(STORAGE_KEY);
+    if(!estadoSalvo) return;
+
+    try {
+        const estado = JSON.parse(estadoSalvo);
+
+        if(!estado.dados || !estado.dados.length) return;
+
+        dadosGlobais = estado.dados;
+
+        document.querySelector(".cards").style.display = "grid";
+        document.querySelectorAll(".grafico-card").forEach(card => {
+            card.style.display = "block";
+        });
+
+        popularFiltro(dadosGlobais);
+        aplicarEstadoFiltros(estado.filtros);
+        atualizarFiltrosOptions();
+        calcularTotais(filtrarDados());
+    } catch (erro) {
+        console.error("Erro ao restaurar dados salvos:", erro);
+        sessionStorage.removeItem(STORAGE_KEY);
+    }
+}
 
 document.getElementById('upload').addEventListener('change', function(e){
 
@@ -375,7 +516,24 @@ document.getElementById('upload').addEventListener('change', function(e){
         const data = new Uint8Array(event.target.result);
         const workbook = XLSX.read(data, {type:'array', cellDates:true});
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const json = XLSX.utils.sheet_to_json(sheet);
+
+        const linhas = XLSX.utils.sheet_to_json(sheet, {header: 1, defval: ""});
+        const cabecalhos = linhas[0];
+
+        const json = linhas.slice(1).map(linha => {
+            const obj = {};
+
+            cabecalhos.forEach((cabecalho, index) => {
+                if(cabecalho){
+                    obj[cabecalho] = linha[index];
+                }
+            });
+
+            obj.__TAG_AC = linha[28];
+            obj.__PREVENTIVA_BG = linha[58];
+
+            return obj;
+        });
 
         dadosGlobais = json;
         document.querySelector(".cards").style.display = "grid";
@@ -384,40 +542,140 @@ document.getElementById('upload').addEventListener('change', function(e){
         });
         popularFiltro(json);
         calcularTotais(json);
+        salvarEstadoPagina();
     };
 
     reader.readAsArrayBuffer(file);
 });
 
-
-document.getElementById("filtroTecnico").addEventListener("change", function(){
-
-    const tecnico = this.value;
-
-    if(!tecnico){
-        calcularTotais(dadosGlobais);
-        return;
-    }
-
-    const filtrado = dadosGlobais.filter(linha =>
-        (linha["TÉCNICO DESIGNADO"] || "Não informado") === tecnico
-    );
-
-    calcularTotais(filtrado);
+["filtroTecnico", "filtroTipo", "filtroEquipamento", "filtroMarca", "filtroModelo"].forEach(id => {
+    document.getElementById(id).addEventListener("change", aplicarFiltros);
 });
 
 btnLimpar.addEventListener("click", limparFiltros);
 
 function popularFiltro(dados){
+    atualizarFiltrosOptions();
+}
 
-    const select = document.getElementById("filtroTecnico");
-    select.innerHTML = '<option value="">Todos</option>';
+function getSelecionados(id){
+    return Array.from(document.querySelectorAll(`#${id} input:checked`)).map(input => input.value);
+}
 
-    const tecnicos = [...new Set(dados.map(l => l["TÉCNICO DESIGNADO"] || "Não informado"))];
+function criarCheckboxes(container, valores, selecionados){
+    container.innerHTML = "";
 
-    tecnicos.forEach(t => {
-        select.innerHTML += `<option value="${t}">${t}</option>`;
+    valores.forEach(valor => {
+        const label = document.createElement("label");
+        label.className = "filtro-checkbox-item";
+
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.value = valor;
+        input.checked = selecionados.includes(valor);
+
+        label.appendChild(input);
+        label.appendChild(document.createTextNode(valor));
+        container.appendChild(label);
     });
+}
+
+function marcarFiltroUnico(id, valor){
+    document.querySelectorAll(`#${id} input`).forEach(input => {
+        input.checked = input.value === valor;
+    });
+}
+
+function filtrarDados(excluirFiltroId = null){
+    let dados = dadosGlobais;
+
+    const tecnicosSelecionados = getSelecionados("filtroTecnico");
+    const tiposSelecionados = getSelecionados("filtroTipo");
+    const equipamentosSelecionados = getSelecionados("filtroEquipamento");
+    const marcasSelecionadas = getSelecionados("filtroMarca");
+    const modelosSelecionados = getSelecionados("filtroModelo");
+
+    if(excluirFiltroId !== "filtroTecnico" && tecnicosSelecionados.length){
+        dados = dados.filter(linha =>
+            tecnicosSelecionados.includes(String(linha["TÉCNICO DESIGNADO"] || "Não informado").trim())
+        );
+    }
+
+    if(excluirFiltroId !== "filtroTipo" && tiposSelecionados.length){
+        dados = dados.filter(linha =>
+            tiposSelecionados.includes(String(linha["TIPO DA SS"] || "Não informado").trim())
+        );
+    }
+
+    if(excluirFiltroId !== "filtroEquipamento" && equipamentosSelecionados.length){
+        dados = dados.filter(linha =>
+            equipamentosSelecionados.includes(String(linha["TIPO DO EQUIPAMENTO"] || "Não informado").trim())
+        );
+    }
+
+    if(excluirFiltroId !== "filtroMarca" && marcasSelecionadas.length){
+        dados = dados.filter(linha =>
+            marcasSelecionadas.includes(String(linha["MARCA"] || "Não informado").trim())
+        );
+    }
+
+    if(excluirFiltroId !== "filtroModelo" && modelosSelecionados.length){
+        dados = dados.filter(linha =>
+            modelosSelecionados.includes(String(linha["MODELO"] || "Não informado").trim())
+        );
+    }
+
+    return dados;
+}
+
+function atualizarFiltrosOptions(){
+    const filtroTecnico = document.getElementById("filtroTecnico");
+    const filtroTipo = document.getElementById("filtroTipo");
+    const filtroEquipamento = document.getElementById("filtroEquipamento");
+    const filtroMarca = document.getElementById("filtroMarca");
+    const filtroModelo = document.getElementById("filtroModelo");
+
+    const tecnicosSelecionados = getSelecionados("filtroTecnico");
+    const tiposSelecionados = getSelecionados("filtroTipo");
+    const equipamentosSelecionados = getSelecionados("filtroEquipamento");
+    const marcasSelecionadas = getSelecionados("filtroMarca");
+    const modelosSelecionados = getSelecionados("filtroModelo");
+
+    const dadosParaTecnico = filtrarDados("filtroTecnico");
+    const tecnicos = [...new Set(dadosParaTecnico.map(l => String(l["TÉCNICO DESIGNADO"] || "Não informado").trim()))]
+        .filter(v => v !== "")
+        .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
+    criarCheckboxes(filtroTecnico, tecnicos, tecnicosSelecionados);
+
+    const dadosParaTipo = filtrarDados("filtroTipo");
+    const tipos = [...new Set(dadosParaTipo.map(l => String(l["TIPO DA SS"] || "Não informado").trim()))]
+        .filter(v => v !== "")
+        .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
+    criarCheckboxes(filtroTipo, tipos, tiposSelecionados);
+
+    const dadosParaEquipamento = filtrarDados("filtroEquipamento");
+    const equipamentos = [...new Set(dadosParaEquipamento.map(l => String(l["TIPO DO EQUIPAMENTO"] || "Não informado").trim()))]
+        .filter(v => v !== "")
+        .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
+    criarCheckboxes(filtroEquipamento, equipamentos, equipamentosSelecionados);
+
+    const dadosParaMarca = filtrarDados("filtroMarca");
+    const marcas = [...new Set(dadosParaMarca.map(l => String(l["MARCA"] || "Não informado").trim()))]
+        .filter(v => v !== "")
+        .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
+    criarCheckboxes(filtroMarca, marcas, marcasSelecionadas);
+
+    const dadosParaModelo = filtrarDados("filtroModelo");
+    const modelos = [...new Set(dadosParaModelo.map(l => String(l["MODELO"] || "Não informado").trim()))]
+        .filter(v => v !== "")
+        .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
+    criarCheckboxes(filtroModelo, modelos, modelosSelecionados);
+}
+
+function aplicarFiltros(){
+    atualizarFiltrosOptions();
+    calcularTotais(filtrarDados());
+    salvarEstadoPagina();
 }
 
 function toHoras(valor){
@@ -466,9 +724,50 @@ function calcularDiasUteis(dataInicio, dataFim){
     return dias;
 }
 
+function valorDiferenteDeZero(valor){
+    if(valor === undefined || valor === null || valor === "") return false;
+
+    const texto = String(valor).trim();
+
+    if(texto === "") return false;
+
+    const numero = Number(texto.replace(",", "."));
+
+    if(!isNaN(numero)){
+        return numero !== 0;
+    }
+
+    return texto !== "0";
+}
+
 function calcularTotais(dados){
 
     document.getElementById("totalAtendimento").innerText = dados.length;
+
+    const tagsPreventivas = new Set();
+
+    dados.forEach(linha => {
+        const tag = String(linha.__TAG_AC || "").trim();
+
+        if(tag && valorDiferenteDeZero(linha.__PREVENTIVA_BG)){
+            tagsPreventivas.add(tag);
+        }
+    });
+
+    document.getElementById("totalPreventivas").innerText = tagsPreventivas.size;
+
+    const totalCorretivas = dados.filter(linha => {
+        const tipoSS = String(linha["TIPO DA SS"] || "").trim().toUpperCase();
+        return tipoSS === "CORRETIVA EMERGENCIAL" || tipoSS === "CORRETIVA PLANEJADA";
+    }).length;
+
+    const totalAvarias = dados.filter(linha => {
+        const tipoSS = String(linha["TIPO DA SS"] || "").trim().toUpperCase();
+        return tipoSS === "AVARIA";
+    }).length;
+
+    document.getElementById("totalCorretivas").innerText = totalCorretivas;
+    document.getElementById("totalAvarias").innerText = totalAvarias;
 
     const totaisTipo = {};
     const totaisTecnico = {};
@@ -499,10 +798,11 @@ function calcularTotais(dados){
         if(data) datas.push(data);
     });
 
-    // Criar gráfico de pizza para tipos de atendimento
     criarGraficoPizza(totaisTipo);
 
     let horasUteis = 0;
+
+    document.getElementById("periodoAnalisado").innerText = "Período analisado: -";
 
     if(datas.length){
 
@@ -511,15 +811,12 @@ function calcularTotais(dados){
         const dataMin = datas[0];
         const dataMax = datas[datas.length-1];
 
-        document.getElementById("dataMin").innerText =
-        dataMin.toLocaleDateString()+" "+dataMin.toLocaleTimeString();
-
-        document.getElementById("dataMax").innerText =
-        dataMax.toLocaleDateString()+" "+dataMax.toLocaleTimeString();
+        document.getElementById("periodoAnalisado").innerText =
+        `Período analisado: ${dataMin.toLocaleDateString("pt-BR")} a ${dataMax.toLocaleDateString("pt-BR")}`;
 
         const diasUteis = calcularDiasUteis(dataMin, dataMax);
 
-        horasUteis = diasUteis * 8.8; // 8h48 = 8.8
+        horasUteis = diasUteis * 8.8;
     }
 
     criarGrafico("graficoTecnico","Atendimentos",Object.keys(totaisTecnico),Object.values(totaisTecnico),grafico,v=>grafico=v,true);
@@ -535,7 +832,6 @@ function calcularTotais(dados){
     criarGrafico("graficoDeslocamento","Horas Deslocamento",["Total"],[horasDesloc],g4,v=>g4=v,false);
     criarGrafico("graficoMaquina","Máquina Parada",["Total"],[maquinaParada],g5,v=>g5=v,false);
 
-    // Mostrar/ocultar botão limpar filtros
     btnLimpar.style.display = existeFiltroAtivo() ? "inline-block" : "none";
 }
 
@@ -584,38 +880,22 @@ function criarGraficoPizza(totaisTipo){
 
     const labels = Object.keys(totaisTipo);
     const data = Object.values(totaisTipo);
-    const total = data.reduce((sum, val) => sum + val, 0);
 
     graficoTipos = new Chart(document.getElementById("graficoTipos"),{
-        type:'pie',
+        type:'bar',
         data:{
             labels:labels,
             datasets:[{
+                label: "Atendimentos",
                 data:data,
-                backgroundColor: [
-                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
-                    '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384'
-                ]
+                backgroundColor: '#34a853'
             }]
         },
         options:{
             responsive:true,
             plugins:{
                 legend:{
-                    position:'bottom',
-                    labels:{
-                        padding: 20,
-                        usePointStyle: true
-                    }
-                },
-                tooltip:{
-                    callbacks:{
-                        label: function(context){
-                            const valor = context.raw;
-                            const porcentagem = ((valor / total) * 100).toFixed(1);
-                            return `${context.label}: ${valor} (${porcentagem}%)`;
-                        }
-                    }
+                    display:false
                 }
             },
             onClick: (event, elements) => {
@@ -630,47 +910,31 @@ function criarGraficoPizza(totaisTipo){
 }
 
 function filtrarPorTecnico(tecnico){
-    document.getElementById("filtroTecnico").value = tecnico;
-
-    if(!tecnico || tecnico === ""){
-        calcularTotais(dadosGlobais);
-        return;
-    }
-
-    const filtrado = dadosGlobais.filter(linha =>
-        (linha["TÉCNICO DESIGNADO"] || "Não informado") === tecnico
-    );
-
-    calcularTotais(filtrado);
+    marcarFiltroUnico("filtroTecnico", tecnico);
+    aplicarFiltros();
 }
 
 function filtrarPorTipo(tipo){
-    if(!tipo || tipo === ""){
-        calcularTotais(dadosGlobais);
-        return;
-    }
-
-    // Resetar filtro de técnico quando filtrar por tipo
-    document.getElementById("filtroTecnico").value = "";
-
-    const filtrado = dadosGlobais.filter(linha =>
-        linha["TIPO DA SS"] === tipo
-    );
-
-    calcularTotais(filtrado);
+    marcarFiltroUnico("filtroTipo", tipo);
+    aplicarFiltros();
 }
 
 function existeFiltroAtivo(){
-    const filtroTecnico = document.getElementById("filtroTecnico").value;
-    return filtroTecnico && filtroTecnico !== "";
+    return getSelecionados("filtroTecnico").length > 0 ||
+           getSelecionados("filtroTipo").length > 0 ||
+           getSelecionados("filtroEquipamento").length > 0 ||
+           getSelecionados("filtroMarca").length > 0 ||
+           getSelecionados("filtroModelo").length > 0;
 }
 
 function limparFiltros(){
-    // Resetar filtro de técnico
-    document.getElementById("filtroTecnico").value = "";
+    document.querySelectorAll(".filtro-checkboxes input").forEach(input => {
+        input.checked = false;
+    });
 
-    // Recalcular totais com todos os dados
+    atualizarFiltrosOptions();
     calcularTotais(dadosGlobais);
+    salvarEstadoPagina();
 }
 
 function toggleMenu() {
@@ -680,35 +944,47 @@ function toggleMenu() {
     }
 }
 
+function logout() {
+    sessionStorage.clear();
+    localStorage.removeItem("usuarioLogado");
+    localStorage.removeItem("logado");
+    localStorage.removeItem("isLoggedIn");
+    window.location.href = "login.html";
+}
+
+window.logout = logout;
+
+window.addEventListener("DOMContentLoaded", restaurarEstadoPagina);
+
 </script>
-          <!-- RODAPÉ -->
-        <footer class="footer">
-            <div class="footer-container">
-                <div class="footer-col">
-                    <h3>Tractorbel Equipamentos</h3>
-                    <p>BR-040, 8245 - KM 523 - Chácaras Boa Vista, Contagem - MG, 32150-193</p>
-                    <p>programacaorental04@tractorbel.com.br</p>
-                </div>
 
-                <div class="footer-col">
-                    <h3>Contato</h3>
-                    <div class="footer-social">
-                        <a href="https://br.linkedin.com/company/tractorbel-equipamentos" target="_blank">
-                            <img src="png/logo-linkedin.png" alt="">
-                        </a>
-                        <a href="https://api.whatsapp.com/send/?phone=558008801422" target="_blank">
-                            <img src="png/logo-whatsapp.png" alt="">
-                        </a>
-                        <a href="https://www.instagram.com/tractorbelequip/" target="_blank">
-                            <img src="png/logo-instagram.png" alt="">
-                        </a>
-                    </div>
-                    <p>© 2026 Tractorbel Equipamentos - Todos os direitos reservados</p>
-                    <p>Desenvolvido por Tâmmer Leonel</p>
-                </div>
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-col">
+            <h3>Tractorbel Equipamentos</h3>
+            <p>BR-040, 8245 - KM 523 - Chácaras Boa Vista, Contagem - MG, 32150-193</p>
+            <p>programacaorental04@tractorbel.com.br</p>
+        </div>
+
+        <div class="footer-col">
+            <h3>Contato</h3>
+            <div class="footer-social">
+                <a href="https://br.linkedin.com/company/tractorbel-equipamentos" target="_blank">
+                    <img src="png/logo-linkedin.png" alt="">
+                </a>
+                <a href="https://api.whatsapp.com/send/?phone=558008801422" target="_blank">
+                    <img src="png/logo-whatsapp.png" alt="">
+                </a>
+                <a href="https://www.instagram.com/tractorbelequip/" target="_blank">
+                    <img src="png/logo-instagram.png" alt="">
+                </a>
             </div>
-        </footer>
+            <p>© 2026 Tractorbel Equipamentos - Todos os direitos reservados</p>
+            <p>Desenvolvido por Tâmmer Leonel</p>
+        </div>
+    </div>
+</footer>
 
-    <script type="module" src="login.js"></script>
+<script type="module" src="login.js"></script>
 </body>
 </html>
