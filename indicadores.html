@@ -91,6 +91,21 @@
       box-shadow: 0 0 0 3px rgba(52, 168, 83, 0.12);
     }
 
+.filtro-busca {
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid #cfd8dc;
+  border-radius: 8px;
+  font-size: 12px;
+  margin-bottom: 6px;
+  outline: none;
+}
+
+.filtro-busca:focus {
+  border-color: #34a853;
+  box-shadow: 0 0 0 2px rgba(52, 168, 83, 0.12);
+}
+
 .filtro-checkboxes {
   width: 100%;
   max-height: 130px;
@@ -381,26 +396,31 @@
 <div class="topo-controles">
   <div class="filtro-box">
     <label class="titulo-filtro">Técnico</label>
+    <input class="filtro-busca" id="buscaFiltroTecnico" placeholder="Buscar..." />
     <div id="filtroTecnico" class="filtro-checkboxes"></div>
   </div>
 
   <div class="filtro-box">
     <label class="titulo-filtro">Tipo de Atendimento</label>
+    <input class="filtro-busca" id="buscaFiltroTipo" placeholder="Buscar..." />
     <div id="filtroTipo" class="filtro-checkboxes"></div>
   </div>
 
   <div class="filtro-box">
     <label class="titulo-filtro">Tipo do Equipamento</label>
+    <input class="filtro-busca" id="buscaFiltroEquipamento" placeholder="Buscar..." />
     <div id="filtroEquipamento" class="filtro-checkboxes"></div>
   </div>
 
   <div class="filtro-box">
     <label class="titulo-filtro">Marca</label>
+    <input class="filtro-busca" id="buscaFiltroMarca" placeholder="Buscar..." />
     <div id="filtroMarca" class="filtro-checkboxes"></div>
   </div>
 
   <div class="filtro-box">
     <label class="titulo-filtro">Modelo</label>
+    <input class="filtro-busca" id="buscaFiltroModelo" placeholder="Buscar..." />
     <div id="filtroModelo" class="filtro-checkboxes"></div>
   </div>
 </div>
@@ -558,6 +578,10 @@ document.getElementById('upload').addEventListener('change', function(e){
     document.getElementById(id).addEventListener("change", aplicarFiltros);
 });
 
+["buscaFiltroTecnico", "buscaFiltroTipo", "buscaFiltroEquipamento", "buscaFiltroMarca", "buscaFiltroModelo"].forEach(id => {
+    document.getElementById(id).addEventListener("input", atualizarFiltrosOptions);
+});
+
 btnLimpar.addEventListener("click", limparFiltros);
 
 function popularFiltro(dados){
@@ -568,10 +592,39 @@ function getSelecionados(id){
     return Array.from(document.querySelectorAll(`#${id} input:checked`)).map(input => input.value);
 }
 
+function getTextoBuscaFiltro(id){
+    const mapaBusca = {
+        filtroTecnico: "buscaFiltroTecnico",
+        filtroTipo: "buscaFiltroTipo",
+        filtroEquipamento: "buscaFiltroEquipamento",
+        filtroMarca: "buscaFiltroMarca",
+        filtroModelo: "buscaFiltroModelo"
+    };
+
+    const input = document.getElementById(mapaBusca[id]);
+    return input ? input.value.trim().toLowerCase() : "";
+}
+
 function criarCheckboxes(container, valores, selecionados){
     container.innerHTML = "";
 
-    valores.forEach(valor => {
+    const busca = getTextoBuscaFiltro(container.id);
+
+    const valoresFiltrados = busca
+        ? valores.filter(valor => valor.toLowerCase().includes(busca))
+        : valores;
+
+    const valoresFinais = [
+        ...selecionados.filter(valor => !valoresFiltrados.includes(valor)),
+        ...valoresFiltrados
+    ];
+
+    if(!valoresFinais.length){
+        container.innerHTML = '<div style="font-size:12px;color:#777;padding:6px;">Nenhum item</div>';
+        return;
+    }
+
+    valoresFinais.forEach(valor => {
         const label = document.createElement("label");
         label.className = "filtro-checkbox-item";
 
@@ -891,15 +944,14 @@ function criarGraficoPizza(totaisTipo){
         type:'bar',
         data:{
             labels:labels,
-           datasets:[{
-    label: "Atendimentos",
-    data:data,
-    backgroundColor: '#34a853',
-    barPercentage: 0.9,
-    categoryPercentage: 0.8,
-    maxBarThickness: 80
-}]
-
+            datasets:[{
+                label: "Atendimentos",
+                data:data,
+                backgroundColor: '#34a853',
+                barPercentage: 0.9,
+                categoryPercentage: 0.8,
+                maxBarThickness: 80
+            }]
         },
         options:{
             responsive:true,
@@ -947,6 +999,10 @@ function existeFiltroAtivo(){
 function limparFiltros(){
     document.querySelectorAll(".filtro-checkboxes input").forEach(input => {
         input.checked = false;
+    });
+
+    document.querySelectorAll(".filtro-busca").forEach(input => {
+        input.value = "";
     });
 
     atualizarFiltrosOptions();
