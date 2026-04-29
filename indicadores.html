@@ -215,6 +215,12 @@
       cursor: pointer;
     }
 
+    #graficoTipos {
+      height: 350px !important;
+      max-height: none;
+      cursor: pointer;
+    }
+
 .grafico-card {
   display: none;
 }
@@ -401,7 +407,7 @@
 
 <div class="cards">
 <div class="card">
-<h3>Total de Atendimento</h3>
+<h3>Total de Atendimentos</h3>
 <div class="total" id="totalAtendimento">0</div>
 </div>
 
@@ -885,17 +891,27 @@ function criarGraficoPizza(totaisTipo){
         type:'bar',
         data:{
             labels:labels,
-            datasets:[{
-                label: "Atendimentos",
-                data:data,
-                backgroundColor: '#34a853'
-            }]
+           datasets:[{
+    label: "Atendimentos",
+    data:data,
+    backgroundColor: '#34a853',
+    barPercentage: 0.9,
+    categoryPercentage: 0.8,
+    maxBarThickness: 80
+}]
+
         },
         options:{
             responsive:true,
+            maintainAspectRatio:false,
             plugins:{
                 legend:{
                     display:false
+                }
+            },
+            scales:{
+                y:{
+                    beginAtZero:true
                 }
             },
             onClick: (event, elements) => {
@@ -908,6 +924,7 @@ function criarGraficoPizza(totaisTipo){
         }
     });
 }
+
 
 function filtrarPorTecnico(tecnico){
     marcarFiltroUnico("filtroTecnico", tecnico);
