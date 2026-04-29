@@ -503,6 +503,7 @@ body {
     let graficos = [];
     let atualizandoFiltros = false;
     const scrollFiltros = {};
+    const STORAGE_KEY = "indicadores_financeiro_estado";
 
     const mesInicio = document.getElementById("mesInicio");
     const mesFim = document.getElementById("mesFim");
@@ -531,6 +532,84 @@ body {
       filtroModelo: "modelo",
       filtroAno: "ano"
     };
+
+    function getEstadoFiltros() {
+      const filtros = {};
+
+      filtrosIds.forEach((id) => {
+        filtros[id] = getMultiValues(id);
+      });
+
+      return filtros;
+    }
+
+    function aplicarEstadoFiltros(filtros) {
+      if (!filtros) return;
+
+      filtrosIds.forEach((id) => {
+        const valores = filtros[id] || [];
+
+        document.querySelectorAll(`#${id} input[type="checkbox"]`).forEach((input) => {
+          input.checked = valores.includes(input.value);
+        });
+      });
+    }
+
+    function salvarEstadoPagina() {
+      if (!dadosGlobais.length) return;
+
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+        dados: dadosGlobais,
+        filtros: getEstadoFiltros(),
+        mesInicio: mesInicio.value,
+        mesFim: mesFim.value
+      }));
+    }
+
+    function restaurarEstadoPagina() {
+      const estadoSalvo = sessionStorage.getItem(STORAGE_KEY);
+      if (!estadoSalvo) return;
+
+      try {
+        const estado = JSON.parse(estadoSalvo);
+
+        if (!estado.dados || !estado.dados.length) return;
+
+        dadosGlobais = estado.dados.map((d) => ({
+          ...d,
+          data: new Date(d.data)
+        })).filter((d) => !isNaN(d.data));
+
+        if (!dadosGlobais.length) return;
+
+        mesInicio.disabled = false;
+        mesFim.disabled = false;
+        mesInicio.value = estado.mesInicio || "";
+        mesFim.value = estado.mesFim || "";
+
+        atualizarFiltros();
+        aplicarEstadoFiltros(estado.filtros);
+        bindBuscaFiltros();
+        gerarRelatorio();
+
+        statusCarga.innerText = "";
+      } catch (erro) {
+        console.error("Erro ao restaurar dados salvos:", erro);
+        sessionStorage.removeItem(STORAGE_KEY);
+      }
+    }
+
+    function bindBuscaFiltros() {
+      filtrosIds.forEach((id) => {
+        const buscaId = "busca" + id.charAt(0).toUpperCase() + id.slice(1);
+        const inputBusca = document.getElementById(buscaId);
+
+        if (inputBusca && !inputBusca.dataset.binded) {
+          inputBusca.addEventListener("input", () => atualizarFiltrosDinamicamente());
+          inputBusca.dataset.binded = "1";
+        }
+      });
+    }
 
     function converterNumero(valor) {
       if (valor === null || valor === undefined || valor === "") return 0;
@@ -889,7 +968,7 @@ body {
         mesInicioVal &&
         mesFimVal;
 
-            if (mostrarGraficoMes) {
+      if (mostrarGraficoMes) {
         const dtIni = new Date(mesInicioVal + "-01T00:00:00");
         const dtFim = new Date(mesFimVal + "-01T00:00:00");
 
@@ -930,13 +1009,14 @@ body {
       } else {
         document.getElementById("cardGraficoMes").style.display = "none";
       }
-            const clienteSelecionado = getMultiValues("filtroCliente");
+
+      const clienteSelecionado = getMultiValues("filtroCliente");
       const mostrarGraficoClienteMes =
         clienteSelecionado.length === 1 &&
         mesInicioVal &&
         mesFimVal;
 
-            if (mostrarGraficoClienteMes) {
+      if (mostrarGraficoClienteMes) {
         const dtIniCliente = new Date(mesInicioVal + "-01T00:00:00");
         const dtFimCliente = new Date(mesFimVal + "-01T00:00:00");
 
@@ -975,19 +1055,23 @@ body {
         } else {
           document.getElementById("cardGraficoClienteMes").style.display = "none";
         }
-            } else {
+      } else {
         document.getElementById("cardGraficoClienteMes").style.display = "none";
       }
     }
 
     function gerarRelatorio() {
-
       if (!dadosGlobais.length) return;
+
       atualizarFiltrosDinamicamente();
+
       const dadosFiltrados = filtrarDados();
+
       calcularTotais(dadosFiltrados);
       gerarGraficos(dadosFiltrados);
+
       btnLimpar.style.display = existeFiltroAtivo() ? "inline-block" : "none";
+      salvarEstadoPagina();
     }
 
     function sugerirPeriodoInicial() {
@@ -1066,17 +1150,9 @@ body {
 
           sugerirPeriodoInicial();
           atualizarFiltros();
-
-          filtrosIds.forEach((id) => {
-            const buscaId = "busca" + id.charAt(0).toUpperCase() + id.slice(1);
-            const inputBusca = document.getElementById(buscaId);
-            if (inputBusca && !inputBusca.dataset.binded) {
-              inputBusca.addEventListener("input", () => atualizarFiltrosDinamicamente());
-              inputBusca.dataset.binded = "1";
-            }
-          });
-
+          bindBuscaFiltros();
           gerarRelatorio();
+          salvarEstadoPagina();
 
           statusCarga.innerText = "Dados carregados com sucesso.";
           setTimeout(() => {
@@ -1106,35 +1182,50 @@ body {
         menu.classList.toggle("active");
       }
     }
+
+    function logout() {
+      sessionStorage.clear();
+      localStorage.removeItem("usuarioLogado");
+      localStorage.removeItem("logado");
+      localStorage.removeItem("isLoggedIn");
+      window.location.href = "login.html";
+    }
+
+    window.logout = logout;
+
+    window.addEventListener("DOMContentLoaded", restaurarEstadoPagina);
   </script>
-          <!-- RODAPÉ -->
-        <footer class="footer">
-            <div class="footer-container">
-                <div class="footer-col">
-                    <h3>Tractorbel Equipamentos</h3>
-                    <p>BR-040, 8245 - KM 523 - Chácaras Boa Vista, Contagem - MG, 32150-193</p>
-                    <p>programacaorental04@tractorbel.com.br</p>
-                </div>
 
-                <div class="footer-col">
-                    <h3>Contato</h3>
-                    <div class="footer-social">
-                        <a href="https://br.linkedin.com/company/tractorbel-equipamentos" target="_blank">
-                            <img src="png/logo-linkedin.png" alt="">
-                        </a>
-                        <a href="https://api.whatsapp.com/send/?phone=558008801422" target="_blank">
-                            <img src="png/logo-whatsapp.png" alt="">
-                        </a>
-                        <a href="https://www.instagram.com/tractorbelequip/" target="_blank">
-                            <img src="png/logo-instagram.png" alt="">
-                        </a>
-                    </div>
-                    <p>© 2026 Tractorbel Equipamentos - Todos os direitos reservados</p>
-                    <p>Desenvolvido por Tâmmer Leonel</p>
-                </div>
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-col">
+            <h3>Tractorbel Equipamentos</h3>
+            <p>BR-040, 8245 - KM 523 - Chácaras Boa Vista, Contagem - MG, 32150-193</p>
+            <p>programacaorental04@tractorbel.com.br</p>
+        </div>
+
+        <div class="footer-col">
+            <h3>Contato</h3>
+            <div class="footer-social">
+                <a href="https://br.linkedin.com/company/tractorbel-equipamentos" target="_blank">
+                    <img src="png/logo-linkedin.png" alt="">
+                </a>
+                <a href="https://api.whatsapp.com/send/?phone=558008801422" target="_blank">
+                    <img src="png/logo-whatsapp.png" alt="">
+                </a>
+                <a href="https://www.instagram.com/tractorbelequip/" target="_blank">
+                    <img src="png/logo-instagram.png" alt="">
+                </a>
             </div>
-        </footer>
+            <p>© 2026 Tractorbel Equipamentos - Todos os direitos reservados</p>
+            <p>Desenvolvido por Tâmmer Leonel</p>
+        </div>
+    </div>
+</footer>
 
-    <script src="login.js"></script>
+<script src="login.js"></script>
+<script>
+  window.logout = logout;
+</script>
 </body>
 </html>
