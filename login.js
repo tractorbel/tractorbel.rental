@@ -68,7 +68,7 @@ if(document.getElementById("login") && document.getElementById("conteudo")) {
   // Para outras páginas, verificar se usuário está logado e redirecionar se não estiver
   onAuthStateChanged(auth, user => {
     if(!user) {
-      window.location.href = "index.html";
+      window.location.href = "indicadores-resultado.html";
     }
   });
 }
