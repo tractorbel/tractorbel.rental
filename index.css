@@ -249,7 +249,6 @@ body{
     margin-bottom: 10px;
 }
 
-
 .veiculos-page {
     display: flex;
     justify-content: center;
@@ -296,7 +295,7 @@ body{
 /* Media queries for responsive design */
 @media (max-width: 768px) {
     body {
-        margin: 12px;
+        margin: 0px;
     }
 
     .cards {
@@ -328,8 +327,7 @@ body{
     }
         #conteudo {
       background: #fff;
-      border-radius: 12px;
-      padding: 16px;
+      border-radius: 12px;     
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
       display: block;
     }
