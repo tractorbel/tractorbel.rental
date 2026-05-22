@@ -286,11 +286,12 @@ FLUXOGRAMA Pedido de venda casada fábrica
 
 <script>
 function filtrarDocumentos() {
-    const input = document.getElementById('pesquisa').value.toLowerCase();
+    const input = document.getElementById('pesquisa').value.toLowerCase().trim();
     const cards = document.querySelectorAll('.card');
 
     cards.forEach(card => {
-        const texto = card.innerText.toLowerCase();
+        const a = card.querySelector('a');
+        const texto = a ? a.innerText.toLowerCase() : card.innerText.toLowerCase();
 
         if (texto.includes(input)) {
             card.style.display = "block";
@@ -306,6 +307,36 @@ function toggleMenu() {
         menu.classList.toggle("active");
     }
 }
+
+function makeCardsClickable() {
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+        const a = card.querySelector('a');
+        if (!a) return;
+
+        card.style.cursor = 'pointer';
+        card.setAttribute('role', 'link');
+        card.tabIndex = 0;
+
+        card.addEventListener('click', (e) => {
+            if (e.target.closest('a')) return; // let native link clicks behave
+            const target = a.target === '_blank' ? '_blank' : '_self';
+            window.open(a.href, target);
+        });
+
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const target = a.target === '_blank' ? '_blank' : '_self';
+                window.open(a.href, target);
+            }
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    makeCardsClickable();
+});
 </script>
         <!-- RODAPÉ -->
         <footer class="footer">
