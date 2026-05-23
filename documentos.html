@@ -956,42 +956,10 @@ function renderDocuments() {
     iconEl.textContent = "📄";
     card.appendChild(iconEl);
 
-    const titleEl = document.createElement("div");
-    titleEl.className = "doc-title";
-    titleEl.textContent = doc.title;
-    titleEl.contentEditable = isAdmin;
-    titleEl.dataset.id = doc.id;
-    titleEl.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        titleEl.blur();
-      }
-    });
-    titleEl.addEventListener("blur", async () => {
-      const newTitle = titleEl.textContent.trim();
-      if (!newTitle) {
-        titleEl.textContent = doc.title;
-        return;
-      }
-      if (newTitle !== doc.title) {
-        if (!isAdmin) {
-          titleEl.textContent = doc.title;
-          showToast("Faça login para renomear documentos.", "error");
-          return;
-        }
-        doc.title = newTitle;
-        doc.updatedAt = Date.now();
-        await saveDocument(doc);
-        documentsCache = documentsCache.map((item) => item.id === doc.id ? doc : item);
-        showToast("Título atualizado com sucesso.");
-      }
-    });
-    card.appendChild(titleEl);
-
     const link = document.createElement("a");
     link.href = doc.fileBlob ? makeObjectUrl(`${doc.id}-file`, doc.fileBlob) : doc.fileUrl;
     link.target = "_blank";
-    link.textContent = doc.fileName || "Abrir documento";
+    link.textContent = doc.title || doc.fileName || "Abrir documento";
     card.appendChild(link);
 
     const actions = document.createElement("div");
