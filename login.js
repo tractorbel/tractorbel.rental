@@ -27,9 +27,11 @@ function mostrarConteudo(user){
   
   if(user){
     login.style.display = "none";
+    conteudo.classList.remove("hidden");
     conteudo.style.display = "block";
   }else{
-    login.style.display = "block";
+    login.style.display = "flex";
+    conteudo.classList.add("hidden");
     conteudo.style.display = "none";
   }
 }
@@ -40,9 +42,10 @@ function inicializarPagina(){
   const conteudo = document.getElementById("conteudo");
   if(!login || !conteudo) return; // Só executar se os elementos existirem
   
-  // Mostrar conteúdo por padrão para evitar "piscar" da tela de login
-  login.style.display = "none";
-  conteudo.style.display = "block";
+  // Exibir login enquanto o Firebase confirma se existe sessao ativa
+  login.style.display = "flex";
+  conteudo.classList.add("hidden");
+  conteudo.style.display = "none";
 }
 
 window.login = function() {
@@ -61,7 +64,7 @@ window.logout = function() {
 
 // Só executar verificação de estado se os elementos existirem (página index.html)
 if(document.getElementById("login") && document.getElementById("conteudo")) {
-  // Inicializar mostrando conteúdo para evitar "piscar"
+  // Inicializar mostrando login ate a validacao do Firebase terminar
   inicializarPagina();
   
   // Verificar estado de autenticação
@@ -287,8 +290,11 @@ function gerarGraficos(dados){
 }
 
 // ------------------- EVENTOS -------------------
-dataInicio.addEventListener("change", gerarRelatorio);
-dataFim.addEventListener("change", gerarRelatorio);
-document.getElementById("btnCarregar").addEventListener("click", carregarDados);
-document.getElementById("btnRelatorio").addEventListener("click", gerarRelatorio);
+if(dataInicio) dataInicio.addEventListener("change", gerarRelatorio);
+if(dataFim) dataFim.addEventListener("change", gerarRelatorio);
 
+const btnCarregar = document.getElementById("btnCarregar");
+const btnRelatorio = document.getElementById("btnRelatorio");
+
+if(btnCarregar) btnCarregar.addEventListener("click", carregarDados);
+if(btnRelatorio) btnRelatorio.addEventListener("click", gerarRelatorio);
