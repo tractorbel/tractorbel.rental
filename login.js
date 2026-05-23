@@ -54,7 +54,9 @@ window.login = function() {
 };
 
 window.logout = function() {
-  signOut(auth);
+    signOut(auth).then(() => {
+        try { window.location.href = 'index.html'; } catch(e){}
+    }).catch(()=>{});
 };
 
 // Só executar verificação de estado se os elementos existirem (página index.html)
@@ -65,12 +67,12 @@ if(document.getElementById("login") && document.getElementById("conteudo")) {
   // Verificar estado de autenticação
   onAuthStateChanged(auth, user => mostrarConteudo(user));
 } else {
-  // Para outras páginas, verificar se usuário está logado e redirecionar se não estiver
-  onAuthStateChanged(auth, user => {
-    if(!user) {
-      window.location.href = "indicadores-resultado.html";
-    }
-  });
+    // Para outras páginas, verificar se usuário está logado e redirecionar ao login se não estiver
+    onAuthStateChanged(auth, user => {
+        if(!user) {
+            window.location.href = "index.html";
+        }
+    });
 }
 
 // ------------------- VARIÁVEIS GLOBAIS -------------------

@@ -1018,11 +1018,11 @@ function toggleMenu() {
 }
 
 function logout() {
-    sessionStorage.clear();
-    localStorage.removeItem("usuarioLogado");
-    localStorage.removeItem("logado");
-    localStorage.removeItem("isLoggedIn");
-    window.location.href = "login.html";
+  sessionStorage.clear();
+  localStorage.removeItem("usuarioLogado");
+  localStorage.removeItem("logado");
+  localStorage.removeItem("isLoggedIn");
+  window.location.href = "index.html";
 }
 
 window.logout = logout;
