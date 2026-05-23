@@ -290,6 +290,10 @@ body{
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
+/* Utility helpers */
+.hidden{display:none !important}
+.align-center{display:flex;align-items:center;justify-content:center}
+
 .veiculos-chart figcaption {
     margin-top: 12px;
     font-size: 14px;
@@ -329,6 +333,11 @@ body{
       display: block;
       margin: 10px auto;
     }
+
+    .page-header{background:white;border-bottom:2px solid #ccc;padding:18px;border-radius:8px}
+
+    .logo-topo{margin-bottom:20px;margin-top:0}
+    .empty-item{font-size:12px;color:#777;padding:6px}
         #conteudo {
       background: #fff;
       border-radius: 12px;     
