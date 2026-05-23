@@ -316,19 +316,26 @@ function makeCardsClickable() {
 
         card.style.cursor = 'pointer';
         card.setAttribute('role', 'link');
+        card.setAttribute('aria-label', a.innerText.trim());
         card.tabIndex = 0;
 
         card.addEventListener('click', (e) => {
-            if (e.target.closest('a')) return; // let native link clicks behave
-            const target = a.target === '_blank' ? '_blank' : '_self';
-            window.open(a.href, target);
+            if (e.target.closest('a')) return;
+            if (a.target === '_blank') {
+                window.open(a.href, '_blank');
+            } else {
+                window.location.href = a.href;
+            }
         });
 
         card.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                const target = a.target === '_blank' ? '_blank' : '_self';
-                window.open(a.href, target);
+                if (a.target === '_blank') {
+                    window.open(a.href, '_blank');
+                } else {
+                    window.location.href = a.href;
+                }
             }
         });
     });
