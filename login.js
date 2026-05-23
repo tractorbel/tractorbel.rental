@@ -57,8 +57,16 @@ window.login = function() {
 };
 
 window.logout = function() {
+    const isIndexPage = document.getElementById("login") && document.getElementById("conteudo");
+    const menu = document.getElementById("menu");
+    if(menu) menu.classList.remove("active");
+
     signOut(auth).then(() => {
-        try { window.location.href = 'index.html'; } catch(e){}
+        if(isIndexPage) {
+            mostrarConteudo(null);
+        } else {
+            window.location.replace("index.html");
+        }
     }).catch(()=>{});
 };
 

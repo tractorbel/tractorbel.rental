@@ -1227,7 +1227,7 @@ window.toggleMenu = function () {
 
 window.logout = function () {
   signOut(auth).then(() => {
-    try { window.location.href = 'index.html'; } catch(e){}
+    try { window.location.replace('index.html'); } catch(e){}
   }).catch(() => {});
 };
 
