@@ -15,8 +15,15 @@ body{
 
 .barra-pesquisa{
   padding:20px;
-  text-align:center;
   background:#ffffff;
+}
+
+.search-actions{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
 }
 
 .barra-pesquisa input{
@@ -26,6 +33,16 @@ body{
   border-radius:8px;
   border:1px solid #ccc;
   font-size:16px;
+}
+
+.barra-pesquisa .btn{
+  border:1px solid #0b7a3e;
+  background:#0b7a3e;
+  color:white;
+  font-weight:600;
+  border-radius:8px;
+  padding:12px 18px;
+  cursor:pointer;
 }
 
 .galeria{
@@ -296,28 +313,19 @@ header h2 {
   <h2>Documentação Rental</h2>
 </header>
 
-<div class="admin-area">
-  <div class="admin-toolbar">
-    <div>
-      <button id="btnShowAddModal" class="btn hidden">Adicionar Documento</button>
-      <span class="admin-info" id="adminInfo">Modo de visualização. Faça login para gerenciar.</span>
-    </div>
-    <div class="admin-auth" id="adminAuth">
-      <input type="email" id="adminEmail" placeholder="Email admin" />
-      <input type="password" id="adminPassword" placeholder="Senha" />
-      <button id="btnAdminLogin" class="btn secondary">Entrar</button>
-      <button id="btnAdminLogout" class="btn secondary hidden">Sair</button>
-    </div>
+<div class="barra-pesquisa">
+  <div class="search-actions">
+    <input
+      id="pesquisa"
+      placeholder="🔎 Buscar documento..."
+      onkeyup="filtrarDocumentos()"
+    >
+    <button id="btnShowAddModal" class="btn hidden">Adicionar Documento</button>
   </div>
-  <div id="toast" class="toast hidden"></div>
 </div>
 
-<div class="barra-pesquisa">
-<input 
-id="pesquisa" 
-placeholder="🔎 Buscar documento..." 
-onkeyup="filtrarDocumentos()"
->
+<div class="admin-area">
+  <div id="toast" class="toast hidden"></div>
 </div>
 
 <div class="galeria" id="galeria">
@@ -633,7 +641,7 @@ FLUXOGRAMA Pedido de venda casada fábrica
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAAF5FLl8xawkivYCcjQGJyb2jo1_A1V7g",
@@ -678,11 +686,7 @@ const gallery = document.getElementById("galeria");
 const staticDocumentCards = [...gallery.querySelectorAll(".card")].map((card) => card.cloneNode(true));
 const toast = document.getElementById("toast");
 const btnShowAddModal = document.getElementById("btnShowAddModal");
-const btnAdminLogin = document.getElementById("btnAdminLogin");
-const btnAdminLogout = document.getElementById("btnAdminLogout");
-const adminInfo = document.getElementById("adminInfo");
-const adminEmail = document.getElementById("adminEmail");
-const adminPassword = document.getElementById("adminPassword");
+
 
 const API_BASE_URL = "http://localhost:4000";
 
@@ -1167,16 +1171,6 @@ function updateAdminState(user) {
   isAdmin = !!(user && user.email === ADMIN_EMAIL);
   document.body.classList.toggle("is-admin", isAdmin);
   btnShowAddModal.classList.toggle("hidden", !isAdmin);
-
-  if (isAdmin) {
-    adminInfo.textContent = "Autenticado como administrador. Agora você pode editar, adicionar e excluir documentos.";
-    btnAdminLogin.classList.add("hidden");
-    btnAdminLogout.classList.remove("hidden");
-  } else {
-    adminInfo.textContent = "Modo de visualização. Faça login com programacaorental04@tractorbel.com.br para gerenciar.";
-    btnAdminLogin.classList.remove("hidden");
-    btnAdminLogout.classList.add("hidden");
-  }
   if (documentsLoaded) renderDocuments();
 }
 
@@ -1193,29 +1187,6 @@ modalOverlay.addEventListener("click", (event) => {
   if (event.target === modalOverlay) closeModal();
 });
 modalSaveBtn.addEventListener("click", handleModalSave);
-
-btnAdminLogin.addEventListener("click", async () => {
-  const email = adminEmail.value.trim();
-  const password = adminPassword.value.trim();
-  if (!email || !password) {
-    showToast("Informe email e senha.", "error");
-    return;
-  }
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    showToast("Login realizado com sucesso.");
-    adminPassword.value = "";
-  } catch (error) {
-    console.error(error);
-    showToast("Login falhou. Verifique suas credenciais.", "error");
-  }
-});
-
-btnAdminLogout.addEventListener("click", () => {
-  signOut(auth).then(() => {
-    showToast("Logout efetuado.");
-  });
-});
 
 onAuthStateChanged(auth, (user) => {
   updateAdminState(user);
