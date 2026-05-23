@@ -76,29 +76,29 @@ body {
     .filtro-lista {
       flex: 1;
       overflow-y: auto;
-      overflow-x: hidden;
+        <input type="file" id="upload" accept=".xls,.xlsx" class="hidden">
       border: 1px solid #d8d8d8;
       border-radius: 6px;
       padding: 4px;
-      background: #fff;
+        <div class="align-center">
     }
 
     .filtro-item {
       display: flex;
       align-items: center;
-      gap: 6px;
+        <button id="btnLimpar" class="btn-google hidden">Limpar Filtros</button>
       padding: 4px 6px;
       border-radius: 4px;
       font-size: 12px;
-      cursor: pointer;
-      min-width: 0;
-    }
-
-    .filtro-item:hover {
-      background: #f1f8f2;
-    }
-
-    .filtro-item input {
+            <a href="https://br.linkedin.com/company/tractorbel-equipamentos" target="_blank" rel="noopener noreferrer" title="LinkedIn Tractorbel">
+              <img src="png/logo-linkedin.png" alt="LinkedIn">
+            </a>
+            <a href="https://api.whatsapp.com/send/?phone=558008801422" target="_blank" rel="noopener noreferrer" title="WhatsApp Tractorbel">
+              <img src="png/logo-whatsapp.png" alt="WhatsApp">
+            </a>
+            <a href="https://www.instagram.com/tractorbelequip/" target="_blank" rel="noopener noreferrer" title="Instagram Tractorbel">
+              <img src="png/logo-instagram.png" alt="Instagram">
+            </a>
       margin: 0;
       flex-shrink: 0;
       accent-color: #2e7d32;
@@ -384,21 +384,21 @@ body {
     <div class="topo-controles">
 <div class="campo-periodo">
   <label for="mesInicio">Mês/Ano Início</label>
-  <input type="month" id="mesInicio" disabled />
+  <input type="text" id="mesInicio" class="month-input" disabled placeholder="YYYY-MM" pattern="\d{4}-\d{2}" />
 </div>
 
 <div class="campo-periodo">
   <label for="mesFim">Mês/Ano Fim</label>
-  <input type="month" id="mesFim" disabled />
+  <input type="text" id="mesFim" class="month-input" disabled placeholder="YYYY-MM" pattern="\d{4}-\d{2}" />
 </div>
 
 
       <div>
         <label for="upload" class="btn-google">Enviar Planilha</label>
-        <input type="file" id="upload" accept=".xls,.xlsx" style="display:none;">
+        <input type="file" id="upload" accept=".xls,.xlsx" class="hidden">
       </div>
 
-      <div style="align-self:center;">
+      <div class="align-center">
         <span id="statusCarga"></span>
       </div>
     </div>
@@ -454,7 +454,7 @@ body {
     </div>
 
     <div id="acoes-filtros">
-      <button id="btnLimpar" class="btn-google" style="display:none;">Limpar Filtros</button>
+      <button id="btnLimpar" class="btn-google hidden">Limpar Filtros</button>
     </div>
 
     <div class="cards">
@@ -1207,14 +1207,14 @@ body {
         <div class="footer-col">
             <h3>Contato</h3>
             <div class="footer-social">
-                <a href="https://br.linkedin.com/company/tractorbel-equipamentos" target="_blank">
-                    <img src="png/logo-linkedin.png" alt="">
+                <a href="https://br.linkedin.com/company/tractorbel-equipamentos" target="_blank" rel="noopener noreferrer" title="LinkedIn Tractorbel">
+                  <img src="png/logo-linkedin.png" alt="LinkedIn">
                 </a>
-                <a href="https://api.whatsapp.com/send/?phone=558008801422" target="_blank">
-                    <img src="png/logo-whatsapp.png" alt="">
+                <a href="https://api.whatsapp.com/send/?phone=558008801422" target="_blank" rel="noopener noreferrer" title="WhatsApp Tractorbel">
+                  <img src="png/logo-whatsapp.png" alt="WhatsApp">
                 </a>
-                <a href="https://www.instagram.com/tractorbelequip/" target="_blank">
-                    <img src="png/logo-instagram.png" alt="">
+                <a href="https://www.instagram.com/tractorbelequip/" target="_blank" rel="noopener noreferrer" title="Instagram Tractorbel">
+                  <img src="png/logo-instagram.png" alt="Instagram">
                 </a>
             </div>
             <p>© 2026 Tractorbel Equipamentos - Todos os direitos reservados</p>

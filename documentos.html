@@ -1,133 +1,146 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="index.css">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Documentos</title>
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/tractorbel/tractorbel.rental/main/icon.png">
 <style>
 body{
-    font-family: Arial, sans-serif;
-    margin:0;
-    background:#f4f6f8;
+  font-family: Arial, sans-serif;
+  margin:0;
+  background:#f4f6f8;
 }
 
 .barra-pesquisa{
-    padding:20px;
-    text-align:center;
-    background:#ffffff;
+  padding:20px;
+  text-align:center;
+  background:#ffffff;
 }
 
 .barra-pesquisa input{
-    width:80%;
-    max-width:400px;
-    padding:12px;
-    border-radius:8px;
-    border:1px solid #ccc;
-    font-size:16px;
+  width:80%;
+  max-width:400px;
+  padding:12px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:16px;
 }
 
 .galeria{
-    display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap:15px;
-    padding:30px;
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap:15px;
+  padding:30px;
 }
 
 .card{
-    background:white;
-    padding:25px;
-    border-radius:10px;
-    box-shadow:0 2px 6px rgba(0,0,0,0.1);
-    text-align:center;
-    transition:0.2s;
+  background:white;
+  padding:25px;
+  border-radius:10px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+  text-align:center;
+  transition:0.2s;
 }
 
 .card:hover{
-    transform:translateY(-5px);
+  transform:translateY(-5px);
 }
 
 .card a{
-    text-decoration:none;
-    color:#0b7a3e;
-    font-weight:bold;
-    display:block;
+  text-decoration:none;
+  color:#0b7a3e;
+  font-weight:bold;
+  display:block;
 }
 
 .icone{
-    font-size:40px;
-    margin-bottom:10px;
+  font-size:40px;
+  margin-bottom:10px;
 }
 
 .sistema-icon{
-    display:flex;
-    justify-content:flex-end;
-    margin-bottom:8px;
-    gap:6px;
-    height:24px;
+  display:flex;
+  justify-content:flex-end;
+  margin-bottom:8px;
+  gap:6px;
+  height:24px;
 }
 
 .sistema-icon img{
-    height:24px;
-    width:auto;
+  height:24px;
+  width:auto;
+}
+
+header {
+  background: white;
+  text-align: center;
+  padding: 20px;
+  border-bottom: 2px solid #ddd;
+}
+
+header h2 {
+  color: black;
+  margin: 0;
+  font-size: 24px;
 }
 
 .admin-area{
-    max-width:1200px;
-    margin:20px auto 0;
-    padding:0 20px;
+  max-width:1200px;
+  margin:20px auto 0;
+  padding:0 20px;
 }
 
 .admin-toolbar{
-    display:flex;
-    flex-wrap:wrap;
-    gap:12px;
-    justify-content:space-between;
-    align-items:center;
-    background:#ffffff;
-    border:1px solid #d1d5db;
-    border-radius:12px;
-    padding:16px 20px;
-    box-shadow:0 2px 10px rgba(0,0,0,0.05);
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  justify-content:space-between;
+  align-items:center;
+  background:#ffffff;
+  border:1px solid #d1d5db;
+  border-radius:12px;
+  padding:16px 20px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.05);
 }
 
 .admin-toolbar .btn{
-    border:1px solid #0b7a3e;
-    background:#0b7a3e;
-    color:white;
-    font-weight:600;
-    border-radius:8px;
-    padding:10px 18px;
-    cursor:pointer;
+  border:1px solid #0b7a3e;
+  background:#0b7a3e;
+  color:white;
+  font-weight:600;
+  border-radius:8px;
+  padding:10px 18px;
+  cursor:pointer;
 }
 
 .admin-toolbar .btn.secondary{
-    background:white;
-    color:#0b7a3e;
+  background:white;
+  color:#0b7a3e;
 }
 
 .admin-toolbar input{
-    border:1px solid #cbd5e1;
-    border-radius:10px;
-    padding:10px 14px;
-    width:180px;
+  border:1px solid #cbd5e1;
+  border-radius:10px;
+  padding:10px 14px;
+  width:180px;
 }
 
 .admin-info{
-    color:#334155;
-    font-size:0.95rem;
+  color:#334155;
+  font-size:0.95rem;
 }
 
 #toast{
-    margin-top:12px;
-    padding:14px 18px;
-    border-radius:12px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.08);
-    display:flex;
-    align-items:center;
-    gap:10px;
-    font-weight:600;
+  margin-top:12px;
+  padding:14px 18px;
+  border-radius:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:600;
 }
 
 .hidden{display:none !important;}
@@ -138,37 +151,37 @@ body{
 #toast.error{background:#fee2e2;color:#991b1b;}
 
 .modal-overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(15,23,42,0.55);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    z-index:1000;
-    padding:20px;
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,0.55);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+  padding:20px;
 }
 
 .modal-overlay.hidden{display:none;}
 
 .modal{
-    width:min(720px,100%);
-    background:white;
-    border-radius:16px;
-    box-shadow:0 20px 60px rgba(15,23,42,0.2);
-    padding:24px;
-    max-height:90vh;
-    overflow:auto;
+  width:min(720px,100%);
+  background:white;
+  border-radius:16px;
+  box-shadow:0 20px 60px rgba(15,23,42,0.2);
+  padding:24px;
+  max-height:90vh;
+  overflow:auto;
 }
 
 .modal h2{
-    margin-top:0;
+  margin-top:0;
 }
 
 .modal label{
-    display:block;
-    margin-bottom:6px;
-    font-weight:600;
-    color:#0f172a;
+  display:block;
+  margin-bottom:6px;
+  font-weight:600;
+  color:#0f172a;
 }
 
 .modal input[type="text"],
@@ -177,84 +190,88 @@ body{
 .modal input[type="file"],
 .modal select,
 .modal textarea{
-    width:100%;
-    border:1px solid #cbd5e1;
-    border-radius:10px;
-    padding:12px 14px;
-    margin-bottom:14px;
-    font-size:1rem;
-    color:#0f172a;
+  width:100%;
+  border:1px solid #cbd5e1;
+  border-radius:10px;
+  padding:12px 14px;
+  margin-bottom:14px;
+  font-size:1rem;
+  color:#0f172a;
 }
 
 .modal textarea{min-height:120px;resize:vertical;}
 
 .modal-actions{
-    display:flex;
-    justify-content:flex-end;
-    gap:10px;
-    flex-wrap:wrap;
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  flex-wrap:wrap;
 }
 
 .modal-actions .btn{
-    border:1px solid #0b7a3e;
-    background:#0b7a3e;
-    color:white;
+  border:1px solid #0b7a3e;
+  background:#0b7a3e;
+  color:white;
 }
 
 .modal-actions .btn.secondary{
-    background:white;
-    color:#0b7a3e;
+  background:white;
+  color:#0b7a3e;
 }
 
 .card-actions{
-    display:flex;
-    justify-content:center;
-    gap:8px;
-    margin-top:14px;
-    flex-wrap:wrap;
+  display:none;
+}
+
+.is-admin .card-actions{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin-top:14px;
+  flex-wrap:wrap;
 }
 
 .card-actions button{
-    border:none;
-    background:#0b7a3e;
-    color:white;
-    padding:8px 12px;
-    border-radius:8px;
-    cursor:pointer;
-    font-size:0.88rem;
+  border:none;
+  background:#0b7a3e;
+  color:white;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:0.88rem;
 }
 
 .card-actions button.danger{
-    background:#b91c1c;
+  background:#b91c1c;
 }
 
 .doc-title{
-    font-size:1rem;
-    font-weight:700;
-    margin:0 0 10px;
-    line-height:1.3;
-    cursor:text;
+  font-size:1rem;
+  font-weight:700;
+  margin:0 0 10px;
+  line-height:1.3;
+  cursor:text;
 }
 
 .doc-title[contenteditable="true"]{
-    border:1px dashed transparent;
-    padding:6px 8px;
+  border:1px dashed transparent;
+  padding:6px 8px;
 }
 
 .doc-title[contenteditable="true"]:focus{
-    outline:none;
-    border-color:#0b7a3e;
-    border-radius:8px;
-    background:#f0fdf4;
+  outline:none;
+  border-color:#0b7a3e;
+  border-radius:8px;
+  background:#f0fdf4;
 }
 
 @media (max-width: 800px) {
-    .admin-toolbar{
-        flex-direction:column;
-        align-items:flex-start;
-    }
+  .admin-toolbar{
+    flex-direction:column;
+    align-items:flex-start;
+  }
 
-    .admin-toolbar input{width:100%;}
+  .admin-toolbar input{width:100%;}
 }
 
 </style>
@@ -262,38 +279,37 @@ body{
 <body>
 
 <nav class="navbar">
-    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-    <ul id="menu">
-        <li><a href="index.html">INICIO</a></li>
-        <li><a href="documentos.html">DOCUMENTOS</a></li>
-        <li><a href="indicadores.html">KPI MANUT.</a></li>
-        <li><a href="indicadores-resultado.html">KPI FINAN.</a></li>
-        <li><a href="#" onclick="logout(); return false;" class="logout-btn">SAIR</a></li>
-    </ul>
+  <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+  <ul id="menu">
+    <li><a href="index.html">INICIO</a></li>
+    <li><a href="documentos.html">DOCUMENTOS</a></li>
+    <li><a href="indicadores.html">KPI MANUT.</a></li>
+    <li><a href="indicadores-resultado.html">KPI FINAN.</a></li>
+    <li><a href="#" onclick="logout(); return false;" class="logout-btn">SAIR</a></li>
+  </ul>
 </nav>
 <div class="logo-topo">
   <img src="png/logo.png" alt="Logo" />
 </div>
 
-<header style="background: white; text-align: center; padding: 20px; border-bottom: 2px ">
-    <h2 style="color: black
-    ; margin: 0; font-size: 24px;">Documentação Rental</h2>
+<header>
+  <h2>Documentação Rental</h2>
 </header>
 
 <div class="admin-area">
-    <div class="admin-toolbar">
-        <div>
-            <button id="btnShowAddModal" class="btn">Adicionar Documento</button>
-            <span class="admin-info" id="adminInfo">Modo de visualização. Faça login para gerenciar.</span>
-        </div>
-        <div class="admin-auth" id="adminAuth">
-            <input type="email" id="adminEmail" placeholder="Email admin" />
-            <input type="password" id="adminPassword" placeholder="Senha" />
-            <button id="btnAdminLogin" class="btn secondary">Entrar</button>
-            <button id="btnAdminLogout" class="btn secondary hidden">Sair</button>
-        </div>
+  <div class="admin-toolbar">
+    <div>
+      <button id="btnShowAddModal" class="btn hidden">Adicionar Documento</button>
+      <span class="admin-info" id="adminInfo">Modo de visualização. Faça login para gerenciar.</span>
     </div>
-    <div id="toast" class="toast hidden"></div>
+    <div class="admin-auth" id="adminAuth">
+      <input type="email" id="adminEmail" placeholder="Email admin" />
+      <input type="password" id="adminPassword" placeholder="Senha" />
+      <button id="btnAdminLogin" class="btn secondary">Entrar</button>
+      <button id="btnAdminLogout" class="btn secondary hidden">Sair</button>
+    </div>
+  </div>
+  <div id="toast" class="toast hidden"></div>
 </div>
 
 <div class="barra-pesquisa">
@@ -309,7 +325,7 @@ onkeyup="filtrarDocumentos()"
 <div class="card">
 <div class="sistema-icon"><img src="organograma.png" alt=""></div>
 <div class="icone">📄</div>
-<a href="pdf/ORGANOGRAMA RENTAL SERRA - ES.pdf" target="_blank">
+<a href="pdf/ORGANOGRAMA RENTAL SERRA - ES.pdf" target="_blank" rel="noopener noreferrer">
 Organograma Serra ES
 </a>
 </div>
@@ -317,7 +333,7 @@ Organograma Serra ES
 <div class="card">
 <div class="sistema-icon"><img src="organograma.png" alt=""></div>
 <div class="icone">📄</div>
-<a href="pdf/ORGANOGRAMA RENTAL CONTAGEM - MG.pdf" target="_blank">
+<a href="pdf/ORGANOGRAMA RENTAL CONTAGEM - MG.pdf" target="_blank" rel="noopener noreferrer">
 Organograma Contagem MG
 </a>
 </div>
@@ -325,7 +341,7 @@ Organograma Contagem MG
 <div class="card">
 <div class="sistema-icon"><img src="organograma.png" alt=""></div>
 <div class="icone">📄</div>
-<a href="pdf/ORGANOGRAMA RENTAL DUQUE DE CAXIAS - RJ.pdf" target="_blank">
+<a href="pdf/ORGANOGRAMA RENTAL DUQUE DE CAXIAS - RJ.pdf" target="_blank" rel="noopener noreferrer">
 Organograma Duque de Caxias RJ
 </a>
 </div>
@@ -333,7 +349,7 @@ Organograma Duque de Caxias RJ
 <div class="card">
 <div class="sistema-icon"><img src="organograma.png" alt=""></div>
 <div class="icone">📄</div>
-<a href="pdf/ORGANOGRAMA RENTAL POUSO ALEGRE - PA.pdf" target="_blank">
+<a href="pdf/ORGANOGRAMA RENTAL POUSO ALEGRE - PA.pdf" target="_blank" rel="noopener noreferrer">
 Organograma Pouso Alegre
 </a>
 </div>
@@ -341,7 +357,7 @@ Organograma Pouso Alegre
 <div class="card">
 <div class="sistema-icon"><img src="fluig.png" alt="fluig"></div>
 <div class="icone">📄</div>
-<a href="pdf/FLUIG Consulta de peças fluig.pdf" target="_blank">
+<a href="pdf/FLUIG Consulta de peças fluig.pdf" target="_blank" rel="noopener noreferrer">
 FLUIG POP Consulta de peças
 </a>
 </div>
@@ -349,7 +365,7 @@ FLUIG POP Consulta de peças
 <div class="card">
 <div class="sistema-icon"><img src="senior.png" alt=""></div>
 <div class="icone">📄</div>
-<a href="pdf/SENIOR Transferência entre depósito.pdf" target="_blank">
+<a href="pdf/SENIOR Transferência entre depósito.pdf" target="_blank" rel="noopener noreferrer">
 SENIOR POP Transferência entre depósito
 </a>
 </div>
@@ -357,7 +373,7 @@ SENIOR POP Transferência entre depósito
 <div class="card">
 <div class="sistema-icon"><img src="sisloc.png" alt=""></div>
 <div class="icone">📄</div>
-<a href="pdf/SISLOC Histórico de manutenção.pdf" target="_blank">
+<a href="pdf/SISLOC Histórico de manutenção.pdf" target="_blank" rel="noopener noreferrer">
 SISLOC POP Relatório de histórico de manutenção
 </a>
 </div>
@@ -365,7 +381,7 @@ SISLOC POP Relatório de histórico de manutenção
 <div class="card">
 <div class="sistema-icon"><img src="sisloc.png" alt=""></div>
 <div class="icone">📄</div>
-<a href="pdf/SISLOC Orçamento de avaria.pdf" target="_blank">
+<a href="pdf/SISLOC Orçamento de avaria.pdf" target="_blank" rel="noopener noreferrer">
 SISLOC POP Orçamento de avaria
 </a>
 </div>
@@ -373,7 +389,7 @@ SISLOC POP Orçamento de avaria
 <div class="card">
 <div class="sistema-icon"><img src="sisloc.png" alt=""></div>
 <div class="icone">📄</div>
-<a href="pdf/SISLOC Solicitação de compra vinculado a OM.pdf" target="_blank">
+<a href="pdf/SISLOC Solicitação de compra vinculado a OM.pdf" target="_blank" rel="noopener noreferrer">
 SISLOC POP Solicitação de compra vinculado a OM
 </a>
 </div>
@@ -381,7 +397,7 @@ SISLOC POP Solicitação de compra vinculado a OM
 <div class="card">
 <div class="sistema-icon"><img src="sisloc.png" alt=""></div>
 <div class="icone">📄</div>
-<a href="pdf/SISLOC Solicitação de compra.pdf" target="_blank">
+<a href="pdf/SISLOC Solicitação de compra.pdf" target="_blank" rel="noopener noreferrer">
 SISLOC POP Solicitação de compra
 </a>
 </div>
@@ -389,7 +405,7 @@ SISLOC POP Solicitação de compra
 <div class="card">
 <div class="sistema-icon"><img src="sismetro.png" alt=""></div>
 <div class="icone">📄</div>
-<a href="pdf/SISMETRO Procedimento equipamentos vendidos.pdf" target="_blank">
+<a href="pdf/SISMETRO Procedimento equipamentos vendidos.pdf" target="_blank" rel="noopener noreferrer">
 SISMETRO Procedimento de atualização de equipamentos vendidos
 </a>
 </div>
@@ -397,7 +413,7 @@ SISMETRO Procedimento de atualização de equipamentos vendidos
 <div class="card">
 <div class="sistema-icon"><img src="sismetro.png" alt=""></div>
 <div class="icone">📄</div>
-<a href="pdf/SISMETRO Orientação de utilização técnicos.pdf" target="_blank">
+<a href="pdf/SISMETRO Orientação de utilização técnicos.pdf" target="_blank" rel="noopener noreferrer">
 SISMETRO Orientação de utilização técnicos
 </a>
 </div>
@@ -405,7 +421,7 @@ SISMETRO Orientação de utilização técnicos
 <div class="card">
 <div class="sistema-icon"><img src="sismetro.png" alt=""></div>
 <div class="icone">📄</div>
-<a href="pdf/SISMETRO Cadastro de Patrimônio Acessórios.pdf" target="_blank">
+<a href="pdf/SISMETRO Cadastro de Patrimônio Acessórios.pdf" target="_blank" rel="noopener noreferrer">
 SISMETRO Cadastro de Patrimônio Acessórios
 </a>
 </div>
@@ -413,7 +429,7 @@ SISMETRO Cadastro de Patrimônio Acessórios
 <div class="card">
 <div class="sistema-icon"><img src="sisloc.png" alt="sisloc"><img src="gestaox.png" alt="gestaox"></div>
 <div class="icone">📄</div>
-<a href="pdf/SISLOC + GESTÃO X Aprovação avaria e solicitação faturamento.pdf" target="_blank">
+<a href="pdf/SISLOC + GESTÃO X Aprovação avaria e solicitação faturamento.pdf" target="_blank" rel="noopener noreferrer">
 SISLOC + GESTÃO X Aprovação avaria e solicitação faturamento
 </a>
 </div>
@@ -421,7 +437,7 @@ SISLOC + GESTÃO X Aprovação avaria e solicitação faturamento
 <div class="card">
 <div class="sistema-icon"><img src="info.png" alt="info"></div>
 <div class="icone">📄</div>
-<a href="pdf/APRENDIZ Orientações de arquivamento relatórios.pdf" target="_blank">
+<a href="pdf/APRENDIZ Orientações de arquivamento relatórios.pdf" target="_blank" rel="noopener noreferrer">
 APRENDIZ Orientações de arquivamento relatórios
 </a>
 </div>
@@ -429,7 +445,138 @@ APRENDIZ Orientações de arquivamento relatórios
 <div class="card">
 <div class="sistema-icon"><img src="gestaox.png" alt=""></div>
 <div class="icone">📄</div>
-<a href="pdf/GESTÃO X Solicitação de cadastro de produtos.pdf" target="_blank">
+<a href="pdf/GESTÃO X Solicitação de cadastro de produtos.pdf" target="_blank" rel="noopener noreferrer">
+GESTÃO X Solicitação de cadastro de produtos
+</a>
+</div>
+
+
+<div class="galeria" id="galeria">
+
+<div class="card">
+<div class="sistema-icon"><img src="organograma.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/ORGANOGRAMA RENTAL SERRA - ES.pdf" target="_blank" rel="noopener noreferrer">
+Organograma Serra ES
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="organograma.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/ORGANOGRAMA RENTAL CONTAGEM - MG.pdf" target="_blank" rel="noopener noreferrer">
+Organograma Contagem MG
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="organograma.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/ORGANOGRAMA RENTAL DUQUE DE CAXIAS - RJ.pdf" target="_blank" rel="noopener noreferrer">
+Organograma Duque de Caxias RJ
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="organograma.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/ORGANOGRAMA RENTAL POUSO ALEGRE - PA.pdf" target="_blank" rel="noopener noreferrer">
+Organograma Pouso Alegre
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="fluig.png" alt="fluig"></div>
+<div class="icone">📄</div>
+<a href="pdf/FLUIG Consulta de peças fluig.pdf" target="_blank" rel="noopener noreferrer">
+FLUIG POP Consulta de peças
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="senior.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/SENIOR Transferência entre depósito.pdf" target="_blank" rel="noopener noreferrer">
+SENIOR POP Transferência entre depósito
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="sisloc.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/SISLOC Histórico de manutenção.pdf" target="_blank" rel="noopener noreferrer">
+SISLOC POP Relatório de histórico de manutenção
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="sisloc.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/SISLOC Orçamento de avaria.pdf" target="_blank" rel="noopener noreferrer">
+SISLOC POP Orçamento de avaria
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="sisloc.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/SISLOC Solicitação de compra vinculado a OM.pdf" target="_blank" rel="noopener noreferrer">
+SISLOC POP Solicitação de compra vinculado a OM
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="sisloc.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/SISLOC Solicitação de compra.pdf" target="_blank" rel="noopener noreferrer">
+SISLOC POP Solicitação de compra
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="sismetro.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/SISMETRO Procedimento equipamentos vendidos.pdf" target="_blank" rel="noopener noreferrer">
+SISMETRO Procedimento de atualização de equipamentos vendidos
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="sismetro.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/SISMETRO Orientação de utilização técnicos.pdf" target="_blank" rel="noopener noreferrer">
+SISMETRO Orientação de utilização técnicos
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="sismetro.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/SISMETRO Cadastro de Patrimônio Acessórios.pdf" target="_blank" rel="noopener noreferrer">
+SISMETRO Cadastro de Patrimônio Acessórios
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="sisloc.png" alt="sisloc"><img src="gestaox.png" alt="gestaox"></div>
+<div class="icone">📄</div>
+<a href="pdf/SISLOC + GESTÃO X Aprovação avaria e solicitação faturamento.pdf" target="_blank" rel="noopener noreferrer">
+SISLOC + GESTÃO X Aprovação avaria e solicitação faturamento
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="info.png" alt="info"></div>
+<div class="icone">📄</div>
+<a href="pdf/APRENDIZ Orientações de arquivamento relatórios.pdf" target="_blank" rel="noopener noreferrer">
+APRENDIZ Orientações de arquivamento relatórios
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="gestaox.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/GESTÃO X Solicitação de cadastro de produtos.pdf" target="_blank" rel="noopener noreferrer">
 GESTÃO X Solicitação de cadastro de produtos
 </a>
 </div>
@@ -437,7 +584,7 @@ GESTÃO X Solicitação de cadastro de produtos
 <div class="card">
 <div class="sistema-icon"><img src="gestaox.png" alt=""></div>
 <div class="icone">📄</div>
-<a href="pdf/GESTÃO X Solicitação de emissão nota fiscal remessa para concerto.pdf" target="_blank">
+<a href="pdf/GESTÃO X Solicitação de emissão nota fiscal remessa para concerto.pdf" target="_blank" rel="noopener noreferrer">
 GESTÃO X Solicitação de emissão nota fiscal remessa para concerto
 </a>
 </div>
@@ -445,7 +592,7 @@ GESTÃO X Solicitação de emissão nota fiscal remessa para concerto
 <div class="card">
 <div class="sistema-icon"><img src="icon.png" alt="gv"><img src="gestaox.png" alt="gestaox"></div>
 <div class="icone">📄</div>
-<a href="pdf/GV + GESTÃO X Pedido de venda e solicitação NF consumo.pdf" target="_blank">
+<a href="pdf/GV + GESTÃO X Pedido de venda e solicitação NF consumo.pdf" target="_blank" rel="noopener noreferrer">
 GV + GESTÃO X Pedido de venda e solicitação NF consumo
 </a>
 </div>
@@ -453,21 +600,21 @@ GV + GESTÃO X Pedido de venda e solicitação NF consumo
 <div class="card">
 <div class="sistema-icon"><img src="info.png" alt="info"></div>
 <div class="icone">📄</div>
-<a href="pdf/Cartilha de orientação para o técnico.pdf" target="_blank">
+<a href="pdf/Cartilha de orientação para o técnico.pdf" target="_blank" rel="noopener noreferrer">
 Cartilha de orientação para o técnico
 
 </a>
 </div>
 
 <div class="card"><div class="sistema-icon"><img src="fluxograma.png" alt=""></div><div class="icone">📄</div>
-<a href="pdf/FLUXOGRAMA DE TRANSFERÊNCIA CONTRATO MESMA FILIAL.pdf" target="_blank">
+<a href="pdf/FLUXOGRAMA DE TRANSFERÊNCIA CONTRATO MESMA FILIAL.pdf" target="_blank" rel="noopener noreferrer">
 FLUXOGRAMA Transferência produto contrato da mesma filial
 
 </a>
 </div>
     
 <div class="card"><div class="sistema-icon"><img src="fluxograma.png" alt=""></div><div class="icone">📄</div>
-<a href="pdf/FLUXOGRAMA DE TRANSFERÊNCIA CONTRATO FILIAIS DIFERENTE.pdf" target="_blank">
+<a href="pdf/FLUXOGRAMA DE TRANSFERÊNCIA CONTRATO FILIAIS DIFERENTE.pdf" target="_blank" rel="noopener noreferrer">
 FLUXOGRAMA Transferência produto contrato da filial diferente
 
 </a>
@@ -476,7 +623,7 @@ FLUXOGRAMA Transferência produto contrato da filial diferente
 <div class="card">
 <div class="sistema-icon"><img src="fluxograma.png" alt=""></div>
 <div class="icone">📄</div>
-<a href="pdf/FLUXOGRAMA DE PEDIDO VENDA CASADA FÁBRICA.pdf" target="_blank">
+<a href="pdf/FLUXOGRAMA DE PEDIDO VENDA CASADA FÁBRICA.pdf" target="_blank" rel="noopener noreferrer">
 FLUXOGRAMA Pedido de venda casada fábrica
 
 </a>
@@ -516,6 +663,8 @@ const SERVER_ICONS = [
   "fluxograma.png"
 ];
 
+const ADMIN_EMAIL = "programacaorental04@tractorbel.com.br";
+
 const DB_NAME = "tractorbelDocuments";
 const STORE_NAME = "documents";
 let documentsCache = [];
@@ -532,6 +681,90 @@ const btnAdminLogout = document.getElementById("btnAdminLogout");
 const adminInfo = document.getElementById("adminInfo");
 const adminEmail = document.getElementById("adminEmail");
 const adminPassword = document.getElementById("adminPassword");
+
+const API_BASE_URL = "http://localhost:4000";
+
+function getRawRepoUrl(path) {
+  if (!path) return null;
+  return path.startsWith("http") ? path : path;
+}
+
+function normalizeManifestItem(item) {
+  return {
+    id: item.id,
+    title: item.title,
+    fileName: item.fileName,
+    fileUrl: getRawRepoUrl(item.filePath || item.fileUrl),
+    fileBlob: null,
+    iconUrl: getRawRepoUrl(item.iconPath || item.iconUrl),
+    iconBlob: null,
+    notes: item.notes || "",
+    createdAt: item.createdAt ? Date.parse(item.createdAt) : Date.now(),
+    updatedAt: item.updatedAt ? Date.parse(item.updatedAt) : Date.now()
+  };
+}
+
+async function fetchManifestFromApi() {
+  const response = await fetch(`${API_BASE_URL}/api/manifest`);
+  if (!response.ok) {
+    throw new Error(`Manifest fetch failed: ${response.status}`);
+  }
+  const manifest = await response.json();
+  return manifest.map(normalizeManifestItem);
+}
+
+async function getIdToken() {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Usuário não autenticado.");
+  return await user.getIdToken();
+}
+
+async function postDocumentToApi(formData) {
+  const token = await getIdToken();
+  const response = await fetch(`${API_BASE_URL}/api/documents`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    body: formData
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error || "Falha ao criar documento.");
+  }
+  return await response.json();
+}
+
+async function putDocumentToApi(id, formData) {
+  const token = await getIdToken();
+  const response = await fetch(`${API_BASE_URL}/api/documents/${id}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    body: formData
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error || "Falha ao atualizar documento.");
+  }
+  return await response.json();
+}
+
+async function deleteDocumentFromApi(id) {
+  const token = await getIdToken();
+  const response = await fetch(`${API_BASE_URL}/api/documents/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error || "Falha ao excluir documento.");
+  }
+  return await response.json();
+}
 
 const modalOverlay = document.createElement("div");
 modalOverlay.className = "modal-overlay hidden";
@@ -658,6 +891,17 @@ function parseStaticDocuments() {
 }
 
 async function loadDocuments() {
+  try {
+    const apiDocs = await fetchManifestFromApi();
+    if (apiDocs.length) {
+      documentsCache = apiDocs;
+      renderDocuments();
+      return;
+    }
+  } catch (error) {
+    console.warn("Falha ao carregar manifest do backend:", error);
+  }
+
   const storedDocs = await getAllDocuments();
   if (!storedDocs.length) {
     const fallbackDocs = parseStaticDocuments();
@@ -858,41 +1102,32 @@ async function handleModalSave() {
     }
   }
 
-  if (currentModalMode === "add") {
-    doc = {
-      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random(),
-      title,
-      fileName: file.name,
-      fileUrl: null,
-      fileBlob: file,
-      iconUrl: iconSelection || null,
-      iconBlob: iconUpload || null,
-      notes,
-      createdAt: Date.now(),
-      updatedAt: Date.now()
-    };
-    await saveDocument(doc);
-    documentsCache.unshift(doc);
-    showToast("Documento adicionado com sucesso.");
-  } else {
-    doc.title = title;
-    doc.notes = notes;
-    if (file) {
-      doc.fileBlob = file;
-      doc.fileUrl = null;
-      doc.fileName = file.name;
+  const formData = new FormData();
+  formData.append("title", title);
+  formData.append("notes", notes);
+  if (iconSelection) formData.append("iconSelection", iconSelection);
+  if (file) formData.append("document", file);
+  if (iconUpload) formData.append("icon", iconUpload);
+
+  try {
+    let apiResult;
+    if (currentModalMode === "add") {
+      apiResult = await postDocumentToApi(formData);
+      doc = normalizeManifestItem(apiResult);
+      documentsCache.unshift(doc);
+      await saveDocument(doc);
+      showToast("Documento adicionado com sucesso.");
+    } else {
+      apiResult = await putDocumentToApi(currentEditingId, formData);
+      doc = normalizeManifestItem(apiResult);
+      documentsCache = documentsCache.map((item) => item.id === doc.id ? doc : item);
+      await saveDocument(doc);
+      showToast(currentModalMode === "replace" ? "Documento substituído com sucesso." : "Documento atualizado com sucesso.");
     }
-    if (iconUpload) {
-      doc.iconBlob = iconUpload;
-      doc.iconUrl = null;
-    } else if (iconSelection) {
-      doc.iconUrl = iconSelection;
-      doc.iconBlob = null;
-    }
-    doc.updatedAt = Date.now();
-    await saveDocument(doc);
-    documentsCache = documentsCache.map((item) => item.id === doc.id ? doc : item);
-    showToast(currentModalMode === "replace" ? "Documento substituído com sucesso." : "Documento atualizado com sucesso.");
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || "Falha ao salvar documento.", "error");
+    return;
   }
 
   renderDocuments();
@@ -905,6 +1140,15 @@ async function confirmDeleteDocument(id) {
     return;
   }
   if (!confirm("Deseja realmente excluir este documento?")) return;
+
+  try {
+    await deleteDocumentFromApi(id);
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || "Falha ao excluir documento.", "error");
+    return;
+  }
+
   await removeDocument(id);
   documentsCache = documentsCache.filter((item) => item.id !== id);
   renderDocuments();
@@ -916,13 +1160,16 @@ function filterDocuments() {
 }
 
 function updateAdminState(user) {
-  isAdmin = !!user;
+  isAdmin = !!(user && user.email === ADMIN_EMAIL);
+  document.body.classList.toggle("is-admin", isAdmin);
+  btnShowAddModal.classList.toggle("hidden", !isAdmin);
+
   if (isAdmin) {
     adminInfo.textContent = "Autenticado como administrador. Agora você pode editar, adicionar e excluir documentos.";
     btnAdminLogin.classList.add("hidden");
     btnAdminLogout.classList.remove("hidden");
   } else {
-    adminInfo.textContent = "Modo de visualização. Faça login para gerenciar.";
+    adminInfo.textContent = "Modo de visualização. Faça login com programacaorental04@tractorbel.com.br para gerenciar.";
     btnAdminLogin.classList.remove("hidden");
     btnAdminLogout.classList.add("hidden");
   }
@@ -979,7 +1226,9 @@ window.toggleMenu = function () {
 };
 
 window.logout = function () {
-  signOut(auth).catch(() => {});
+  signOut(auth).then(() => {
+    try { window.location.href = 'index.html'; } catch(e){}
+  }).catch(() => {});
 };
 
 loadDocuments();
@@ -996,14 +1245,14 @@ loadDocuments();
                 <div class="footer-col">
                     <h3>Contato</h3>
                     <div class="footer-social">
-                        <a href="https://br.linkedin.com/company/tractorbel-equipamentos" target="_blank">
-                            <img src="png/logo-linkedin.png" alt="">
+                        <a href="https://br.linkedin.com/company/tractorbel-equipamentos" target="_blank" rel="noopener noreferrer" title="LinkedIn Tractorbel">
+                            <img src="png/logo-linkedin.png" alt="LinkedIn">
                         </a>
-                        <a href="https://api.whatsapp.com/send/?phone=558008801422" target="_blank">
-                            <img src="png/logo-whatsapp.png" alt="">
+                        <a href="https://api.whatsapp.com/send/?phone=558008801422" target="_blank" rel="noopener noreferrer" title="WhatsApp Tractorbel">
+                            <img src="png/logo-whatsapp.png" alt="WhatsApp">
                         </a>
-                        <a href="https://www.instagram.com/tractorbelequip/" target="_blank">
-                            <img src="png/logo-instagram.png" alt="">
+                        <a href="https://www.instagram.com/tractorbelequip/" target="_blank" rel="noopener noreferrer" title="Instagram Tractorbel">
+                            <img src="png/logo-instagram.png" alt="Instagram">
                         </a>
                     </div>
                     <p>© 2026 Tractorbel Equipamentos - Todos os direitos reservados</p>
