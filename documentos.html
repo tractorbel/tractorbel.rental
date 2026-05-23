@@ -641,7 +641,7 @@ const firebaseConfig = {
   projectId: "tractorbel-8ceb8",
   storageBucket: "tractorbel-8ceb8.firebasestorage.app",
   messagingSenderId: "720471893475",
-  appId: "1:720471853475:web:e6eb1d64cae5f7aa27ecd6"
+  appId: "1:720471893475:web:e6eb1d64cae5f7aa27ecd6"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -668,12 +668,14 @@ const ADMIN_EMAIL = "programacaorental04@tractorbel.com.br";
 const DB_NAME = "tractorbelDocuments";
 const STORE_NAME = "documents";
 let documentsCache = [];
+let documentsLoaded = false;
 let urlCache = new Map();
 let isAdmin = false;
 let currentModalMode = "add";
 let currentEditingId = null;
 
 const gallery = document.getElementById("galeria");
+const staticDocumentCards = [...gallery.querySelectorAll(".card")].map((card) => card.cloneNode(true));
 const toast = document.getElementById("toast");
 const btnShowAddModal = document.getElementById("btnShowAddModal");
 const btnAdminLogin = document.getElementById("btnAdminLogin");
@@ -869,7 +871,7 @@ function makeObjectUrl(key, blob) {
 }
 
 function parseStaticDocuments() {
-  const staticCards = [...gallery.querySelectorAll('.card')];
+  const staticCards = staticDocumentCards;
   return staticCards.map((card) => {
     const link = card.querySelector('a');
     const iconImg = card.querySelector('.sistema-icon img');
@@ -895,6 +897,7 @@ async function loadDocuments() {
     const apiDocs = await fetchManifestFromApi();
     if (apiDocs.length) {
       documentsCache = apiDocs;
+      documentsLoaded = true;
       renderDocuments();
       return;
     }
@@ -912,6 +915,7 @@ async function loadDocuments() {
   } else {
     documentsCache = storedDocs;
   }
+  documentsLoaded = true;
   renderDocuments();
 }
 
@@ -1173,7 +1177,7 @@ function updateAdminState(user) {
     btnAdminLogin.classList.remove("hidden");
     btnAdminLogout.classList.add("hidden");
   }
-  renderDocuments();
+  if (documentsLoaded) renderDocuments();
 }
 
 btnShowAddModal.addEventListener("click", () => {
