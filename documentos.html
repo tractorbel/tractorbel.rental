@@ -220,6 +220,10 @@ header h2 {
 }
 
 .card-actions{
+  display:none;
+}
+
+.is-admin .card-actions{
   display:flex;
   justify-content:center;
   gap:8px;
@@ -295,7 +299,7 @@ header h2 {
 <div class="admin-area">
   <div class="admin-toolbar">
     <div>
-      <button id="btnShowAddModal" class="btn">Adicionar Documento</button>
+      <button id="btnShowAddModal" class="btn hidden">Adicionar Documento</button>
       <span class="admin-info" id="adminInfo">Modo de visualização. Faça login para gerenciar.</span>
     </div>
     <div class="admin-auth" id="adminAuth">
@@ -659,6 +663,8 @@ const SERVER_ICONS = [
   "fluxograma.png"
 ];
 
+const ADMIN_EMAIL = "programacaorental04@tractorbel.com.br";
+
 const DB_NAME = "tractorbelDocuments";
 const STORE_NAME = "documents";
 let documentsCache = [];
@@ -675,6 +681,90 @@ const btnAdminLogout = document.getElementById("btnAdminLogout");
 const adminInfo = document.getElementById("adminInfo");
 const adminEmail = document.getElementById("adminEmail");
 const adminPassword = document.getElementById("adminPassword");
+
+const API_BASE_URL = "http://localhost:4000";
+
+function getRawRepoUrl(path) {
+  if (!path) return null;
+  return path.startsWith("http") ? path : path;
+}
+
+function normalizeManifestItem(item) {
+  return {
+    id: item.id,
+    title: item.title,
+    fileName: item.fileName,
+    fileUrl: getRawRepoUrl(item.filePath || item.fileUrl),
+    fileBlob: null,
+    iconUrl: getRawRepoUrl(item.iconPath || item.iconUrl),
+    iconBlob: null,
+    notes: item.notes || "",
+    createdAt: item.createdAt ? Date.parse(item.createdAt) : Date.now(),
+    updatedAt: item.updatedAt ? Date.parse(item.updatedAt) : Date.now()
+  };
+}
+
+async function fetchManifestFromApi() {
+  const response = await fetch(`${API_BASE_URL}/api/manifest`);
+  if (!response.ok) {
+    throw new Error(`Manifest fetch failed: ${response.status}`);
+  }
+  const manifest = await response.json();
+  return manifest.map(normalizeManifestItem);
+}
+
+async function getIdToken() {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Usuário não autenticado.");
+  return await user.getIdToken();
+}
+
+async function postDocumentToApi(formData) {
+  const token = await getIdToken();
+  const response = await fetch(`${API_BASE_URL}/api/documents`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    body: formData
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error || "Falha ao criar documento.");
+  }
+  return await response.json();
+}
+
+async function putDocumentToApi(id, formData) {
+  const token = await getIdToken();
+  const response = await fetch(`${API_BASE_URL}/api/documents/${id}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    body: formData
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error || "Falha ao atualizar documento.");
+  }
+  return await response.json();
+}
+
+async function deleteDocumentFromApi(id) {
+  const token = await getIdToken();
+  const response = await fetch(`${API_BASE_URL}/api/documents/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error || "Falha ao excluir documento.");
+  }
+  return await response.json();
+}
 
 const modalOverlay = document.createElement("div");
 modalOverlay.className = "modal-overlay hidden";
@@ -801,6 +891,17 @@ function parseStaticDocuments() {
 }
 
 async function loadDocuments() {
+  try {
+    const apiDocs = await fetchManifestFromApi();
+    if (apiDocs.length) {
+      documentsCache = apiDocs;
+      renderDocuments();
+      return;
+    }
+  } catch (error) {
+    console.warn("Falha ao carregar manifest do backend:", error);
+  }
+
   const storedDocs = await getAllDocuments();
   if (!storedDocs.length) {
     const fallbackDocs = parseStaticDocuments();
@@ -1001,457 +1102,32 @@ async function handleModalSave() {
     }
   }
 
-  if (currentModalMode === "add") {
-    doc = {
-      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random(),
-      title,
-      fileName: file.name,
-      fileUrl: null,
-      fileBlob: file,
-      iconUrl: iconSelection || null,
-      iconBlob: iconUpload || null,
-      notes,
-      createdAt: Date.now(),
-      updatedAt: Date.now()
-    };
-    await saveDocument(doc);
-    documentsCache.unshift(doc);
-    showToast("Documento adicionado com sucesso.");
-  } else {
-    doc.title = title;
-    doc.notes = notes;
-    if (file) {
-      doc.fileBlob = file;
-      doc.fileUrl = null;
-      doc.fileName = file.name;
-    }
-    if (iconUpload) {
-      doc.iconBlob = iconUpload;
-      doc.iconUrl = null;
-    } else if (iconSelection) {
-      doc.iconUrl = iconSelection;
-      doc.iconBlob = null;
-    }
-    doc.updatedAt = Date.now();
-    await saveDocument(doc);
-    documentsCache = documentsCache.map((item) => item.id === doc.id ? doc : item);
-    showToast(currentModalMode === "replace" ? "Documento substituído com sucesso." : "Documento atualizado com sucesso.");
-  }
+  const formData = new FormData();
+  formData.append("title", title);
+  formData.append("notes", notes);
+  if (iconSelection) formData.append("iconSelection", iconSelection);
+  if (file) formData.append("document", file);
+  if (iconUpload) formData.append("icon", iconUpload);
 
-  renderDocuments();
-  closeModal();
-}
-
-async function confirmDeleteDocument(id) {
-  if (!isAdmin) {
-    showToast("Faça login para excluir documentos.", "error");
-    return;
-  }
-  if (!confirm("Deseja realmente excluir este documento?")) return;
-  await removeDocument(id);
-  documentsCache = documentsCache.filter((item) => item.id !== id);
-  renderDocuments();
-  showToast("Documento removido com sucesso.");
-}
-
-function filterDocuments() {
-  renderDocuments();
-}
-
-function updateAdminState(user) {
-  isAdmin = !!user;
-  if (isAdmin) {
-    adminInfo.textContent = "Autenticado como administrador. Agora você pode editar, adicionar e excluir documentos.";
-    btnAdminLogin.classList.add("hidden");
-    btnAdminLogout.classList.remove("hidden");
-  } else {
-    adminInfo.textContent = "Modo de visualização. Faça login para gerenciar.";
-    btnAdminLogin.classList.remove("hidden");
-    btnAdminLogout.classList.add("hidden");
-  }
-  renderDocuments();
-}
-
-btnShowAddModal.addEventListener("click", () => {
-  if (!isAdmin) {
-    showToast("Faça login para adicionar documentos.", "error");
-    return;
-  }
-  openModal("add");
-});
-
-modalCancelBtn.addEventListener("click", closeModal);
-modalOverlay.addEventListener("click", (event) => {
-  if (event.target === modalOverlay) closeModal();
-});
-modalSaveBtn.addEventListener("click", handleModalSave);
-
-btnAdminLogin.addEventListener("click", async () => {
-  const email = adminEmail.value.trim();
-  const password = adminPassword.value.trim();
-  if (!email || !password) {
-    showToast("Informe email e senha.", "error");
-    return;
-  }
   try {
-    await signInWithEmailAndPassword(auth, email, password);
-    showToast("Login realizado com sucesso.");
-    adminPassword.value = "";
+    let apiResult;
+    if (currentModalMode === "add") {
+      apiResult = await postDocumentToApi(formData);
+      doc = normalizeManifestItem(apiResult);
+      documentsCache.unshift(doc);
+      await saveDocument(doc);
+      showToast("Documento adicionado com sucesso.");
+    } else {
+      apiResult = await putDocumentToApi(currentEditingId, formData);
+      doc = normalizeManifestItem(apiResult);
+      documentsCache = documentsCache.map((item) => item.id === doc.id ? doc : item);
+      await saveDocument(doc);
+      showToast(currentModalMode === "replace" ? "Documento substituído com sucesso." : "Documento atualizado com sucesso.");
+    }
   } catch (error) {
     console.error(error);
-    showToast("Login falhou. Verifique suas credenciais.", "error");
-  }
-});
-
-btnAdminLogout.addEventListener("click", () => {
-  signOut(auth).then(() => {
-    showToast("Logout efetuado.");
-  });
-});
-
-onAuthStateChanged(auth, (user) => {
-  updateAdminState(user);
-});
-
-window.filtrarDocumentos = filterDocuments;
-window.toggleMenu = function () {
-  const menu = document.getElementById("menu");
-  if (menu) {
-    menu.classList.toggle("active");
-  }
-};
-
-window.logout = function () {
-  signOut(auth).catch(() => {});
-};
-
-loadDocuments();
-</script>
-        <!-- RODAPÉ -->
-        <footer class="footer">
-            <div class="footer-container">
-                <div class="footer-col">
-                    <h3>Tractorbel Equipamentos</h3>
-                    <p>BR-040, 8245 - KM 523 - Chácaras Boa Vista, Contagem - MG, 32150-193</p>
-                    <p>programacaorental04@tractorbel.com.br</p>
-                </div>
-
-                <div class="footer-col">
-                    <h3>Contato</h3>
-                    <div class="footer-social">
-                        <a href="https://br.linkedin.com/company/tractorbel-equipamentos" target="_blank" rel="noopener noreferrer" title="LinkedIn Tractorbel">
-                            <img src="png/logo-linkedin.png" alt="LinkedIn">
-                        </a>
-                        <a href="https://api.whatsapp.com/send/?phone=558008801422" target="_blank" rel="noopener noreferrer" title="WhatsApp Tractorbel">
-                            <img src="png/logo-whatsapp.png" alt="WhatsApp">
-                        </a>
-                        <a href="https://www.instagram.com/tractorbelequip/" target="_blank" rel="noopener noreferrer" title="Instagram Tractorbel">
-                            <img src="png/logo-instagram.png" alt="Instagram">
-                        </a>
-                    </div>
-                    <p>© 2026 Tractorbel Equipamentos - Todos os direitos reservados</p>
-                    <p>Desenvolvido por Tâmmer Leonel</p>
-                </div>
-            </div>
-        </footer>
-</body>
-</html>
-    const request = store.getAll();
-    request.onsuccess = () => resolve(request.result || []);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-async function saveDocument(doc) {
-  const db = await openDb();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, "readwrite");
-    const store = tx.objectStore(STORE_NAME);
-    const request = store.put(doc);
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-async function removeDocument(id) {
-  const db = await openDb();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, "readwrite");
-    const store = tx.objectStore(STORE_NAME);
-    const request = store.delete(id);
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
-  });
-}
-
-function makeObjectUrl(key, blob) {
-  if (!blob) return null;
-  if (urlCache.has(key)) return urlCache.get(key);
-  const url = URL.createObjectURL(blob);
-  urlCache.set(key, url);
-  return url;
-}
-
-function parseStaticDocuments() {
-  const staticCards = [...gallery.querySelectorAll('.card')];
-  return staticCards.map((card) => {
-    const link = card.querySelector('a');
-    const iconImg = card.querySelector('.sistema-icon img');
-    const iconUrl = iconImg ? iconImg.getAttribute('src') : null;
-    const href = link ? link.getAttribute('href') : "";
-    return {
-      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random(),
-      title: link ? link.textContent.trim() : "Documento",
-      fileName: link ? link.textContent.trim() : "Documento",
-      fileUrl: href,
-      fileBlob: null,
-      iconUrl: iconUrl,
-      iconBlob: null,
-      notes: "",
-      createdAt: Date.now(),
-      updatedAt: Date.now()
-    };
-  });
-}
-
-async function loadDocuments() {
-  const storedDocs = await getAllDocuments();
-  if (!storedDocs.length) {
-    const fallbackDocs = parseStaticDocuments();
-    if (fallbackDocs.length) {
-      await Promise.all(fallbackDocs.map((doc) => saveDocument(doc)));
-      documentsCache = fallbackDocs;
-    }
-  } else {
-    documentsCache = storedDocs;
-  }
-  renderDocuments();
-}
-
-
- 
-function renderDocuments() {
-  gallery.innerHTML = "";
-  const fragment = document.createDocumentFragment();
-
-  const filtered = documentsCache.filter((doc) => {
-    const query = document.getElementById("pesquisa").value.toLowerCase();
-    return !query || doc.title.toLowerCase().includes(query);
-  });
-
-  filtered.sort((a, b) => b.updatedAt - a.updatedAt).forEach((doc) => {
-    const card = document.createElement("div");
-    card.className = "card";
-
-    const systemIcon = document.createElement("div");
-    systemIcon.className = "sistema-icon";
-    if (doc.iconBlob) {
-      const img = document.createElement("img");
-      img.src = makeObjectUrl(`${doc.id}-icon`, doc.iconBlob);
-      img.alt = doc.title;
-      systemIcon.appendChild(img);
-    } else if (doc.iconUrl) {
-      const img = document.createElement("img");
-      img.src = doc.iconUrl;
-      img.alt = doc.title;
-      systemIcon.appendChild(img);
-    }
-    card.appendChild(systemIcon);
-
-    const iconEl = document.createElement("div");
-    iconEl.className = "icone";
-    iconEl.textContent = "📄";
-    card.appendChild(iconEl);
-
-    const titleEl = document.createElement("div");
-    titleEl.className = "doc-title";
-    titleEl.textContent = doc.title;
-    titleEl.contentEditable = isAdmin;
-    titleEl.dataset.id = doc.id;
-    titleEl.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        titleEl.blur();
-      }
-    });
-    titleEl.addEventListener("blur", async () => {
-      const newTitle = titleEl.textContent.trim();
-      if (!newTitle) {
-        titleEl.textContent = doc.title;
-        return;
-      }
-      if (newTitle !== doc.title) {
-        if (!isAdmin) {
-          titleEl.textContent = doc.title;
-          showToast("Faça login para renomear documentos.", "error");
-          return;
-        }
-        doc.title = newTitle;
-        doc.updatedAt = Date.now();
-        await saveDocument(doc);
-        documentsCache = documentsCache.map((item) => item.id === doc.id ? doc : item);
-        showToast("Título atualizado com sucesso.");
-      }
-    });
-    card.appendChild(titleEl);
-
-    const link = document.createElement("a");
-    link.href = doc.fileBlob ? makeObjectUrl(`${doc.id}-file`, doc.fileBlob) : doc.fileUrl;
-    link.target = "_blank";
-    link.textContent = doc.fileName || "Abrir documento";
-    card.appendChild(link);
-
-    const actions = document.createElement("div");
-    actions.className = "card-actions";
-
-    const replaceBtn = document.createElement("button");
-    replaceBtn.textContent = "Substituir";
-    replaceBtn.addEventListener("click", () => openModal("replace", doc.id));
-    actions.appendChild(replaceBtn);
-
-    const editBtn = document.createElement("button");
-    editBtn.textContent = "Editar";
-    editBtn.addEventListener("click", () => openModal("edit", doc.id));
-    actions.appendChild(editBtn);
-
-    const deleteBtn = document.createElement("button");
-    deleteBtn.className = "danger";
-    deleteBtn.textContent = "Excluir";
-    deleteBtn.addEventListener("click", () => confirmDeleteDocument(doc.id));
-    actions.appendChild(deleteBtn);
-
-    card.appendChild(actions);
-    fragment.appendChild(card);
-  });
-
-  gallery.appendChild(fragment);
-}
-
-function openModal(mode, docId = null) {
-  currentModalMode = mode;
-  currentEditingId = docId;
-  modalOverlay.classList.remove("hidden");
-  modalTitleInput.value = "";
-  modalFileInput.value = "";
-  modalIconSelect.value = "";
-  modalIconUpload.value = "";
-  modalNotes.value = "";
-
-  modalIconSelect.innerHTML = '<option value="">-- Selecionar ícone --</option>';
-  SERVER_ICONS.forEach((icon) => {
-    const option = document.createElement("option");
-    option.value = icon;
-    option.textContent = icon;
-    modalIconSelect.appendChild(option);
-  });
-
-  if (mode === "edit" || mode === "replace") {
-    const doc = documentsCache.find((item) => item.id === docId);
-    if (!doc) return;
-    modalTitleInput.value = doc.title;
-    modalNotes.value = doc.notes || "";
-    if (doc.iconUrl) {
-      modalIconSelect.value = doc.iconUrl;
-    }
-    modalTitleLabel.textContent = mode === "replace" ? "Substituir documento" : "Editar documento";
-  } else {
-    modalTitleLabel.textContent = "Adicionar documento";
-  }
-}
-
-function closeModal() {
-  modalOverlay.classList.add("hidden");
-}
-
-async function handleModalSave() {
-  if (!isAdmin) {
-    showToast("Faça login para salvar alterações.", "error");
+    showToast(error.message || "Falha ao salvar documento.", "error");
     return;
-  }
-
-  const title = modalTitleInput.value.trim();
-  const file = modalFileInput.files[0];
-  const iconUpload = modalIconUpload.files[0];
-  const iconSelection = modalIconSelect.value;
-  const notes = modalNotes.value.trim();
-
-  if (!title) {
-    showToast("Informe o título do documento.", "error");
-    return;
-  }
-
-  if (currentModalMode === "add" && !file) {
-    showToast("Selecione um arquivo PDF para adicionar.", "error");
-    return;
-  }
-
-  let doc = null;
-  if (currentModalMode === "edit" || currentModalMode === "replace") {
-    doc = documentsCache.find((item) => item.id === currentEditingId);
-    if (!doc) {
-      showToast("Documento não encontrado.", "error");
-      closeModal();
-      return;
-    }
-  }
-
-  if (file) {
-    if (!ALLOWED_DOC_TYPES.includes(file.type)) {
-      showToast("Formato inválido. Somente PDF é permitido.", "error");
-      return;
-    }
-    if (file.size > MAX_FILE_BYTES) {
-      showToast("Arquivo muito grande. Máximo 15MB.", "error");
-      return;
-    }
-  }
-
-  if (iconUpload) {
-    if (!ALLOWED_ICON_TYPES.includes(iconUpload.type)) {
-      showToast("Formato de ícone inválido.", "error");
-      return;
-    }
-    if (iconUpload.size > MAX_ICON_BYTES) {
-      showToast("Ícone muito grande. Máximo 3MB.", "error");
-      return;
-    }
-  }
-
-  if (currentModalMode === "add") {
-    doc = {
-      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random(),
-      title,
-      fileName: file.name,
-      fileUrl: null,
-      fileBlob: file,
-      iconUrl: iconSelection || null,
-      iconBlob: iconUpload || null,
-      notes,
-      createdAt: Date.now(),
-      updatedAt: Date.now()
-    };
-    await saveDocument(doc);
-    documentsCache.unshift(doc);
-    showToast("Documento adicionado com sucesso.");
-  } else {
-    doc.title = title;
-    doc.notes = notes;
-    if (file) {
-      doc.fileBlob = file;
-      doc.fileUrl = null;
-      doc.fileName = file.name;
-    }
-    if (iconUpload) {
-      doc.iconBlob = iconUpload;
-      doc.iconUrl = null;
-    } else if (iconSelection) {
-      doc.iconUrl = iconSelection;
-      doc.iconBlob = null;
-    }
-    doc.updatedAt = Date.now();
-    await saveDocument(doc);
-    documentsCache = documentsCache.map((item) => item.id === doc.id ? doc : item);
-    showToast(currentModalMode === "replace" ? "Documento substituído com sucesso." : "Documento atualizado com sucesso.");
   }
 
   renderDocuments();
@@ -1464,6 +1140,15 @@ async function confirmDeleteDocument(id) {
     return;
   }
   if (!confirm("Deseja realmente excluir este documento?")) return;
+
+  try {
+    await deleteDocumentFromApi(id);
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || "Falha ao excluir documento.", "error");
+    return;
+  }
+
   await removeDocument(id);
   documentsCache = documentsCache.filter((item) => item.id !== id);
   renderDocuments();
@@ -1475,13 +1160,16 @@ function filterDocuments() {
 }
 
 function updateAdminState(user) {
-  isAdmin = !!user;
+  isAdmin = !!(user && user.email === ADMIN_EMAIL);
+  document.body.classList.toggle("is-admin", isAdmin);
+  btnShowAddModal.classList.toggle("hidden", !isAdmin);
+
   if (isAdmin) {
     adminInfo.textContent = "Autenticado como administrador. Agora você pode editar, adicionar e excluir documentos.";
     btnAdminLogin.classList.add("hidden");
     btnAdminLogout.classList.remove("hidden");
   } else {
-    adminInfo.textContent = "Modo de visualização. Faça login para gerenciar.";
+    adminInfo.textContent = "Modo de visualização. Faça login com programacaorental04@tractorbel.com.br para gerenciar.";
     btnAdminLogin.classList.remove("hidden");
     btnAdminLogout.classList.add("hidden");
   }
