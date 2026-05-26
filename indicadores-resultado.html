@@ -76,29 +76,17 @@ body {
     .filtro-lista {
       flex: 1;
       overflow-y: auto;
-        <input type="file" id="upload" accept=".xls,.xlsx" class="hidden">
       border: 1px solid #d8d8d8;
       border-radius: 6px;
       padding: 4px;
-        <div class="align-center">
     }
 
     .filtro-item {
       display: flex;
       align-items: center;
-        <button id="btnLimpar" class="btn-google hidden">Limpar Filtros</button>
       padding: 4px 6px;
       border-radius: 4px;
       font-size: 12px;
-            <a href="https://br.linkedin.com/company/tractorbel-equipamentos" target="_blank" rel="noopener noreferrer" title="LinkedIn Tractorbel">
-              <img src="png/logo-linkedin.png" alt="LinkedIn">
-            </a>
-            <a href="https://api.whatsapp.com/send/?phone=558008801422" target="_blank" rel="noopener noreferrer" title="WhatsApp Tractorbel">
-              <img src="png/logo-whatsapp.png" alt="WhatsApp">
-            </a>
-            <a href="https://www.instagram.com/tractorbelequip/" target="_blank" rel="noopener noreferrer" title="Instagram Tractorbel">
-              <img src="png/logo-instagram.png" alt="Instagram">
-            </a>
       margin: 0;
       flex-shrink: 0;
       accent-color: #2e7d32;
@@ -509,7 +497,6 @@ body {
     const mesFim = document.getElementById("mesFim");
     const upload = document.getElementById("upload");
     const btnLimpar = document.getElementById("btnLimpar");
-    const statusCarga = document.getElementById("statusCarga");
 
     const filtrosIds = [
       "filtroFilial",
@@ -1070,7 +1057,11 @@ body {
       calcularTotais(dadosFiltrados);
       gerarGraficos(dadosFiltrados);
 
-      btnLimpar.style.display = existeFiltroAtivo() ? "inline-block" : "none";
+      if (existeFiltroAtivo()) {
+        btnLimpar.classList.remove("hidden");
+      } else {
+        btnLimpar.classList.add("hidden");
+      }
       salvarEstadoPagina();
     }
 
@@ -1086,7 +1077,7 @@ body {
       mesInicio.value = ultimoMesAno;
       mesFim.value = ultimoMesAno;
     }
-
+classList.add("hidden")
     function carregarDados(file) {
       if (!file) return;
 

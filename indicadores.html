@@ -484,8 +484,6 @@ let grafico, graficoTipos, g1, g2, g3, g4, g5, g6;
 const STORAGE_KEY = "indicadores_ss_estado";
 const btnLimpar = document.getElementById("btnLimpar");
 
-btnLimpar.style.display = "none";
-
 function getEstadoFiltros(){
     return {
         filtroTecnico: getSelecionados("filtroTecnico"),
@@ -928,7 +926,11 @@ function calcularTotais(dados){
     criarGrafico("graficoDeslocamento","Horas Deslocamento",["Total"],[horasDesloc],g4,v=>g4=v,false);
     criarGrafico("graficoMaquina","Máquina Parada",["Total"],[maquinaParada],g5,v=>g5=v,false);
 
-    btnLimpar.style.display = existeFiltroAtivo() ? "inline-block" : "none";
+    if (existeFiltroAtivo()) {
+        btnLimpar.classList.remove("hidden");
+    } else {
+        btnLimpar.classList.add("hidden");
+    }
 }
 
 function criarGrafico(id,label,labels,data,graficoAtual,salvar,comClickable,clickCallback){
