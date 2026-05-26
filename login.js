@@ -26,10 +26,11 @@ function mostrarConteudo(user){
   if(!login || !conteudo) return; // Só executar se os elementos existirem
   
   if(user){
-    login.style.display = "none";
+    login.classList.add("hidden");
     conteudo.classList.remove("hidden");
     conteudo.style.display = "block";
   }else{
+    login.classList.remove("hidden");
     login.style.display = "flex";
     conteudo.classList.add("hidden");
     conteudo.style.display = "none";
@@ -42,8 +43,8 @@ function inicializarPagina(){
   const conteudo = document.getElementById("conteudo");
   if(!login || !conteudo) return; // Só executar se os elementos existirem
   
-  // Exibir login enquanto o Firebase confirma se existe sessao ativa
-  login.style.display = "flex";
+  // Manter ambos ocultos até que o Firebase confirme o estado de autenticação
+  login.classList.add("hidden");
   conteudo.classList.add("hidden");
   conteudo.style.display = "none";
 }
