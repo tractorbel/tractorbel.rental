@@ -1253,11 +1253,9 @@ body {
 
             let dataLinha = l[indices.data];
             dataLinha = parseDataLinha(dataLinha);
-            if (dataLinha && !isNaN(dataLinha)) {
-              dataLinha.setHours(0, 0, 0, 0);
-            } else {
-              dataLinha = null;
-            }
+            if (!dataLinha) continue;
+
+            dataLinha.setHours(0, 0, 0, 0);
 
             dadosGlobais.push({
               filial: normalizarTexto(l[indices.filial]),
