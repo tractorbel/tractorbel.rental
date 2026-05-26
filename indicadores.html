@@ -407,6 +407,12 @@
   </div>
 
   <div class="filtro-box">
+    <label class="titulo-filtro">Cliente</label>
+    <input class="filtro-busca" id="buscaFiltroCliente" placeholder="Buscar..." />
+    <div id="filtroCliente" class="filtro-checkboxes"></div>
+  </div>
+
+  <div class="filtro-box">
     <label class="titulo-filtro">Tipo do Equipamento</label>
     <input class="filtro-busca" id="buscaFiltroEquipamento" placeholder="Buscar..." />
     <div id="filtroEquipamento" class="filtro-checkboxes"></div>
@@ -484,6 +490,7 @@ function getEstadoFiltros(){
     return {
         filtroTecnico: getSelecionados("filtroTecnico"),
         filtroTipo: getSelecionados("filtroTipo"),
+        filtroCliente: getSelecionados("filtroCliente"),
         filtroEquipamento: getSelecionados("filtroEquipamento"),
         filtroMarca: getSelecionados("filtroMarca"),
         filtroModelo: getSelecionados("filtroModelo")
@@ -579,11 +586,11 @@ document.getElementById('upload').addEventListener('change', function(e){
     reader.readAsArrayBuffer(file);
 });
 
-["filtroTecnico", "filtroTipo", "filtroEquipamento", "filtroMarca", "filtroModelo"].forEach(id => {
+["filtroTecnico", "filtroTipo", "filtroCliente", "filtroEquipamento", "filtroMarca", "filtroModelo"].forEach(id => {
     document.getElementById(id).addEventListener("change", aplicarFiltros);
 });
 
-["buscaFiltroTecnico", "buscaFiltroTipo", "buscaFiltroEquipamento", "buscaFiltroMarca", "buscaFiltroModelo"].forEach(id => {
+["buscaFiltroTecnico", "buscaFiltroTipo", "buscaFiltroCliente", "buscaFiltroEquipamento", "buscaFiltroMarca", "buscaFiltroModelo"].forEach(id => {
     document.getElementById(id).addEventListener("input", atualizarFiltrosOptions);
 });
 
@@ -601,6 +608,7 @@ function getTextoBuscaFiltro(id){
     const mapaBusca = {
         filtroTecnico: "buscaFiltroTecnico",
         filtroTipo: "buscaFiltroTipo",
+        filtroCliente: "buscaFiltroCliente",
         filtroEquipamento: "buscaFiltroEquipamento",
         filtroMarca: "buscaFiltroMarca",
         filtroModelo: "buscaFiltroModelo"
@@ -671,6 +679,13 @@ function filtrarDados(excluirFiltroId = null){
         );
     }
 
+    const clientesSelecionados = getSelecionados("filtroCliente");
+    if(excluirFiltroId !== "filtroCliente" && clientesSelecionados.length){
+        dados = dados.filter(linha =>
+            clientesSelecionados.includes(String(linha["SOLICITANTE"] || "Não informado").trim())
+        );
+    }
+
     if(excluirFiltroId !== "filtroEquipamento" && equipamentosSelecionados.length){
         dados = dados.filter(linha =>
             equipamentosSelecionados.includes(String(linha["TIPO DO EQUIPAMENTO"] || "Não informado").trim())
@@ -695,12 +710,14 @@ function filtrarDados(excluirFiltroId = null){
 function atualizarFiltrosOptions(){
     const filtroTecnico = document.getElementById("filtroTecnico");
     const filtroTipo = document.getElementById("filtroTipo");
+    const filtroCliente = document.getElementById("filtroCliente");
     const filtroEquipamento = document.getElementById("filtroEquipamento");
     const filtroMarca = document.getElementById("filtroMarca");
     const filtroModelo = document.getElementById("filtroModelo");
 
     const tecnicosSelecionados = getSelecionados("filtroTecnico");
     const tiposSelecionados = getSelecionados("filtroTipo");
+    const clientesSelecionados = getSelecionados("filtroCliente");
     const equipamentosSelecionados = getSelecionados("filtroEquipamento");
     const marcasSelecionadas = getSelecionados("filtroMarca");
     const modelosSelecionados = getSelecionados("filtroModelo");
@@ -716,6 +733,12 @@ function atualizarFiltrosOptions(){
         .filter(v => v !== "")
         .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
     criarCheckboxes(filtroTipo, tipos, tiposSelecionados);
+
+    const dadosParaCliente = filtrarDados("filtroCliente");
+    const clientes = [...new Set(dadosParaCliente.map(l => String(l["SOLICITANTE"] || "Não informado").trim()))]
+        .filter(v => v !== "")
+        .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
+    criarCheckboxes(filtroCliente, clientes, clientesSelecionados);
 
     const dadosParaEquipamento = filtrarDados("filtroEquipamento");
     const equipamentos = [...new Set(dadosParaEquipamento.map(l => String(l["TIPO DO EQUIPAMENTO"] || "Não informado").trim()))]
@@ -887,12 +910,12 @@ function calcularTotais(dados){
         horasUteis = diasUteis * 8.8;
     }
 
-    criarGrafico("graficoTecnico","Atendimentos",Object.keys(totaisTecnico),Object.values(totaisTecnico),grafico,v=>grafico=v,true);
+    criarGrafico("graficoTecnico","Atendimentos",Object.keys(totaisTecnico),Object.values(totaisTecnico),grafico,v=>grafico=v,true, filtrarPorTecnico);
 
     const clientesOrdenados = Object.keys(totaisCliente)
         .sort((a,b) => totaisCliente[b] - totaisCliente[a] || a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
     const totCliente = clientesOrdenados.map(cliente => totaisCliente[cliente]);
-    criarGrafico("graficoCliente","Atendimentos por Cliente",clientesOrdenados,totCliente,g6,v=>g6=v,false);
+    criarGrafico("graficoCliente","Atendimentos por Cliente",clientesOrdenados,totCliente,g6,v=>g6=v,true, filtrarPorCliente);
 
     criarGrafico("graficoTotalHoras","Horas",
         ["Trabalhadas","Horas Úteis"],
@@ -908,7 +931,7 @@ function calcularTotais(dados){
     btnLimpar.style.display = existeFiltroAtivo() ? "inline-block" : "none";
 }
 
-function criarGrafico(id,label,labels,data,graficoAtual,salvar,comClickable){
+function criarGrafico(id,label,labels,data,graficoAtual,salvar,comClickable,clickCallback){
 
     if(graficoAtual){
         graficoAtual.destroy();
@@ -921,12 +944,12 @@ function criarGrafico(id,label,labels,data,graficoAtual,salvar,comClickable){
         }
     };
 
-    if(comClickable){
+    if(comClickable && typeof clickCallback === "function"){
         opcoes.onClick = (event, elements) => {
             if(elements.length > 0){
                 const index = elements[0].index;
-                const tecnico = labels[index];
-                filtrarPorTecnico(tecnico);
+                const valor = labels[index];
+                clickCallback(valor);
             }
         };
     }
@@ -997,6 +1020,11 @@ function filtrarPorTecnico(tecnico){
     aplicarFiltros();
 }
 
+function filtrarPorCliente(cliente){
+    marcarFiltroUnico("filtroCliente", cliente);
+    aplicarFiltros();
+}
+
 function filtrarPorTipo(tipo){
     marcarFiltroUnico("filtroTipo", tipo);
     aplicarFiltros();
@@ -1005,6 +1033,7 @@ function filtrarPorTipo(tipo){
 function existeFiltroAtivo(){
     return getSelecionados("filtroTecnico").length > 0 ||
            getSelecionados("filtroTipo").length > 0 ||
+           getSelecionados("filtroCliente").length > 0 ||
            getSelecionados("filtroEquipamento").length > 0 ||
            getSelecionados("filtroMarca").length > 0 ||
            getSelecionados("filtroModelo").length > 0;
