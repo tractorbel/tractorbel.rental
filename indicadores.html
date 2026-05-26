@@ -457,6 +457,11 @@
 <canvas id="graficoTipos"></canvas>
 </div>
 
+<div class="card grafico-card">
+<h3>Total de Atendimento x Cliente</h3>
+<canvas id="graficoCliente"></canvas>
+</div>
+
 <div class="card grafico-card"><h3>Total de Horas x Horas Úteis</h3><canvas id="graficoTotalHoras"></canvas></div>
 <div class="card grafico-card"><h3>Horas Trabalhadas</h3><canvas id="graficoTrabalhadas"></canvas></div>
 <div class="card grafico-card"><h3>Horas Aguardando</h3><canvas id="graficoAguardando"></canvas></div>
@@ -468,7 +473,7 @@
 <script>
 
 let dadosGlobais = [];
-let grafico, graficoTipos, g1, g2, g3, g4, g5;
+let grafico, graficoTipos, g1, g2, g3, g4, g5, g6;
 
 const STORAGE_KEY = "indicadores_ss_estado";
 const btnLimpar = document.getElementById("btnLimpar");
@@ -830,6 +835,7 @@ function calcularTotais(dados){
 
     const totaisTipo = {};
     const totaisTecnico = {};
+    const totaisCliente = {};
 
     let totalHoras = 0;
     let horasTrab = 0;
@@ -846,6 +852,9 @@ function calcularTotais(dados){
 
         const tecnico = linha["TÉCNICO DESIGNADO"] || "Não informado";
         totaisTecnico[tecnico] = (totaisTecnico[tecnico] || 0) + 1;
+
+        const cliente = String(linha["SOLICITANTE"] || "Não informado").trim() || "Não informado";
+        totaisCliente[cliente] = (totaisCliente[cliente] || 0) + 1;
 
         totalHoras += toHoras(linha["TOTAL DE HORAS"]);
         horasTrab += toHoras(linha["HORAS TRABALHADAS"]);
@@ -879,6 +888,11 @@ function calcularTotais(dados){
     }
 
     criarGrafico("graficoTecnico","Atendimentos",Object.keys(totaisTecnico),Object.values(totaisTecnico),grafico,v=>grafico=v,true);
+
+    const clientesOrdenados = Object.keys(totaisCliente)
+        .sort((a,b) => totaisCliente[b] - totaisCliente[a] || a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
+    const totCliente = clientesOrdenados.map(cliente => totaisCliente[cliente]);
+    criarGrafico("graficoCliente","Atendimentos por Cliente",clientesOrdenados,totCliente,g6,v=>g6=v,false);
 
     criarGrafico("graficoTotalHoras","Horas",
         ["Trabalhadas","Horas Úteis"],
