@@ -1,0 +1,19 @@
+﻿diff --git a/indicadores-resultado.html b/indicadores-resultado.html
+index 9b461c6..d6cf67c 100644
+--- a/indicadores-resultado.html
++++ b/indicadores-resultado.html
+@@ -1187,9 +1187,11 @@ classList.add("hidden")
+ 
+             let dataLinha = l[indices.data];
+             dataLinha = parseDataLinha(dataLinha);
+-            if (!dataLinha) continue;
+-
+-            dataLinha.setHours(0, 0, 0, 0);
++            if (dataLinha && !isNaN(dataLinha)) {
++              dataLinha.setHours(0, 0, 0, 0);
++            } else {
++              dataLinha = null;
++            }
+ 
+             dadosGlobais.push({
+               filial: normalizarTexto(l[indices.filial]),

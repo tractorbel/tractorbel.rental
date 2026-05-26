@@ -616,6 +616,17 @@ body {
       return new Date((serial - 25569) * 86400 * 1000);
     }
 
+    function normalizarHeader(texto) {
+      return String(texto || "")
+        .normalize("NFD")
+        .replace(/[ -]/g, "")
+        .replace(/[-]/g, "")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^\w\s]/g, " ")
+        .trim()
+        .toLowerCase();
+    }
+
     function parseDataLinha(dataLinha) {
       if (dataLinha === null || dataLinha === undefined || dataLinha === "") return null;
       if (typeof dataLinha === "number") {
@@ -627,6 +638,13 @@ body {
 
       const texto = String(dataLinha).trim();
       if (!texto) return null;
+
+      if (/^\d+(\.\d+)?$/.test(texto)) {
+        const serial = Number(texto);
+        if (!isNaN(serial)) {
+          return excelDateToJSDate(serial);
+        }
+      }
 
       const formatos = [
         texto,
@@ -1119,7 +1137,7 @@ body {
       mesInicio.value = ultimoMesAno;
       mesFim.value = ultimoMesAno;
     }
-classList.add("hidden")
+
     function carregarDados(file) {
       if (!file) return;
 
@@ -1138,7 +1156,7 @@ classList.add("hidden")
           const headerRow = json[0] || [];
           const headerMap = {};
           headerRow.forEach((value, index) => {
-            const key = String(value || "").trim().toLowerCase();
+            const key = normalizarHeader(value);
             if (key) {
               headerMap[key] = index;
             }
@@ -1146,13 +1164,15 @@ classList.add("hidden")
 
           const getIndex = (names, fallback) => {
             for (const name of names) {
-              if (headerMap[name] !== undefined) {
-                return headerMap[name];
+              const normalized = normalizarHeader(name);
+              if (headerMap[normalized] !== undefined) {
+                return headerMap[normalized];
               }
             }
             for (const name of names) {
+              const normalized = normalizarHeader(name);
               for (const key in headerMap) {
-                if (key.includes(name)) {
+                if (key.includes(normalized)) {
                   return headerMap[key];
                 }
               }
@@ -1162,21 +1182,21 @@ classList.add("hidden")
 
           const indices = {
             filial: getIndex(["filial"], 0),
-            patrimonio: getIndex(["patrimonio"], 1),
+            patrimonio: getIndex(["patrimonio", "patrimônio"], 1),
             serie: getIndex(["serie"], 2),
             equipamento: getIndex(["equipamento"], 3),
             marca: getIndex(["marca"], 4),
             modelo: getIndex(["modelo"], 5),
             ano: getIndex(["ano"], 6),
             faturamento: getIndex(["faturamento"], 7),
-            manutencao: getIndex(["manutenção", "manutencao"], 8),
+            manutencao: getIndex(["manutencao", "manutencao"], 8),
             financiamento: getIndex(["financiamento"], 9),
             impostos: getIndex(["impostos"], 10),
             tx: getIndex(["tx", "taxa"], 11),
             resultado: getIndex(["resultado"], 12),
             mau: getIndex(["mau", "faturamento avaria"], 13),
             cliente: getIndex(["cliente", "solicitante"], 14),
-            data: getIndex(["data", "data de alteração da ss", "data de alteracao da ss"], 15)
+            data: getIndex(["data", "data de alteracao da ss", "data de alteracao"], 15)
           };
 
           dadosGlobais = [];
