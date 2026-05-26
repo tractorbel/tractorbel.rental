@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
      <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Relatório Financeiro Rental</title>
+  <title>RelatÃ³rio Financeiro Rental</title>
   <link rel="icon" type="image/png" href="icon.png">
   <link rel="stylesheet" href="index.css">
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
@@ -353,7 +353,7 @@ body {
 <body>
 
 <nav class="navbar">
-    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+    <div class="menu-toggle" onclick="toggleMenu()">â˜°</div>
     <ul id="menu">
         <li><a href="index.html">INICIO</a></li>
         <li><a href="documentos.html">DOCUMENTOS</a></li>
@@ -368,15 +368,15 @@ body {
 </div>
 
     <div id="conteudo">
-      <h2>Relatório Financeiro Rental</h2>
+      <h2>RelatÃ³rio Financeiro Rental</h2>
     <div class="topo-controles">
 <div class="campo-periodo">
-  <label for="mesInicio">Mês/Ano Início</label>
+  <label for="mesInicio">MÃªs/Ano InÃ­cio</label>
   <input type="text" id="mesInicio" class="month-input" disabled placeholder="YYYY-MM" pattern="\d{4}-\d{2}" />
 </div>
 
 <div class="campo-periodo">
-  <label for="mesFim">Mês/Ano Fim</label>
+  <label for="mesFim">MÃªs/Ano Fim</label>
   <input type="text" id="mesFim" class="month-input" disabled placeholder="YYYY-MM" pattern="\d{4}-\d{2}" />
 </div>
 
@@ -399,13 +399,13 @@ body {
       </div>
 
       <div class="filtro-box">
-        <label class="titulo-filtro">Patrimônio</label>
+        <label class="titulo-filtro">PatrimÃ´nio</label>
         <input class="filtro-busca" id="buscaFiltroPatrimonio" placeholder="Buscar..." />
         <div class="filtro-lista" id="filtroPatrimonio"></div>
       </div>
 
       <div class="filtro-box">
-        <label class="titulo-filtro">Série</label>
+        <label class="titulo-filtro">SÃ©rie</label>
         <input class="filtro-busca" id="buscaFiltroSerie" placeholder="Buscar..." />
         <div class="filtro-lista" id="filtroSerie"></div>
       </div>
@@ -449,19 +449,19 @@ body {
       <div class="card"><h4>Faturamento</h4><div class="total" id="cardFat">R$ 0,00</div></div>
       <div class="card"><h4>Financiamento</h4><div class="total" id="cardFin">R$ 0,00</div></div>
       <div class="card"><h4>Impostos</h4><div class="total" id="cardImp">R$ 0,00</div></div>
-      <div class="card"><h4>Manutenção</h4><div class="total" id="cardMan">R$ 0,00</div></div>
+      <div class="card"><h4>ManutenÃ§Ã£o</h4><div class="total" id="cardMan">R$ 0,00</div></div>
       <div class="card"><h4>Taxa Administrativa</h4><div class="total" id="cardTx">R$ 0,00</div></div>
       <div class="card"><h4>Resultado</h4><div class="total" id="cardRes">R$ 0,00</div></div>
       <div class="card"><h4>Faturamento Avaria</h4><div class="total" id="cardMau">R$ 0,00</div></div>
     </div>
 
     <div class="card grafico-card" id="cardGraficoMes">
-      <h3>Relatório Financeiro Mês</h3>
+      <h3>RelatÃ³rio Financeiro MÃªs</h3>
       <canvas id="graficoMes"></canvas>
     </div>
 
     <div class="card grafico-card" id="cardGraficoClienteMes">
-     <h3>Faturamento do Cliente x Mês</h3>
+     <h3>Faturamento do Cliente x MÃªs</h3>
      <canvas id="graficoClienteMes"></canvas>
     </div>
 
@@ -476,12 +476,12 @@ body {
     </div>
 
     <div class="card grafico-card" id="cardGraficoManutencao">
-      <h3>Manutenção x Cliente</h3>
+      <h3>ManutenÃ§Ã£o x Cliente</h3>
       <canvas id="graficoManutencao"></canvas>
     </div>
 
     <div class="card grafico-card" id="cardGraficoDeficit">
-      <h3>Déficit x Cliente</h3>
+      <h3>DÃ©ficit x Cliente</h3>
       <canvas id="graficoDeficit"></canvas>
     </div>
   </div>
@@ -1153,7 +1153,50 @@ body {
           const sheet = workbook.Sheets[workbook.SheetNames[0]];
           const json = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
 
-          const headerRow = json[0] || [];
+          const isPossibleHeaderRow = (row) => {
+            if (!row) return false;
+            const normalizedValues = row.map((value) => normalizarHeader(value));
+            const expected = [
+              "filial",
+              "patrimonio",
+              "serie",
+              "equipamento",
+              "marca",
+              "modelo",
+              "ano",
+              "faturamento",
+              "manutencao",
+              "financiamento",
+              "impostos",
+              "tx",
+              "taxa",
+              "resultado",
+              "mau",
+              "faturamento avaria",
+              "cliente",
+              "solicitante",
+              "data",
+              "data de alteracao da ss",
+              "data de alteracao"
+            ];
+
+            const hits = normalizedValues.reduce((count, value) => {
+              if (!value) return count;
+              return count + expected.some((expectedHeader) => value.includes(expectedHeader));
+            }, 0);
+
+            return hits >= 3;
+          };
+
+          let headerRowIndex = 0;
+          for (let rowIndex = 0; rowIndex < Math.min(5, json.length); rowIndex++) {
+            if (isPossibleHeaderRow(json[rowIndex])) {
+              headerRowIndex = rowIndex;
+              break;
+            }
+          }
+
+          const headerRow = json[headerRowIndex] || [];
           const headerMap = {};
           headerRow.forEach((value, index) => {
             const key = normalizarHeader(value);
@@ -1163,26 +1206,29 @@ body {
           });
 
           const getIndex = (names, fallback) => {
-            for (const name of names) {
-              const normalized = normalizarHeader(name);
-              if (headerMap[normalized] !== undefined) {
+            const normalizedNames = names.map((name) => normalizarHeader(name));
+
+            for (const normalized of normalizedNames) {
+              if (normalized && headerMap[normalized] !== undefined) {
                 return headerMap[normalized];
               }
             }
-            for (const name of names) {
-              const normalized = normalizarHeader(name);
+
+            for (const normalized of normalizedNames) {
+              if (!normalized) continue;
               for (const key in headerMap) {
                 if (key.includes(normalized)) {
                   return headerMap[key];
                 }
               }
             }
+
             return fallback;
           };
 
           const indices = {
             filial: getIndex(["filial"], 0),
-            patrimonio: getIndex(["patrimonio", "patrimônio"], 1),
+            patrimonio: getIndex(["patrimonio", "patrimÃ´nio"], 1),
             serie: getIndex(["serie"], 2),
             equipamento: getIndex(["equipamento"], 3),
             marca: getIndex(["marca"], 4),
@@ -1201,7 +1247,7 @@ body {
 
           dadosGlobais = [];
 
-          for (let i = 1; i < json.length; i++) {
+          for (let i = headerRowIndex + 1; i < json.length; i++) {
             const l = json[i];
             if (!l || l.length === 0) continue;
 
@@ -1234,7 +1280,7 @@ body {
           }
 
           if (!dadosGlobais.length) {
-            statusCarga.innerText = "Nenhum dado válido encontrado.";
+            statusCarga.innerText = "Nenhum dado vÃ¡lido encontrado.";
             return;
           }
 
@@ -1293,7 +1339,7 @@ body {
     <div class="footer-container">
         <div class="footer-col">
             <h3>Tractorbel Equipamentos</h3>
-            <p>BR-040, 8245 - KM 523 - Chácaras Boa Vista, Contagem - MG, 32150-193</p>
+            <p>BR-040, 8245 - KM 523 - ChÃ¡caras Boa Vista, Contagem - MG, 32150-193</p>
             <p>programacaorental04@tractorbel.com.br</p>
         </div>
 
@@ -1310,15 +1356,12 @@ body {
                   <img src="png/logo-instagram.png" alt="Instagram">
                 </a>
             </div>
-            <p>© 2026 Tractorbel Equipamentos - Todos os direitos reservados</p>
-            <p>Desenvolvido por Tâmmer Leonel</p>
+            <p>Â© 2026 Tractorbel Equipamentos - Todos os direitos reservados</p>
+            <p>Desenvolvido por TÃ¢mmer Leonel</p>
         </div>
     </div>
 </footer>
 
-<script src="login.js"></script>
-<script>
-  window.logout = logout;
-</script>
+<script type="module" src="login.js"></script>
 </body>
 </html>
