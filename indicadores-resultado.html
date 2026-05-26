@@ -383,7 +383,7 @@ body {
 
       <div>
         <label for="upload" class="btn-google">Enviar Planilha</label>
-        <input type="file" id="upload" accept=".xls,.xlsx" class="hidden">
+        <input type="file" id="upload" accept=".xls,.xlsx" style="display: none;">
       </div>
 
       <div class="align-center">
@@ -497,6 +497,12 @@ body {
     const mesFim = document.getElementById("mesFim");
     const upload = document.getElementById("upload");
     const btnLimpar = document.getElementById("btnLimpar");
+    const statusCarga = document.getElementById("statusCarga");
+    const uploadLabel = document.querySelector('label[for="upload"]');
+
+    if (uploadLabel && upload) {
+      uploadLabel.addEventListener("click", () => upload.click());
+    }
 
     const filtrosIds = [
       "filtroFilial",
@@ -608,6 +614,42 @@ body {
 
     function excelDateToJSDate(serial) {
       return new Date((serial - 25569) * 86400 * 1000);
+    }
+
+    function parseDataLinha(dataLinha) {
+      if (dataLinha === null || dataLinha === undefined || dataLinha === "") return null;
+      if (typeof dataLinha === "number") {
+        return excelDateToJSDate(dataLinha);
+      }
+      if (dataLinha instanceof Date) {
+        return isNaN(dataLinha) ? null : dataLinha;
+      }
+
+      const texto = String(dataLinha).trim();
+      if (!texto) return null;
+
+      const formatos = [
+        texto,
+        texto.replace(/\./g, "/"),
+        texto.replace(/-/g, "/"),
+        texto.replace(/^(\d{2})\/(\d{2})\/(\d{4})$/, "$3-$2-$1"),
+        texto.replace(/^(\d{2})\.(\d{2})\.(\d{4})$/, "$3-$2-$1"),
+        texto.replace(/^(\d{4})\/(\d{2})\/(\d{2})$/, "$1-$2-$3")
+      ];
+
+      for (const candidate of formatos) {
+        const data = new Date(candidate);
+        if (!isNaN(data)) {
+          return data;
+        }
+      }
+
+      const match = texto.match(/(\d{2})[\/\.-](\d{2})[\/\.-](\d{4})/);
+      if (match) {
+        return new Date(`${match[3]}-${match[2]}-${match[1]}`);
+      }
+
+      return null;
     }
 
     function normalizarTexto(valor) {
@@ -1093,40 +1135,78 @@ classList.add("hidden")
           const sheet = workbook.Sheets[workbook.SheetNames[0]];
           const json = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
 
+          const headerRow = json[0] || [];
+          const headerMap = {};
+          headerRow.forEach((value, index) => {
+            const key = String(value || "").trim().toLowerCase();
+            if (key) {
+              headerMap[key] = index;
+            }
+          });
+
+          const getIndex = (names, fallback) => {
+            for (const name of names) {
+              if (headerMap[name] !== undefined) {
+                return headerMap[name];
+              }
+            }
+            for (const name of names) {
+              for (const key in headerMap) {
+                if (key.includes(name)) {
+                  return headerMap[key];
+                }
+              }
+            }
+            return fallback;
+          };
+
+          const indices = {
+            filial: getIndex(["filial"], 0),
+            patrimonio: getIndex(["patrimonio"], 1),
+            serie: getIndex(["serie"], 2),
+            equipamento: getIndex(["equipamento"], 3),
+            marca: getIndex(["marca"], 4),
+            modelo: getIndex(["modelo"], 5),
+            ano: getIndex(["ano"], 6),
+            faturamento: getIndex(["faturamento"], 7),
+            manutencao: getIndex(["manutenção", "manutencao"], 8),
+            financiamento: getIndex(["financiamento"], 9),
+            impostos: getIndex(["impostos"], 10),
+            tx: getIndex(["tx", "taxa"], 11),
+            resultado: getIndex(["resultado"], 12),
+            mau: getIndex(["mau", "faturamento avaria"], 13),
+            cliente: getIndex(["cliente", "solicitante"], 14),
+            data: getIndex(["data", "data de alteração da ss", "data de alteracao da ss"], 15)
+          };
+
           dadosGlobais = [];
 
           for (let i = 1; i < json.length; i++) {
             const l = json[i];
             if (!l || l.length === 0) continue;
 
-            let dataLinha = l[15];
+            let dataLinha = l[indices.data];
+            dataLinha = parseDataLinha(dataLinha);
             if (!dataLinha) continue;
 
-            if (typeof dataLinha === "number") {
-              dataLinha = excelDateToJSDate(dataLinha);
-            } else {
-              dataLinha = new Date(dataLinha);
-            }
-
-            if (isNaN(dataLinha)) continue;
             dataLinha.setHours(0, 0, 0, 0);
 
             dadosGlobais.push({
-              filial: normalizarTexto(l[0]),
-              patrimonio: normalizarTexto(l[1]),
-              serie: normalizarTexto(l[2]),
-              equipamento: normalizarTexto(l[3]),
-              marca: normalizarTexto(l[4]),
-              modelo: normalizarTexto(l[5]),
-              ano: normalizarTexto(l[6]),
-              faturamento: converterNumero(l[7]),
-              manutencao: converterNumero(l[8]),
-              financiamento: converterNumero(l[9]),
-              impostos: converterNumero(l[10]),
-              tx: converterNumero(l[11]),
-              resultado: converterNumero(l[12]),
-              mau: converterNumero(l[13]),
-              cliente: normalizarTexto(l[14]),
+              filial: normalizarTexto(l[indices.filial]),
+              patrimonio: normalizarTexto(l[indices.patrimonio]),
+              serie: normalizarTexto(l[indices.serie]),
+              equipamento: normalizarTexto(l[indices.equipamento]),
+              marca: normalizarTexto(l[indices.marca]),
+              modelo: normalizarTexto(l[indices.modelo]),
+              ano: normalizarTexto(l[indices.ano]),
+              faturamento: converterNumero(l[indices.faturamento]),
+              manutencao: converterNumero(l[indices.manutencao]),
+              financiamento: converterNumero(l[indices.financiamento]),
+              impostos: converterNumero(l[indices.impostos]),
+              tx: converterNumero(l[indices.tx]),
+              resultado: converterNumero(l[indices.resultado]),
+              mau: converterNumero(l[indices.mau]),
+              cliente: normalizarTexto(l[indices.cliente]),
               data: dataLinha
             });
           }
@@ -1145,7 +1225,7 @@ classList.add("hidden")
           gerarRelatorio();
           salvarEstadoPagina();
 
-          statusCarga.innerText = "Dados carregados com sucesso.";
+          statusCarga.innerText = `Dados carregados com sucesso: ${dadosGlobais.length} registro(s).`;
           setTimeout(() => {
             statusCarga.innerText = "";
           }, 2000);
