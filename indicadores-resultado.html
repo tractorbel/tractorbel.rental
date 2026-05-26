@@ -1187,9 +1187,11 @@ classList.add("hidden")
 
             let dataLinha = l[indices.data];
             dataLinha = parseDataLinha(dataLinha);
-            if (!dataLinha) continue;
-
-            dataLinha.setHours(0, 0, 0, 0);
+            if (dataLinha && !isNaN(dataLinha)) {
+              dataLinha.setHours(0, 0, 0, 0);
+            } else {
+              dataLinha = null;
+            }
 
             dadosGlobais.push({
               filial: normalizarTexto(l[indices.filial]),
