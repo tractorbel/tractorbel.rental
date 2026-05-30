@@ -645,9 +645,7 @@ body {
         .some((input) => input.value.trim() !== "");
 
       return filtrosIds.some((id) => getMultiValues(id).length > 0) ||
-        existeBuscaAtiva ||
-        mesInicio.value !== "" ||
-        mesFim.value !== "";
+        existeBuscaAtiva;
     }
 
     function getTextoBusca(id) {
@@ -809,9 +807,6 @@ body {
       document.querySelectorAll(".filtro-busca").forEach((input) => {
         input.value = "";
       });
-
-      mesInicio.value = "";
-      mesFim.value = "";
 
       atualizarFiltrosDinamicamente();
       gerarRelatorio();
