@@ -512,10 +512,15 @@ function aplicarEstadoFiltros(filtros){
 function salvarEstadoPagina(){
     if(!dadosGlobais.length) return;
 
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
-        dados: dadosGlobais,
-        filtros: getEstadoFiltros()
-    }));
+    try {
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+            dados: dadosGlobais,
+            filtros: getEstadoFiltros()
+        }));
+    } catch (erro) {
+        console.warn("Nao foi possivel salvar o estado da pagina no navegador:", erro);
+        sessionStorage.removeItem(STORAGE_KEY);
+    }
 }
 
 function restaurarEstadoPagina(){
