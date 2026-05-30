@@ -439,12 +439,12 @@ body {
     <div class="topo-controles">
 <div class="campo-periodo">
   <label for="mesInicio">Mês/Ano Início</label>
-  <input type="text" id="mesInicio" class="month-input" disabled readonly placeholder="MM/AAAA" pattern="\d{2}/\d{4}" autocomplete="off" />
+  <input type="text" id="mesInicio" class="month-input" disabled readonly placeholder="Mes/AAAA" autocomplete="off" />
 </div>
 
 <div class="campo-periodo">
   <label for="mesFim">Mês/Ano Fim</label>
-  <input type="text" id="mesFim" class="month-input" disabled readonly placeholder="MM/AAAA" pattern="\d{2}/\d{4}" autocomplete="off" />
+  <input type="text" id="mesFim" class="month-input" disabled readonly placeholder="Mes/AAAA" autocomplete="off" />
 </div>
 
       <div class="acoes-planilha">
@@ -703,7 +703,8 @@ body {
       const normalizada = normalizarChaveMes(chave);
       if (!normalizada) return "";
       const [ano, mes] = normalizada.split("-");
-      return `${mes}/${ano}`;
+      const nomesMeses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+      return `${nomesMeses[Number(mes) - 1]}/${ano}`;
     }
 
     function getMesSelecionado(input) {
@@ -719,7 +720,7 @@ body {
     function atualizarMesesDisponiveis() {
       mesesDisponiveis = [
         ...new Set(dadosGlobais.map((d) => getChaveMes(d.data)).filter(Boolean))
-      ].sort();
+      ].sort((a, b) => b.localeCompare(a));
     }
 
     function fecharCalendariosMes() {
@@ -1227,7 +1228,7 @@ body {
       if (!mesesDisponiveis.length) atualizarMesesDisponiveis();
       if (!mesesDisponiveis.length) return;
 
-      const ultimoMesAno = mesesDisponiveis[mesesDisponiveis.length - 1];
+      const ultimoMesAno = mesesDisponiveis[0];
       setMesSelecionado(mesInicio, ultimoMesAno);
       setMesSelecionado(mesFim, ultimoMesAno);
     }
