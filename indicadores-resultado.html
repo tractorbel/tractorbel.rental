@@ -76,33 +76,21 @@ body {
     .filtro-lista {
       flex: 1;
       overflow-y: auto;
-        <input type="file" id="upload" accept=".xls,.xlsx" class="hidden">
       border: 1px solid #d8d8d8;
       border-radius: 6px;
       padding: 4px;
-        <div class="align-center">
     }
 
-    .filtro-item {
-      display: flex;
-      align-items: center;
-        <button id="btnLimpar" class="btn-google hidden">Limpar Filtros</button>
-      padding: 4px 6px;
-      border-radius: 4px;
-      font-size: 12px;
-            <a href="https://br.linkedin.com/company/tractorbel-equipamentos" target="_blank" rel="noopener noreferrer" title="LinkedIn Tractorbel">
-              <img src="png/logo-linkedin.png" alt="LinkedIn">
-            </a>
-            <a href="https://api.whatsapp.com/send/?phone=558008801422" target="_blank" rel="noopener noreferrer" title="WhatsApp Tractorbel">
-              <img src="png/logo-whatsapp.png" alt="WhatsApp">
-            </a>
-            <a href="https://www.instagram.com/tractorbelequip/" target="_blank" rel="noopener noreferrer" title="Instagram Tractorbel">
-              <img src="png/logo-instagram.png" alt="Instagram">
-            </a>
-      margin: 0;
-      flex-shrink: 0;
-      accent-color: #2e7d32;
-    }
+.filtro-item {
+  display: flex;
+  align-items: center;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: #2e7d32;
+}
 
     .filtro-item span {
       display: block;
@@ -363,6 +351,7 @@ body {
   </style>
 </head>
 <body>
+<input type="file" id="upload" accept=".xls,.xlsx" class="hidden">
 
 <nav class="navbar">
     <div class="menu-toggle" onclick="toggleMenu()">☰</div>
@@ -395,8 +384,7 @@ body {
 
       <div>
         <label for="upload" class="btn-google">Enviar Planilha</label>
-        <input type="file" id="upload" accept=".xls,.xlsx" class="hidden">
-      </div>
+        </div>
 
       <div class="align-center">
         <span id="statusCarga"></span>
