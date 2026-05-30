@@ -50,8 +50,14 @@
 
     .topo-controles {
       display: grid;
-      grid-template-columns: repeat(5, minmax(160px, 1fr));
-      gap: 10px;
+      grid-template-columns:
+        minmax(145px, 1fr)
+        minmax(175px, 1.2fr)
+        minmax(145px, 1fr)
+        minmax(165px, 1.15fr)
+        minmax(90px, 0.65fr)
+        minmax(105px, 0.75fr);
+      gap: 8px;
       align-items: start;
       margin-bottom: 14px;
     }
@@ -61,7 +67,7 @@
       flex-direction: column;
       border: 1px solid #d8e8da;
       border-radius: 12px;
-      padding: 10px;
+      padding: 8px;
       background: #fff;
       box-shadow: 0 2px 8px rgba(46, 125, 50, 0.08);
       min-width: 0;
@@ -72,6 +78,9 @@
       font-weight: 700;
       color: #2e7d32;
       margin: 0 0 6px 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .filtro-seletor {
@@ -94,7 +103,7 @@
 
 .filtro-busca {
   width: 100%;
-  padding: 7px 9px;
+  padding: 7px 8px;
   border: 1px solid #cfd8dc;
   border-radius: 8px;
   font-size: 12px;
@@ -113,22 +122,26 @@
   overflow-y: auto;
   border: 1px solid #cfd8dc;
   border-radius: 10px;
-  padding: 8px 10px;
+  padding: 7px 8px;
   background: linear-gradient(180deg, #ffffff 0%, #f7faf8 100%);
 }
 
 .filtro-checkbox-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 13px;
+  gap: 5px;
+  font-size: 12px;
   padding: 4px 0;
   cursor: pointer;
   text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .filtro-checkbox-item input {
   accent-color: #34a853;
+  flex: 0 0 auto;
 }
 
     .btn-google {
