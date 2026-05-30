@@ -139,6 +139,13 @@ body {
       cursor: pointer;
     }
 
+    .acoes-planilha {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
     .cards {
       display: none;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -179,11 +186,6 @@ body {
 
     canvas {
       max-height: 280px;
-    }
-
-    #acoes-filtros {
-      text-align: right;
-      margin: 10px 0 16px;
     }
 
     #statusCarga {
@@ -381,10 +383,10 @@ body {
   <input type="text" id="mesFim" class="month-input" disabled placeholder="YYYY-MM" pattern="\d{4}-\d{2}" />
 </div>
 
-
-      <div>
+      <div class="acoes-planilha">
         <label for="upload" class="btn-google">Enviar Planilha</label>
-        </div>
+        <button id="btnLimpar" class="btn-google hidden">Limpar Filtros</button>
+      </div>
 
       <div class="align-center">
         <span id="statusCarga"></span>
@@ -439,10 +441,6 @@ body {
         <input class="filtro-busca" id="buscaFiltroAno" placeholder="Buscar..." />
         <div class="filtro-lista" id="filtroAno"></div>
       </div>
-    </div>
-
-    <div id="acoes-filtros">
-      <button id="btnLimpar" class="btn-google hidden">Limpar Filtros</button>
     </div>
 
     <div class="cards">
@@ -638,7 +636,13 @@ body {
     }
 
     function existeFiltroAtivo() {
-      return filtrosIds.some((id) => getMultiValues(id).length > 0);
+      const existeBuscaAtiva = Array.from(document.querySelectorAll(".filtro-busca"))
+        .some((input) => input.value.trim() !== "");
+
+      return filtrosIds.some((id) => getMultiValues(id).length > 0) ||
+        existeBuscaAtiva ||
+        mesInicio.value !== "" ||
+        mesFim.value !== "";
     }
 
     function getTextoBusca(id) {
@@ -796,6 +800,13 @@ body {
           el.checked = false;
         });
       });
+
+      document.querySelectorAll(".filtro-busca").forEach((input) => {
+        input.value = "";
+      });
+
+      mesInicio.value = "";
+      mesFim.value = "";
 
       atualizarFiltrosDinamicamente();
       gerarRelatorio();
@@ -1058,7 +1069,7 @@ body {
       calcularTotais(dadosFiltrados);
       gerarGraficos(dadosFiltrados);
 
-      btnLimpar.style.display = existeFiltroAtivo() ? "inline-block" : "none";
+      btnLimpar.classList.toggle("hidden", !existeFiltroAtivo());
       salvarEstadoPagina();
     }
 
@@ -1078,7 +1089,7 @@ body {
     function carregarDados(file) {
       if (!file) return;
 
-      btnLimpar.style.display = "none";
+      btnLimpar.classList.add("hidden");
       statusCarga.innerText = "Carregando planilha...";
 
       const reader = new FileReader();

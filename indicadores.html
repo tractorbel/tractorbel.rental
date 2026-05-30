@@ -484,7 +484,7 @@ let grafico, graficoTipos, g1, g2, g3, g4, g5, g6;
 const STORAGE_KEY = "indicadores_ss_estado";
 const btnLimpar = document.getElementById("btnLimpar");
 
-btnLimpar.style.display = "none";
+btnLimpar.classList.add("hidden");
 
 function getEstadoFiltros(){
     return {
@@ -928,7 +928,7 @@ function calcularTotais(dados){
     criarGrafico("graficoDeslocamento","Horas Deslocamento",["Total"],[horasDesloc],g4,v=>g4=v,false);
     criarGrafico("graficoMaquina","Máquina Parada",["Total"],[maquinaParada],g5,v=>g5=v,false);
 
-    btnLimpar.style.display = existeFiltroAtivo() ? "inline-block" : "none";
+    btnLimpar.classList.toggle("hidden", !existeFiltroAtivo());
 }
 
 function criarGrafico(id,label,labels,data,graficoAtual,salvar,comClickable,clickCallback){
@@ -1031,12 +1031,16 @@ function filtrarPorTipo(tipo){
 }
 
 function existeFiltroAtivo(){
+    const existeBuscaAtiva = Array.from(document.querySelectorAll(".filtro-busca"))
+        .some(input => input.value.trim() !== "");
+
     return getSelecionados("filtroTecnico").length > 0 ||
            getSelecionados("filtroTipo").length > 0 ||
            getSelecionados("filtroCliente").length > 0 ||
            getSelecionados("filtroEquipamento").length > 0 ||
            getSelecionados("filtroMarca").length > 0 ||
-           getSelecionados("filtroModelo").length > 0;
+           getSelecionados("filtroModelo").length > 0 ||
+           existeBuscaAtiva;
 }
 
 function limparFiltros(){
