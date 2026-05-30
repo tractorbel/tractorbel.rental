@@ -553,6 +553,7 @@ body {
     let graficos = [];
     let atualizandoFiltros = false;
     let mesesDisponiveis = [];
+    let statusTimeout = null;
     const scrollFiltros = {};
     const STORAGE_KEY = "indicadores_financeiro_estado";
 
@@ -649,7 +650,7 @@ body {
         bindBuscaFiltros();
         gerarRelatorio();
 
-        statusCarga.innerText = "";
+        mostrarStatus("", "sucesso", 0);
       } catch (erro) {
         console.error("Erro ao restaurar dados salvos:", erro);
         sessionStorage.removeItem(STORAGE_KEY);
@@ -717,6 +718,33 @@ body {
       input.value = formatarMesAno(normalizada);
     }
 
+    function mostrarStatus(mensagem, tipo = "sucesso", duracao = 3000) {
+      clearTimeout(statusTimeout);
+      statusCarga.innerText = mensagem;
+      statusCarga.style.color = tipo === "erro" ? "#c62828" : "#2e7d32";
+
+      if (duracao > 0) {
+        statusTimeout = setTimeout(() => {
+          statusCarga.innerText = "";
+          statusCarga.style.color = "#2e7d32";
+        }, duracao);
+      }
+    }
+
+    function validarPeriodoSelecionado(input, chave) {
+      const inicioAtual = getMesSelecionado(mesInicio);
+      const fimAtual = getMesSelecionado(mesFim);
+      const novoInicio = input === mesInicio ? chave : inicioAtual;
+      const novoFim = input === mesFim ? chave : fimAtual;
+
+      if (novoInicio && novoFim && novoInicio > novoFim) {
+        mostrarStatus("Periodo invalido: o Mes/Ano Fim nao pode ser menor que o Mes/Ano Inicio.", "erro", 5000);
+        return false;
+      }
+
+      return true;
+    }
+
     function atualizarMesesDisponiveis() {
       mesesDisponiveis = [
         ...new Set(dadosGlobais.map((d) => getChaveMes(d.data)).filter(Boolean))
@@ -747,6 +775,8 @@ body {
         botao.className = "month-option" + (chave === selecionado ? " active" : "");
         botao.textContent = formatarMesAno(chave);
         botao.addEventListener("click", () => {
+          if (!validarPeriodoSelecionado(input, chave)) return;
+
           setMesSelecionado(input, chave);
           fecharCalendariosMes();
           gerarRelatorio();
@@ -1237,7 +1267,7 @@ body {
       if (!file) return;
 
       btnLimpar.classList.add("hidden");
-      statusCarga.innerText = "Carregando planilha...";
+      mostrarStatus("Carregando planilha...", "sucesso", 0);
 
       const reader = new FileReader();
 
@@ -1287,7 +1317,7 @@ body {
           }
 
           if (!dadosGlobais.length) {
-            statusCarga.innerText = "Nenhum dado válido encontrado.";
+            mostrarStatus("Nenhum dado valido encontrado.", "erro", 0);
             return;
           }
 
@@ -1301,13 +1331,10 @@ body {
           gerarRelatorio();
           salvarEstadoPagina();
 
-          statusCarga.innerText = "Dados carregados com sucesso.";
-          setTimeout(() => {
-            statusCarga.innerText = "";
-          }, 2000);
+          mostrarStatus("Dados carregados com sucesso.", "sucesso", 2000);
         } catch (error) {
           console.error(error);
-          statusCarga.innerText = "Erro ao carregar planilha.";
+          mostrarStatus("Erro ao carregar planilha.", "erro", 0);
         }
       };
 
