@@ -146,6 +146,70 @@ body {
       flex-wrap: wrap;
     }
 
+    .campo-periodo {
+      position: relative;
+    }
+
+    .campo-periodo label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .month-input {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid #cfd8dc;
+      border-radius: 8px;
+      padding: 9px 12px;
+      background: #fff;
+      color: #222;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .month-input:disabled {
+      background: #eef2f3;
+      color: #7a7a7a;
+      cursor: not-allowed;
+    }
+
+    .month-picker {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      z-index: 30;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      max-height: 220px;
+      overflow-y: auto;
+      padding: 8px;
+      border: 1px solid #d8e8da;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
+    }
+
+    .month-option {
+      border: 1px solid #d8e8da;
+      border-radius: 6px;
+      padding: 8px;
+      background: #fff;
+      color: #2e7d32;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .month-option:hover,
+    .month-option.active {
+      background: #34a853;
+      color: #fff;
+      border-color: #34a853;
+    }
+
     .cards {
       display: none;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -375,12 +439,12 @@ body {
     <div class="topo-controles">
 <div class="campo-periodo">
   <label for="mesInicio">Mês/Ano Início</label>
-  <input type="text" id="mesInicio" class="month-input" disabled placeholder="YYYY-MM" pattern="\d{4}-\d{2}" />
+  <input type="text" id="mesInicio" class="month-input" disabled readonly placeholder="MM/AAAA" pattern="\d{2}/\d{4}" autocomplete="off" />
 </div>
 
 <div class="campo-periodo">
   <label for="mesFim">Mês/Ano Fim</label>
-  <input type="text" id="mesFim" class="month-input" disabled placeholder="YYYY-MM" pattern="\d{4}-\d{2}" />
+  <input type="text" id="mesFim" class="month-input" disabled readonly placeholder="MM/AAAA" pattern="\d{2}/\d{4}" autocomplete="off" />
 </div>
 
       <div class="acoes-planilha">
@@ -488,6 +552,7 @@ body {
     let dadosGlobais = [];
     let graficos = [];
     let atualizandoFiltros = false;
+    let mesesDisponiveis = [];
     const scrollFiltros = {};
     const STORAGE_KEY = "indicadores_financeiro_estado";
 
@@ -548,8 +613,8 @@ body {
         sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
           dados: dadosGlobais,
           filtros: getEstadoFiltros(),
-          mesInicio: mesInicio.value,
-          mesFim: mesFim.value
+          mesInicio: getMesSelecionado(mesInicio),
+          mesFim: getMesSelecionado(mesFim)
         }));
       } catch (erro) {
         console.warn("Nao foi possivel salvar o estado da pagina no navegador:", erro);
@@ -575,8 +640,9 @@ body {
 
         mesInicio.disabled = false;
         mesFim.disabled = false;
-        mesInicio.value = estado.mesInicio || "";
-        mesFim.value = estado.mesFim || "";
+        atualizarMesesDisponiveis();
+        setMesSelecionado(mesInicio, estado.mesInicio || "");
+        setMesSelecionado(mesFim, estado.mesFim || "");
 
         atualizarFiltros();
         aplicarEstadoFiltros(estado.filtros);
@@ -616,6 +682,86 @@ body {
 
     function normalizarTexto(valor) {
       return valor === null || valor === undefined ? "" : String(valor).trim();
+    }
+
+    function getChaveMes(data) {
+      if (!(data instanceof Date) || isNaN(data)) return "";
+      return `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, "0")}`;
+    }
+
+    function normalizarChaveMes(valor) {
+      const texto = normalizarTexto(valor);
+      if (/^\d{4}-\d{2}$/.test(texto)) return texto;
+
+      const partes = texto.match(/^(\d{2})\/(\d{4})$/);
+      if (partes) return `${partes[2]}-${partes[1]}`;
+
+      return "";
+    }
+
+    function formatarMesAno(chave) {
+      const normalizada = normalizarChaveMes(chave);
+      if (!normalizada) return "";
+      const [ano, mes] = normalizada.split("-");
+      return `${mes}/${ano}`;
+    }
+
+    function getMesSelecionado(input) {
+      return normalizarChaveMes(input.dataset.mes || input.value);
+    }
+
+    function setMesSelecionado(input, chave) {
+      const normalizada = normalizarChaveMes(chave);
+      input.dataset.mes = normalizada;
+      input.value = formatarMesAno(normalizada);
+    }
+
+    function atualizarMesesDisponiveis() {
+      mesesDisponiveis = [
+        ...new Set(dadosGlobais.map((d) => getChaveMes(d.data)).filter(Boolean))
+      ].sort();
+    }
+
+    function fecharCalendariosMes() {
+      document.querySelectorAll(".month-picker").forEach((picker) => picker.remove());
+    }
+
+    function abrirCalendarioMes(input) {
+      if (input.disabled || !mesesDisponiveis.length) return;
+
+      const container = input.closest(".campo-periodo");
+      if (!container) return;
+
+      const jaAberto = container.querySelector(".month-picker");
+      fecharCalendariosMes();
+      if (jaAberto) return;
+
+      const selecionado = getMesSelecionado(input);
+      const picker = document.createElement("div");
+      picker.className = "month-picker";
+
+      mesesDisponiveis.forEach((chave) => {
+        const botao = document.createElement("button");
+        botao.type = "button";
+        botao.className = "month-option" + (chave === selecionado ? " active" : "");
+        botao.textContent = formatarMesAno(chave);
+        botao.addEventListener("click", () => {
+          setMesSelecionado(input, chave);
+          fecharCalendariosMes();
+          gerarRelatorio();
+        });
+        picker.appendChild(botao);
+      });
+
+      container.appendChild(picker);
+    }
+
+    function prepararCampoMes(input) {
+      input.addEventListener("click", () => abrirCalendarioMes(input));
+      input.addEventListener("focus", () => abrirCalendarioMes(input));
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") fecharCalendariosMes();
+      });
     }
 
     function formatarMoeda(valor) {
@@ -724,8 +870,10 @@ body {
     function filtrarDados(excluirFiltroId = null) {
       let dados = [...dadosGlobais];
 
-      const inicio = mesInicio.value ? new Date(mesInicio.value + "-01T00:00:00") : null;
-      const fim = mesFim.value ? new Date(mesFim.value + "-01T00:00:00") : null;
+      const mesInicioSelecionado = getMesSelecionado(mesInicio);
+      const mesFimSelecionado = getMesSelecionado(mesFim);
+      const inicio = mesInicioSelecionado ? new Date(mesInicioSelecionado + "-01T00:00:00") : null;
+      const fim = mesFimSelecionado ? new Date(mesFimSelecionado + "-01T00:00:00") : null;
 
       if (inicio) {
         dados = dados.filter((d) => d.data >= inicio);
@@ -960,8 +1108,8 @@ body {
         }, true, valoresOriginais);
       }
 
-      const mesInicioVal = mesInicio.value;
-      const mesFimVal = mesFim.value;
+      const mesInicioVal = getMesSelecionado(mesInicio);
+      const mesFimVal = getMesSelecionado(mesFim);
       const mostrarGraficoMes =
         (patrimonioSelecionado.length === 1 || serieSelecionada.length === 1) &&
         mesInicioVal &&
@@ -1076,14 +1224,12 @@ body {
     function sugerirPeriodoInicial() {
       if (!dadosGlobais.length) return;
 
-      const datas = dadosGlobais.map((d) => d.data).filter(Boolean).sort((a, b) => a - b);
-      if (!datas.length) return;
+      if (!mesesDisponiveis.length) atualizarMesesDisponiveis();
+      if (!mesesDisponiveis.length) return;
 
-      const ultimaData = datas[datas.length - 1];
-      const ultimoMesAno = `${ultimaData.getFullYear()}-${String(ultimaData.getMonth() + 1).padStart(2, "0")}`;
-
-      mesInicio.value = ultimoMesAno;
-      mesFim.value = ultimoMesAno;
+      const ultimoMesAno = mesesDisponiveis[mesesDisponiveis.length - 1];
+      setMesSelecionado(mesInicio, ultimoMesAno);
+      setMesSelecionado(mesFim, ultimoMesAno);
     }
 
     function carregarDados(file) {
@@ -1147,6 +1293,7 @@ body {
           mesInicio.disabled = false;
           mesFim.disabled = false;
 
+          atualizarMesesDisponiveis();
           sugerirPeriodoInicial();
           atualizarFiltros();
           bindBuscaFiltros();
@@ -1166,8 +1313,8 @@ body {
       reader.readAsArrayBuffer(file);
     }
 
-    mesInicio.addEventListener("change", gerarRelatorio);
-    mesFim.addEventListener("change", gerarRelatorio);
+    prepararCampoMes(mesInicio);
+    prepararCampoMes(mesFim);
     btnLimpar.addEventListener("click", limparFiltros);
 
     upload.addEventListener("change", (e) => {
@@ -1191,6 +1338,10 @@ body {
     }
 
     window.logout = logout;
+
+    document.addEventListener("click", (event) => {
+      if (!event.target.closest(".campo-periodo")) fecharCalendariosMes();
+    });
 
     window.addEventListener("DOMContentLoaded", restaurarEstadoPagina);
   </script>
