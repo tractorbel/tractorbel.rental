@@ -1083,6 +1083,7 @@ function toggleMenu() {
 }
 
 function logout() {
+  try { localStorage.removeItem('indicadores_financeiro_estado'); sessionStorage.removeItem('indicadores_financeiro_estado'); } catch(e) {}
   sessionStorage.clear();
   localStorage.removeItem("usuarioLogado");
   localStorage.removeItem("logado");
