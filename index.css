@@ -11,14 +11,14 @@ body{
     display:flex;
     justify-content: center; /* CENTRALIZA MENU */
     align-items: center;
-    padding: 15px 20px;
+    padding: 8px 16px;
     position: relative;
     box-shadow:0 2px 5px rgba(0,0,0,0.2);
 }
 
 .navbar ul{
     display:flex;
-    gap:20px;
+    gap:14px;
     list-style:none;
     margin:0;
     padding:0;
@@ -31,8 +31,9 @@ body{
     text-decoration:none;
     font-weight:500;
     display: inline-block;
-    padding: 8px 10px;
+    padding: 6px 8px;
     vertical-align: middle;
+    font-size: 14px;
 }
 
 .navbar ul li a:hover{
@@ -58,7 +59,7 @@ body{
 
 /* espaço padrão abaixo do menu */
 .container{
-    padding: 30px 30px 0px 30px;
+    padding: 16px 24px 0px 24px;
 }
 
 /* ===== HEADER ===== */
@@ -326,18 +327,18 @@ body{
     max-width: none;
 }
     .logo-topo img {
-      width: 220px;
-      height: 50px;
+      width: 176px;
+      height: 40px;
       object-fit: cover;
       object-position: center;
       border-radius: 5px;
       display: block;
-      margin: 10px auto;
+      margin: 6px auto;
     }
 
-    .page-header{background:white;border-bottom:2px solid #ccc;padding:18px;border-radius:8px}
+    .page-header{background:white;border-bottom:2px solid #ccc;padding:12px;border-radius:8px}
 
-    .logo-topo{margin-bottom:20px;margin-top:0}
+    .logo-topo{margin-bottom:8px;margin-top:0}
     .empty-item{font-size:12px;color:#777;padding:6px}
         #conteudo {
       background: #fff;
