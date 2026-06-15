@@ -15,7 +15,7 @@
     }
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: Arial, sans-serif; 
   margin: 0;
   padding-top: 0;
   background: #f5f7f9;
@@ -611,7 +611,7 @@ body {
       if (!dadosGlobais.length) return;
 
       try {
-        sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
           dados: dadosGlobais,
           filtros: getEstadoFiltros(),
           mesInicio: getMesSelecionado(mesInicio),
@@ -619,12 +619,12 @@ body {
         }));
       } catch (erro) {
         console.warn("Nao foi possivel salvar o estado da pagina no navegador:", erro);
-        sessionStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(STORAGE_KEY);
       }
     }
 
     function restaurarEstadoPagina() {
-      const estadoSalvo = sessionStorage.getItem(STORAGE_KEY);
+      const estadoSalvo = localStorage.getItem(STORAGE_KEY);
       if (!estadoSalvo) return;
 
       try {
@@ -653,7 +653,7 @@ body {
         mostrarStatus("", "sucesso", 0);
       } catch (erro) {
         console.error("Erro ao restaurar dados salvos:", erro);
-        sessionStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(STORAGE_KEY);
       }
     }
 
