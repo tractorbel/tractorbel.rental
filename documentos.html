@@ -10,12 +10,15 @@
 body{
   font-family: Arial, sans-serif;
   margin:0;
-  background:#f4f6f8;
+  background:#f5f7f9;
+  color:#0f2238;
 }
 
 .barra-pesquisa{
-  padding:20px;
-  background:#ffffff;
+  max-width:1200px;
+  margin:0 auto 14px;
+  padding:0 18px;
+  background:transparent;
 }
 
 .search-actions{
@@ -27,12 +30,14 @@ body{
 }
 
 .barra-pesquisa input{
-  width:80%;
-  max-width:400px;
-  padding:12px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  font-size:16px;
+  width:100%;
+  max-width:520px;
+  padding:12px 14px;
+  border-radius:10px;
+  border:1px solid #d6dee8;
+  font-size:15px;
+  background:#fff;
+  box-shadow:0 1px 4px rgba(15,34,56,0.06);
 }
 
 .barra-pesquisa .btn{
@@ -45,20 +50,205 @@ body{
   cursor:pointer;
 }
 
+.docs-hero{
+  max-width:1200px;
+  margin:0 auto 16px;
+  padding:0 18px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(320px,0.72fr);
+  gap:18px;
+  align-items:stretch;
+}
+
+.hero-title,
+.hero-tip{
+  background:#fff;
+  border:1px solid #e2e8f0;
+  border-radius:8px;
+  box-shadow:0 2px 10px rgba(15,34,56,0.06);
+  padding:16px 20px;
+}
+
+.hero-title{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.hero-icon{
+  color:#2f5f98;
+  font-size:30px;
+  line-height:1;
+}
+
+.hero-title h1{
+  margin:0 0 4px;
+  font-size:28px;
+  line-height:1.1;
+  color:#132b46;
+}
+
+.hero-title p,
+.hero-tip p{
+  margin:0;
+  color:#475569;
+  font-size:15px;
+  line-height:1.5;
+}
+
+.hero-tip{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.hero-tip strong{
+  color:#087a45;
+}
+
+.docs-shell{
+  max-width:1200px;
+  margin:0 auto;
+  padding:0 18px 24px;
+  display:grid;
+  grid-template-columns:265px minmax(0,1fr);
+  gap:20px;
+}
+
+.setores-panel,
+.docs-panel{
+  background:#fff;
+  border:1px solid #e2e8f0;
+  border-radius:8px;
+  box-shadow:0 2px 10px rgba(15,34,56,0.06);
+}
+
+.setores-panel{
+  padding:20px 14px;
+}
+
+.setores-panel h2{
+  margin:0 0 14px;
+  font-size:15px;
+  color:#132b46;
+  letter-spacing:.02em;
+  text-transform:uppercase;
+}
+
+.setor-lista{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.setor-btn{
+  width:100%;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:10px;
+  padding:12px;
+  border:1px solid #e2e8f0;
+  border-radius:7px;
+  background:#fff;
+  color:#0f2238;
+  text-align:left;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.setor-btn:hover,
+.setor-btn.active{
+  border-color:#9bd9b6;
+  background:#f0fdf4;
+  color:#087a45;
+}
+
+.setor-icon{
+  color:#e4a500;
+  font-size:20px;
+}
+
+.setor-count{
+  padding:4px 8px;
+  border-radius:6px;
+  background:#dcfce7;
+  color:#087a45;
+  font-size:12px;
+}
+
+.docs-panel{
+  padding:18px 18px 24px;
+}
+
+.docs-panel-header{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:center;
+  border-bottom:1px solid #e2e8f0;
+  padding-bottom:16px;
+  margin-bottom:16px;
+}
+
+.docs-panel-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.docs-panel-title h2{
+  margin:0 0 6px;
+  color:#087a45;
+  font-size:20px;
+}
+
+.docs-panel-title p{
+  margin:0;
+  color:#64748b;
+  font-size:14px;
+}
+
+.view-buttons{
+  display:flex;
+  gap:8px;
+}
+
+.view-buttons button{
+  width:42px;
+  height:38px;
+  border:1px solid #d6dee8;
+  border-radius:6px;
+  background:#fff;
+  color:#64748b;
+  font-size:18px;
+}
+
+.view-buttons button.active{
+  border-color:#0b7a3e;
+  color:#0b7a3e;
+  background:#f0fdf4;
+}
+
 .galeria{
   display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap:15px;
-  padding:30px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap:12px;
+  padding:0;
 }
 
 .card{
   background:white;
-  padding:25px;
-  border-radius:10px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+  min-height:145px;
+  padding:16px 14px;
+  border:1px solid #e5e7eb;
+  border-radius:8px;
+  box-shadow:0 2px 8px rgba(15,34,56,0.05);
   text-align:center;
   transition:0.2s;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
 }
 
 .card:hover{
@@ -67,14 +257,15 @@ body{
 
 .card a{
   text-decoration:none;
-  color:#0b7a3e;
-  font-weight:bold;
+  color:#087a45;
+  font-weight:700;
   display:block;
+  line-height:1.35;
 }
 
 .icone{
-  font-size:40px;
-  margin-bottom:10px;
+  font-size:32px;
+  margin-bottom:8px;
 }
 
 .sistema-icon{
@@ -91,6 +282,7 @@ body{
 }
 
 header {
+  display:none;
   background: white;
   text-align: center;
   padding: 20px;
@@ -283,6 +475,11 @@ header h2 {
 }
 
 @media (max-width: 800px) {
+  .docs-hero,
+  .docs-shell{
+    grid-template-columns:1fr;
+  }
+
   .admin-toolbar{
     flex-direction:column;
     align-items:flex-start;
@@ -313,6 +510,20 @@ header h2 {
   <h2>Documentação Rental</h2>
 </header>
 
+<section class="docs-hero">
+  <div class="hero-title">
+    <div class="hero-icon">&#128193;</div>
+    <div>
+      <h1>Organizacao por Setores</h1>
+      <p>Pastas por setor com exibicao de documentos em grade</p>
+    </div>
+  </div>
+  <div class="hero-tip">
+    <span>&#128161;</span>
+    <p><strong>Dica:</strong> organize por setores para facilitar o acesso e mantenha os documentos visiveis em uma grade como ja esta!</p>
+  </div>
+</section>
+
 <div class="barra-pesquisa">
   <div class="search-actions">
     <input
@@ -327,6 +538,27 @@ header h2 {
 <div class="admin-area">
   <div id="toast" class="toast hidden"></div>
 </div>
+
+<main class="docs-shell">
+  <aside class="setores-panel">
+    <h2>Setores</h2>
+    <div id="setoresLista" class="setor-lista"></div>
+  </aside>
+
+  <section class="docs-panel">
+    <div class="docs-panel-header">
+      <div class="docs-panel-title">
+        <span class="setor-icon">&#128193;</span>
+        <div>
+          <h2 id="tituloSetorAtual">Todos os Documentos</h2>
+          <p id="contadorDocumentos">0 documentos</p>
+        </div>
+      </div>
+      <div class="view-buttons" aria-label="Visualizacao">
+        <button type="button" class="active" title="Grade">&#9638;</button>
+        <button type="button" title="Lista">&#9776;</button>
+      </div>
+    </div>
 
 <div class="galeria" id="galeria">
 
@@ -638,6 +870,8 @@ FLUXOGRAMA Pedido de venda casada fábrica
 </div>
     
 </div>
+  </section>
+</main>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
@@ -686,6 +920,12 @@ const gallery = document.getElementById("galeria");
 const staticDocumentCards = [...gallery.querySelectorAll(".card")].map((card) => card.cloneNode(true));
 const toast = document.getElementById("toast");
 const btnShowAddModal = document.getElementById("btnShowAddModal");
+const setoresLista = document.getElementById("setoresLista");
+const tituloSetorAtual = document.getElementById("tituloSetorAtual");
+const contadorDocumentos = document.getElementById("contadorDocumentos");
+const TODOS_SETOR = "Todos os Documentos";
+const SETORES = [TODOS_SETOR, "Compras", "Patrimonio", "Manutencao", "Sistemas", "Gestao", "Financeiro", "Pessoal"];
+let currentSector = TODOS_SETOR;
 
 
 const API_BASE_URL = "http://localhost:4000";
@@ -696,7 +936,7 @@ function getRawRepoUrl(path) {
 }
 
 function normalizeManifestItem(item) {
-  return {
+  const doc = {
     id: item.id,
     title: item.title,
     fileName: item.fileName,
@@ -705,9 +945,12 @@ function normalizeManifestItem(item) {
     iconUrl: getRawRepoUrl(item.iconPath || item.iconUrl),
     iconBlob: null,
     notes: item.notes || "",
+    sector: item.sector || "",
     createdAt: item.createdAt ? Date.parse(item.createdAt) : Date.now(),
     updatedAt: item.updatedAt ? Date.parse(item.updatedAt) : Date.now()
   };
+  doc.sector = doc.sector || inferDocumentSector(doc);
+  return doc;
 }
 
 async function fetchManifestFromApi() {
@@ -874,14 +1117,77 @@ function makeObjectUrl(key, blob) {
   return url;
 }
 
+function inferDocumentSector(doc) {
+  const title = (doc.title || doc.fileName || "").toLowerCase();
+  const icon = (doc.iconUrl || "").toLowerCase();
+
+  if (title.includes("nota fiscal") || title.includes("faturamento") || title.includes("financeiro")) return "Financeiro";
+  if (title.includes("tecnico") || title.includes("aprendiz") || title.includes("orientacao")) return "Pessoal";
+  if (title.includes("manutenc") || title.includes("avaria") || title.includes("equipamento") || title.includes("patrimonio")) return "Manutencao";
+  if (title.includes("compra") || title.includes("orcamento") || title.includes("peca")) return "Compras";
+  if (title.includes("sisloc") || title.includes("sismetro") || title.includes("fluig") || title.includes("senior") || icon.includes("sisloc") || icon.includes("sismetro") || icon.includes("fluig")) return "Sistemas";
+  if (title.includes("gestao") || title.includes("gv") || title.includes("fluxograma") || icon.includes("gestaox")) return "Gestao";
+  return "Compras";
+}
+
+function getDocumentSector(doc) {
+  return doc.sector || inferDocumentSector(doc);
+}
+
+function dedupeDocuments(docs) {
+  const seen = new Set();
+
+  return docs.filter((doc) => {
+    const key = `${doc.fileUrl || doc.fileName || ""}|${doc.title || ""}`.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function getSectorCounts() {
+  const counts = Object.fromEntries(SETORES.map((setor) => [setor, 0]));
+  counts[TODOS_SETOR] = documentsCache.length;
+
+  documentsCache.forEach((doc) => {
+    const setor = getDocumentSector(doc);
+    counts[setor] = (counts[setor] || 0) + 1;
+  });
+
+  return counts;
+}
+
+function renderSectorList() {
+  if (!setoresLista) return;
+
+  const counts = getSectorCounts();
+  setoresLista.innerHTML = "";
+
+  SETORES.forEach((setor) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "setor-btn" + (setor === currentSector ? " active" : "");
+    button.innerHTML = `
+      <span class="setor-icon">&#128193;</span>
+      <span>${setor}</span>
+      <span class="setor-count">${counts[setor] || 0}</span>
+    `;
+    button.addEventListener("click", () => {
+      currentSector = setor;
+      renderDocuments();
+    });
+    setoresLista.appendChild(button);
+  });
+}
+
 function parseStaticDocuments() {
   const staticCards = staticDocumentCards;
-  return staticCards.map((card) => {
+  const docs = staticCards.map((card) => {
     const link = card.querySelector('a');
     const iconImg = card.querySelector('.sistema-icon img');
     const iconUrl = iconImg ? iconImg.getAttribute('src') : null;
     const href = link ? link.getAttribute('href') : "";
-    return {
+    const doc = {
       id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random(),
       title: link ? link.textContent.trim() : "Documento",
       fileName: link ? link.textContent.trim() : "Documento",
@@ -893,14 +1199,18 @@ function parseStaticDocuments() {
       createdAt: Date.now(),
       updatedAt: Date.now()
     };
+    doc.sector = inferDocumentSector(doc);
+    return doc;
   });
+
+  return dedupeDocuments(docs);
 }
 
 async function loadDocuments() {
   try {
     const apiDocs = await fetchManifestFromApi();
     if (apiDocs.length) {
-      documentsCache = apiDocs;
+      documentsCache = dedupeDocuments(apiDocs);
       documentsLoaded = true;
       renderDocuments();
       return;
@@ -917,7 +1227,7 @@ async function loadDocuments() {
       documentsCache = fallbackDocs;
     }
   } else {
-    documentsCache = storedDocs;
+    documentsCache = dedupeDocuments(storedDocs);
   }
   documentsLoaded = true;
   renderDocuments();
@@ -926,11 +1236,19 @@ async function loadDocuments() {
 function renderDocuments() {
   gallery.innerHTML = "";
   const fragment = document.createDocumentFragment();
+  renderSectorList();
 
   const filtered = documentsCache.filter((doc) => {
     const query = document.getElementById("pesquisa").value.toLowerCase();
-    return !query || doc.title.toLowerCase().includes(query);
+    const matchesSearch = !query || doc.title.toLowerCase().includes(query);
+    const matchesSector = currentSector === TODOS_SETOR || getDocumentSector(doc) === currentSector;
+    return matchesSearch && matchesSector;
   });
+
+  if (tituloSetorAtual) tituloSetorAtual.textContent = currentSector;
+  if (contadorDocumentos) {
+    contadorDocumentos.textContent = `${filtered.length} ${filtered.length === 1 ? "documento" : "documentos"}`;
+  }
 
   filtered.sort((a, b) => b.updatedAt - a.updatedAt).forEach((doc) => {
     const card = document.createElement("div");
