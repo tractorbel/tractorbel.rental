@@ -63,6 +63,8 @@ window.logout = function() {
     if(menu) menu.classList.remove("active");
 
     signOut(auth).then(() => {
+        try { localStorage.removeItem('indicadores_financeiro_estado'); sessionStorage.removeItem('indicadores_financeiro_estado'); } catch(e) {}
+
         if(isIndexPage) {
             mostrarConteudo(null);
         } else {

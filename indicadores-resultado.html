@@ -1358,10 +1358,15 @@ body {
     }
 
     function logout() {
-      sessionStorage.clear();
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+        sessionStorage.removeItem(STORAGE_KEY);
+      } catch (e) {}
+
       localStorage.removeItem("usuarioLogado");
       localStorage.removeItem("logado");
       localStorage.removeItem("isLoggedIn");
+
       window.location.replace("index.html");
     }
 
