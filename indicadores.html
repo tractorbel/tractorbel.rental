@@ -687,38 +687,38 @@ function filtrarDados(excluirFiltroId = null){
 
     if(excluirFiltroId !== "filtroTecnico" && tecnicosSelecionados.length){
         dados = dados.filter(linha =>
-            tecnicosSelecionados.includes(String(linha["TÉCNICO DESIGNADO"] || "Não informado").trim())
+          tecnicosSelecionados.includes(String(linha["TÉCNICO DESIGNADO"] ?? "Não informado").trim())
         );
     }
 
     if(excluirFiltroId !== "filtroTipo" && tiposSelecionados.length){
         dados = dados.filter(linha =>
-            tiposSelecionados.includes(String(linha["TIPO DA SS"] || "Não informado").trim())
+          tiposSelecionados.includes(String(linha["TIPO DA SS"] ?? "Não informado").trim())
         );
     }
 
     const clientesSelecionados = getSelecionados("filtroCliente");
     if(excluirFiltroId !== "filtroCliente" && clientesSelecionados.length){
         dados = dados.filter(linha =>
-            clientesSelecionados.includes(String(linha["SOLICITANTE"] || "Não informado").trim())
+          clientesSelecionados.includes(String(linha["SOLICITANTE"] ?? "Não informado").trim())
         );
     }
 
     if(excluirFiltroId !== "filtroEquipamento" && equipamentosSelecionados.length){
         dados = dados.filter(linha =>
-            equipamentosSelecionados.includes(String(linha["TIPO DO EQUIPAMENTO"] || "Não informado").trim())
+          equipamentosSelecionados.includes(String(linha["TIPO DO EQUIPAMENTO"] ?? "Não informado").trim())
         );
     }
 
     if(excluirFiltroId !== "filtroMarca" && marcasSelecionadas.length){
         dados = dados.filter(linha =>
-            marcasSelecionadas.includes(String(linha["MARCA"] || "Não informado").trim())
+          marcasSelecionadas.includes(String(linha["MARCA"] ?? "Não informado").trim())
         );
     }
 
     if(excluirFiltroId !== "filtroModelo" && modelosSelecionados.length){
         dados = dados.filter(linha =>
-            modelosSelecionados.includes(String(linha["MODELO"] || "Não informado").trim())
+          modelosSelecionados.includes(String(linha["MODELO"] ?? "Não informado").trim())
         );
     }
 
@@ -741,37 +741,37 @@ function atualizarFiltrosOptions(){
     const modelosSelecionados = getSelecionados("filtroModelo");
 
     const dadosParaTecnico = filtrarDados("filtroTecnico");
-    const tecnicos = [...new Set(dadosParaTecnico.map(l => String(l["TÉCNICO DESIGNADO"] || "Não informado").trim()))]
+    const tecnicos = [...new Set(dadosParaTecnico.map(l => String(l["TÉCNICO DESIGNADO"] ?? "Não informado").trim()))]
         .filter(v => v !== "")
         .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
     criarCheckboxes(filtroTecnico, tecnicos, tecnicosSelecionados);
 
     const dadosParaTipo = filtrarDados("filtroTipo");
-    const tipos = [...new Set(dadosParaTipo.map(l => String(l["TIPO DA SS"] || "Não informado").trim()))]
+    const tipos = [...new Set(dadosParaTipo.map(l => String(l["TIPO DA SS"] ?? "Não informado").trim()))]
         .filter(v => v !== "")
         .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
     criarCheckboxes(filtroTipo, tipos, tiposSelecionados);
 
     const dadosParaCliente = filtrarDados("filtroCliente");
-    const clientes = [...new Set(dadosParaCliente.map(l => String(l["SOLICITANTE"] || "Não informado").trim()))]
+    const clientes = [...new Set(dadosParaCliente.map(l => String(l["SOLICITANTE"] ?? "Não informado").trim()))]
         .filter(v => v !== "")
         .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
     criarCheckboxes(filtroCliente, clientes, clientesSelecionados);
 
     const dadosParaEquipamento = filtrarDados("filtroEquipamento");
-    const equipamentos = [...new Set(dadosParaEquipamento.map(l => String(l["TIPO DO EQUIPAMENTO"] || "Não informado").trim()))]
+    const equipamentos = [...new Set(dadosParaEquipamento.map(l => String(l["TIPO DO EQUIPAMENTO"] ?? "Não informado").trim()))]
         .filter(v => v !== "")
         .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
     criarCheckboxes(filtroEquipamento, equipamentos, equipamentosSelecionados);
 
     const dadosParaMarca = filtrarDados("filtroMarca");
-    const marcas = [...new Set(dadosParaMarca.map(l => String(l["MARCA"] || "Não informado").trim()))]
+    const marcas = [...new Set(dadosParaMarca.map(l => String(l["MARCA"] ?? "Não informado").trim()))]
         .filter(v => v !== "")
         .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
     criarCheckboxes(filtroMarca, marcas, marcasSelecionadas);
 
     const dadosParaModelo = filtrarDados("filtroModelo");
-    const modelos = [...new Set(dadosParaModelo.map(l => String(l["MODELO"] || "Não informado").trim()))]
+    const modelos = [...new Set(dadosParaModelo.map(l => String(l["MODELO"] ?? "Não informado").trim()))]
         .filter(v => v !== "")
         .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
     criarCheckboxes(filtroModelo, modelos, modelosSelecionados);
