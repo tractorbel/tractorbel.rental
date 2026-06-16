@@ -1122,12 +1122,12 @@ function inferDocumentSector(doc) {
   const icon = (doc.iconUrl || "").toLowerCase();
 
   if (title.includes("nota fiscal") || title.includes("faturamento")) return "Assistência Técnica Rental";
-  if (title.includes("tecnico") || title.includes("aprendiz") || title.includes("orientacao")) return "Pessoal";
+  if (title.includes("tecnico") || title.includes("aprendiz") || title.includes("orientacao")) return "Assistência Técnica Rental";
   if (title.includes("manutenc") || title.includes("avaria") || title.includes("equipamento") || title.includes("patrimonio")) return "Assistência Técnica Rental";
   if (title.includes("compra") || title.includes("orcamento") || title.includes("peca")) return "Assistência Técnica Rental";
   if (title.includes("sisloc") || title.includes("sismetro") || title.includes("fluig") || title.includes("senior") || icon.includes("sisloc") || icon.includes("sismetro") || icon.includes("fluig")) return "Assistência Técnica Rental";
-  if (title.includes("gestao") || title.includes("gv") || title.includes("fluxograma") || icon.includes("gestaox")) return "Gestao";
-  return "Compras";
+  if (title.includes("gestao") || title.includes("gv") || title.includes("fluxograma") || icon.includes("gestaox")) return "Assistência Técnica Rental";
+  return "Assistência Técnica Rental";
 }
 
 function getDocumentSector(doc) {
