@@ -112,34 +112,51 @@
 <div id="conteudo" class="hidden">
 
     <!-- MENU (SÓ APÓS LOGIN) -->
-<nav class="navbar">
-    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-    <ul id="menu">
-        <li><a href="#" aria-current="page" onclick="document.getElementById('menu').classList.remove('active'); return false;">INICIO</a></li>
-        <li><a href="documentos.html">DOCUMENTOS</a></li>
-        <li><a href="indicadores.html">KPI MANUT.</a></li>
-        <li><a href="indicadores-resultado.html">KPI FINAN.</a></li>
-        <li><a href="#" onclick="logout(); return false;" class="logout-btn">SAIR</a></li>
-    </ul>
-</nav>
-<div class="logo-topo">
-  <img src="png/logo.png" alt="Logo" />
-</div>
+    <nav class="navbar">
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+        <ul id="menu">
+            <li><a href="#" aria-current="page" onclick="document.getElementById('menu').classList.remove('active'); return false;">INICIO</a></li>
+            <li><a href="documentos.html">DOCUMENTOS</a></li>
+            <li><a href="indicadores.html">KPI MANUT.</a></li>
+            <li><a href="indicadores-resultado.html">KPI FINAN.</a></li>
+            <li><a href="#" onclick="logout(); return false;" class="logout-btn">SAIR</a></li>
+        </ul>
+    </nav>
 
-    <div class="container">
-        <header class="page-header">
-                    <!-- TEXTO CENTRALIZADO EM BLOCO -->
-            <div class="texto-container">
-                <h3 class="texto-apresentacao">
-📂 <strong>Organização de Documentos</strong><br>
-Esta página foi criada para centralizar os documentos operacionais da Tractorbel, facilitando a execução, evitando erros e sanando dúvidas tornando mais fácil a compreensão e execução das tarefas.<br>
-📊 <strong>Análise de dados</strong><br>
-Permite analisar de forma clara os dados de atendimento técnico e custos operacionais, facilitando a tomada de decisões.<br>
-                </h3>
+    <main class="container">
+        <section class="hero">
+            <div class="hero-top">
+                <div class="logo-topo">
+                    <img src="png/logo.png" alt="Logo Tractorbel" />
+                </div>
+                <div class="hero-copy">
+                    <span class="hero-eyebrow">TRATORBEL EQUIPAMENTOS</span>
+                    <h1>Bem-vindo ao Portal Operacional Tractorbel</h1>
+                    <p class="hero-subtitle">Soluções que conectam informação, eficiência e resultados.</p>
+                </div>
             </div>
-        </header>
 
-        
+            <div class="cards">
+                <article class="card">
+                    <span class="card-icon">📁</span>
+                    <h2>Organização de Documentos</h2>
+                    <p>Esta página foi criada para centralizar os documentos operacionais da Tractorbel, facilitando a execução, evitando erros e sanando dúvidas.</p>
+                    <div class="card-actions">
+                        <a href="documentos.html" class="btn btn-primary">Acessar Documentos</a>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <span class="card-icon">📊</span>
+                    <h2>Análise de dados</h2>
+                    <p>Permite analisar de forma clara os dados de atendimento técnico e custos operacionais, facilitando a tomada de decisões.</p>
+                    <div class="card-actions">
+                        <a href="indicadores.html" class="btn btn-secondary">KPI Manutenção</a>
+                        <a href="indicadores-resultado.html" class="btn btn-secondary">KPI Financeiro</a>
+                    </div>
+                </article>
+            </div>
+        </section>
 
         <!-- RODAPÉ -->
         <footer class="footer">

@@ -1,8 +1,9 @@
 body{
     color: #222;
-    background:#f5f7f9;
-    margin:0px;
-    font-family:Arial, Helvetica, sans-serif;
+    background: radial-gradient(circle at top, rgba(46,125,50,0.14), transparent 28%), #f5f7f9;
+    margin:0;
+    padding:0;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 /* ===== MENU INTELIGENTE ===== */
@@ -11,14 +12,14 @@ body{
     display:flex;
     justify-content: center; /* CENTRALIZA MENU */
     align-items: center;
-    padding: 8px 16px;
+    padding: 10px 20px;
     position: relative;
-    box-shadow:0 2px 5px rgba(0,0,0,0.2);
+    box-shadow:0 2px 5px rgba(0,0,0,0.16);
 }
 
 .navbar ul{
     display:flex;
-    gap:14px;
+    gap:18px;
     list-style:none;
     margin:0;
     padding:0;
@@ -29,16 +30,17 @@ body{
 .navbar ul li a{
     color:white;
     text-decoration:none;
-    font-weight:500;
+    font-weight:600;
     display: inline-block;
-    padding: 6px 8px;
+    padding: 10px 12px;
     vertical-align: middle;
     font-size: 14px;
+    transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .navbar ul li a:hover{
-    color:black;
-    font-weight:bold;
+    color:#d1fae5;
+    transform: translateY(-1px);
 }
 
 .menu-toggle{
@@ -48,6 +50,144 @@ body{
     cursor:pointer;
 }
 
+/* ===== CONTAINER ===== */
+.container{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px 32px;
+}
+
+.hero {
+    padding: 48px 0 24px;
+}
+
+.hero-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 36px;
+}
+
+.logo-topo {
+    width: 110px;
+    height: 110px;
+    border-radius: 28px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 24px 60px rgba(15,23,42,0.08);
+}
+
+.logo-topo img {
+    max-width: 72px;
+    width: 100%;
+    height: auto;
+}
+
+.hero-eyebrow {
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.78rem;
+    color: #166534;
+    font-weight: 700;
+    margin-bottom: 14px;
+}
+
+.hero-copy h1 {
+    margin: 0;
+    font-size: clamp(2.4rem, 4vw, 3.5rem);
+    line-height: 1.02;
+    color: #0f172a;
+}
+
+.hero-subtitle {
+    margin: 16px auto 0;
+    color: #475569;
+    font-size: 1.05rem;
+    max-width: 720px;
+    line-height: 1.8;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 28px;
+    box-shadow: 0 22px 50px rgba(15,23,42,0.08);
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 320px;
+}
+
+.card-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 22px;
+    background: rgba(34,197,94,0.13);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.card h2 {
+    margin: 0 0 18px;
+    font-size: 1.5rem;
+    color: #0f172a;
+}
+
+.card p {
+    margin: 0;
+    color: #475569;
+    line-height: 1.8;
+}
+
+.card-actions {
+    margin-top: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #166534;
+    color: #ffffff;
+    border-radius: 999px;
+    padding: 12px 22px;
+    text-decoration: none;
+    font-weight: 700;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: #166534;
+}
+
+.btn-secondary {
+    background: #f8fafc;
+    color: #14532d;
+    border: 1px solid #d1fae5;
+}
+
 /* Estilo para gráficos de pizza */
 #graficoTipos {
     max-width: 100%;
@@ -55,11 +195,6 @@ body{
     margin: 0 auto;
     display: block;
     cursor: pointer;
-}
-
-/* espaço padrão abaixo do menu */
-.container{
-    padding: 16px 24px 0px 24px;
 }
 
 /* ===== HEADER ===== */
