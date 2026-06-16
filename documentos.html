@@ -1121,7 +1121,7 @@ function inferDocumentSector(doc) {
   const title = (doc.title || doc.fileName || "").toLowerCase();
   const icon = (doc.iconUrl || "").toLowerCase();
 
-  if (title.includes("nota fiscal") || title.includes("faturamento") || title.includes("Assistência Técnica Rental")) return "Assistência Técnica Rental";
+  if (title.includes("nota fiscal") || title.includes("faturamento")) return "Assistência Técnica Rental";
   if (title.includes("tecnico") || title.includes("aprendiz") || title.includes("orientacao")) return "Pessoal";
   if (title.includes("manutenc") || title.includes("avaria") || title.includes("equipamento") || title.includes("patrimonio")) return "Assistência Técnica Rental";
   if (title.includes("compra") || title.includes("orcamento") || title.includes("peca")) return "Assistência Técnica Rental";
