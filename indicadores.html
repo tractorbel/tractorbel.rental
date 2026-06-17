@@ -606,6 +606,10 @@ function restaurarEstadoPagina(){
         if(topo) topo.style.display = "grid";
         try{ btnLimpar.classList.remove("hidden"); }catch(e){}
 
+        // reduzir área de upload para ícone disponível após restauração de dados
+        const ua_restore = document.getElementById('uploadArea');
+        if(ua_restore){ ua_restore.classList.remove('upload-area--large'); ua_restore.classList.add('upload-area--small'); }
+
         popularFiltro(dadosGlobais);
         aplicarEstadoFiltros(estado.filtros);
         atualizarFiltrosOptions();
@@ -653,6 +657,9 @@ document.getElementById('upload').addEventListener('change', function(e){
           card.style.display = "block";
         });
         try{ btnLimpar.classList.remove("hidden"); }catch(e){}
+        // reduzir área de upload para ícone disponível após upload
+        const ua = document.getElementById('uploadArea');
+        if(ua){ ua.classList.remove('upload-area--large'); ua.classList.add('upload-area--small'); }
         popularFiltro(json);
         calcularTotais(json);
         salvarEstadoPagina();
@@ -673,6 +680,16 @@ btnLimpar.addEventListener("click", limparFiltros);
 
 function popularFiltro(dados){
     atualizarFiltrosOptions();
+}
+
+// Permite clicar na área de upload (ícone pequeno) para selecionar novo arquivo
+const uploadAreaEl = document.getElementById('uploadArea');
+if(uploadAreaEl){
+  uploadAreaEl.addEventListener('click', function(e){
+    // evitar propagação quando clicando em inputs internos
+    const input = document.getElementById('upload');
+    if(input) input.click();
+  });
 }
 
 function getSelecionados(id){
