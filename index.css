@@ -208,14 +208,11 @@ body{
     transform: translateY(-1px);
 }
 
-.btn-primary {
-    background: #166534;
-}
-
+.btn-primary,
 .btn-secondary {
-    background: #f8fafc;
-    color: #14532d;
-    border: 1px solid #d1fae5;
+    background: #166534;
+    color: #ffffff;
+    border: none;
 }
 
 /* Estilo para gráficos de pizza */
