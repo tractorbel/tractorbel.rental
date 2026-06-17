@@ -161,6 +161,18 @@
       display:block;
     }
 
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
     /* quando o upload estiver compacto ao lado do período */
     .periodo-cabecalho{display:none}
     .periodo-cabecalho.show{display:flex;align-items:center;gap:8px}
@@ -495,7 +507,8 @@
   </div>
 
   <div class="acoes-cabecalho">
-    <input type="file" id="upload" accept=".xls,.xlsx" class="hidden">
+    <label for="upload" class="sr-only">Upload de planilha</label>
+    <input type="file" id="upload" accept=".xls,.xlsx" class="hidden" aria-label="Upload de planilha">
     <button id="btnLimpar" class="btn-google hidden">Limpar Filtros</button>
   </div>
 </div>
