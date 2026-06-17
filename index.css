@@ -75,9 +75,9 @@ body{
 
 .navbar-logo img {
     max-height: auto;
-    width: 80px;
+    width: 70px;
     background: white;
-    padding: 0px 3px;
+    padding: 0px 1px;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     border: 1px solid rgba(0, 0, 0, 0.08);
