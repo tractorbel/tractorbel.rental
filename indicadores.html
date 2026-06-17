@@ -696,7 +696,9 @@ document.getElementById('upload').addEventListener('change', function(e){
             obj.__PREVENTIVA_BG = linha[58];
 
             return obj;
-        });
+        }).filter(row =>
+            Object.values(row).some(value => value !== "" && value !== null && value !== undefined)
+        );
 
         dadosGlobais = json;
         const topo = document.querySelector(".topo-controles");
