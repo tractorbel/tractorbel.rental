@@ -570,6 +570,7 @@
 
 let dadosGlobais = [];
 let grafico, graficoTipos, g1, g2, g3, g4, g5, g6;
+let uploadDialogOpen = false; /* prevent duplicate file picker opens */
 
 const STORAGE_KEY = "indicadores_ss_estado";
 const btnLimpar = document.getElementById("btnLimpar");
@@ -653,6 +654,7 @@ function restaurarEstadoPagina(){
 
 document.getElementById('upload').addEventListener('change', function(e){
 
+    uploadDialogOpen = true; /* mark dialog as open */
     const file = e.target.files[0];
     const reader = new FileReader();
 
@@ -698,6 +700,7 @@ document.getElementById('upload').addEventListener('change', function(e){
         popularFiltro(json);
         calcularTotais(json);
         salvarEstadoPagina();
+        uploadDialogOpen = false; /* mark dialog as closed after loading */
     };
 
     reader.readAsArrayBuffer(file);
@@ -721,9 +724,13 @@ function popularFiltro(dados){
 const uploadAreaEl = document.getElementById('uploadArea');
 if(uploadAreaEl){
   uploadAreaEl.addEventListener('click', function(e){
-    // evitar propagação quando clicando em inputs internos
+    // evitar propagação quando clicando em inputs internos e prevenir duplo clique
+    if(uploadDialogOpen) return; /* prevent duplicate dialog opens */
     const input = document.getElementById('upload');
-    if(input) input.click();
+    if(input) {
+      uploadDialogOpen = true;
+      input.click();
+    }
   });
 }
 
