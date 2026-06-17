@@ -62,6 +62,13 @@
       margin-bottom: 14px;
     }
 
+    /* Inicialmente mantenha a interface limpa: mostrar apenas o upload até o usuário carregar uma planilha */
+    .topo-controles,
+    .cards,
+    .grafico-card {
+      display: none;
+    }
+
     .filtro-box {
       display: flex;
       flex-direction: column;
@@ -72,6 +79,37 @@
       box-shadow: 0 2px 8px rgba(46, 125, 50, 0.08);
       min-width: 0;
     }
+
+    /* Upload area styles */
+    .upload-area {
+      max-width: 920px;
+      margin: 18px auto 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px;
+    }
+
+    .upload-area--large .upload-box {
+      width: 100%;
+      border: 2px dashed #cfead9;
+      border-radius: 12px;
+      background: #fff;
+      padding: 36px 28px;
+      text-align: center;
+      color: #475569;
+    }
+
+    .upload-icon{font-size:34px;background:rgba(34,197,94,0.08);display:inline-block;padding:16px;border-radius:50%;margin-bottom:12px}
+    .upload-box h3{margin:6px 0 4px;color:#0f172a}
+    .upload-box p{margin:0 0 12px;font-size:0.95rem}
+    .upload-btn{display:inline-block;background:#fff;border:1px solid #22c55e;color:#14532d;padding:10px 18px;border-radius:10px;cursor:pointer}
+
+    /* Small state: keep only the icon/button compact */
+    .upload-area--small{max-width:160px;margin:8px auto}
+    .upload-area--small .upload-box{padding:6px;text-align:center;background:transparent;border:none}
+    .upload-area--small .upload-box h3,.upload-area--small .upload-box p,.upload-area--small .upload-btn{display:none}
+    .upload-area--small .upload-icon{font-size:22px;padding:8px}
 
     .filtro-box label.titulo-filtro {
       font-size: 13px;
@@ -403,9 +441,18 @@
   </div>
 
   <div class="acoes-cabecalho">
-    <label for="upload" class="btn-google">Enviar Planilha</label>
     <input type="file" id="upload" accept=".xls,.xlsx" class="hidden">
     <button id="btnLimpar" class="btn-google hidden">Limpar Filtros</button>
+  </div>
+</div>
+
+<!-- Área de upload centralizada (visível inicialmente) -->
+<div class="upload-area upload-area--large" id="uploadArea">
+  <div class="upload-box">
+    <div class="upload-icon">📤</div>
+    <h3>Envie sua planilha</h3>
+    <p>Arraste e solte o arquivo aqui ou clique para selecionar</p>
+    <label for="upload" class="upload-btn">Selecionar arquivo</label>
   </div>
 </div>
 
@@ -555,6 +602,10 @@ function restaurarEstadoPagina(){
             card.style.display = "block";
         });
 
+        const topo = document.querySelector(".topo-controles");
+        if(topo) topo.style.display = "grid";
+        try{ btnLimpar.classList.remove("hidden"); }catch(e){}
+
         popularFiltro(dadosGlobais);
         aplicarEstadoFiltros(estado.filtros);
         atualizarFiltrosOptions();
@@ -595,10 +646,13 @@ document.getElementById('upload').addEventListener('change', function(e){
         });
 
         dadosGlobais = json;
+        const topo = document.querySelector(".topo-controles");
+        if(topo) topo.style.display = "grid";
         document.querySelector(".cards").style.display = "grid";
         document.querySelectorAll(".grafico-card").forEach(card => {
-            card.style.display = "block";
+          card.style.display = "block";
         });
+        try{ btnLimpar.classList.remove("hidden"); }catch(e){}
         popularFiltro(json);
         calcularTotais(json);
         salvarEstadoPagina();
