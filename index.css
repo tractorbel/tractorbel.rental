@@ -34,7 +34,6 @@ body{
     width: auto;
     max-height: 48px;
     max-width: 160px;
-    min-width: 120px; /* ensure visible size on KPI pages */
     background: white;
     padding: 4px 8px;
     border-radius: 12px;
