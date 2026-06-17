@@ -743,11 +743,11 @@ function popularFiltro(dados){
 const uploadAreaEl = document.getElementById('uploadArea');
 if(uploadAreaEl){
   uploadAreaEl.addEventListener('click', function(e){
-    // evitar propagação quando clicando em inputs internos e prevenir duplo clique
-    if(uploadDialogOpen) return; /* prevent duplicate dialog opens */
+    // Se o clique for no label ou no input, deixe o comportamento nativo abrir o seletor
+    if(e.target.closest('label') || e.target.closest('input')) return;
+
     const input = document.getElementById('upload');
     if(input) {
-      uploadDialogOpen = true;
       input.click();
     }
   });
