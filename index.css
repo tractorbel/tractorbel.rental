@@ -61,6 +61,17 @@ body{
     cursor:pointer;
 }
 
+.navbar-logo {
+    display: flex;
+    align-items: center;
+    margin-right: 18px;
+}
+
+.navbar-logo img {
+    max-height: 42px;
+    width: auto;
+}
+
 /* ===== CONTAINER ===== */
 .container{
     max-width: 1180px;
@@ -287,6 +298,10 @@ h3{
     .navbar ul li{
         text-align:center;
         padding:10px 0;
+    }
+
+    .navbar-logo {
+        display: none;
     }
 }
 
