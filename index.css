@@ -80,7 +80,7 @@ body{
 /* ===== CONTAINER ===== */
 .container{
     max-width: 1180px;
-    margin: 0 auto;
+    margin: 19px;
     padding: 0 24px 32px;
 }
 
