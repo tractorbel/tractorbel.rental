@@ -26,14 +26,15 @@ body{
     display: flex;
     align-items: center;
     margin-right: 12px;
-    flex: 0 0 auto;
+    flex: 0 0 160px; /* reserve fixed space so logo doesn't shrink */
 }
 
 .navbar-logo img {
     display: block;
     width: auto;
-    max-height: 42px;
+    max-height: 48px;
     max-width: 160px;
+    min-width: 120px; /* ensure visible size on KPI pages */
     background: white;
     padding: 4px 8px;
     border-radius: 12px;
@@ -155,8 +156,7 @@ body{
     padding: 32px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    min-height: 320px;
+    justify-content: space-between;    
 }
 
 .card-icon {

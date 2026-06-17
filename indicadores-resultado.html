@@ -425,7 +425,7 @@ body {
 <nav class="navbar">
     <div class="menu-toggle" onclick="toggleMenu()">☰</div>
     <div class="navbar-logo">
-      <img src="png/logo-tractorbel.png" alt="Logo">
+      <img src="png/logo_tractorbel.png" alt="Logo">
     </div>
     <ul id="menu">
         <li><a href="index.html">INICIO</a></li>
@@ -786,11 +786,14 @@ body {
         picker.appendChild(botao);
       });
 
+      // prevent clicks inside the picker from bubbling to document
+      picker.addEventListener("click", (e) => e.stopPropagation());
+
       container.appendChild(picker);
     }
 
     function prepararCampoMes(input) {
-      input.addEventListener("click", () => abrirCalendarioMes(input));
+      input.addEventListener("click", (e) => { e.stopPropagation(); abrirCalendarioMes(input); });
       input.addEventListener("focus", () => abrirCalendarioMes(input));
       input.addEventListener("keydown", (event) => {
         if (event.key === "Escape") fecharCalendariosMes();
