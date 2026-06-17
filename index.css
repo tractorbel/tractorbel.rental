@@ -15,12 +15,18 @@ body{
     padding: 10px 20px;
     position: relative;
     box-shadow:0 2px 5px rgba(0,0,0,0.16);
+    width: 100vw;
+    max-width: 100vw;
+    min-width: 100%;
+    box-sizing: border-box;
+    flex-wrap: wrap;
 }
 
 .navbar-logo {
     display: flex;
     align-items: center;
     margin-right: 12px;
+    flex: 0 0 auto;
 }
 
 .navbar-logo img {
@@ -43,6 +49,9 @@ body{
     padding:0;
     background:none;
     white-space:nowrap;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 auto;
 }
 
 .navbar ul li a{
