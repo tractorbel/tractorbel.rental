@@ -140,10 +140,16 @@ body {
     }
 
     .acoes-planilha {
-      display: flex;
+      display: flex !important;
       gap: 10px;
       align-items: center;
       flex-wrap: wrap;
+      min-height: 40px;
+    }
+
+    .acoes-planilha label {
+      display: inline-block !important;
+      visibility: visible !important;
     }
 
     .campo-periodo {
