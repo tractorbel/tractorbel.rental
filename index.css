@@ -20,18 +20,19 @@ body{
 .navbar-logo {
     display: flex;
     align-items: center;
-    margin-right: 18px;
+    margin-right: 12px;
 }
 
 .navbar-logo img {
-    max-height: 42px;
+    display: block;
     width: auto;
-    max-width: 180px;
+    max-height: 42px;
+    max-width: 160px;
     background: white;
-    padding: 6px 10px;
+    padding: 4px 8px;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 .navbar ul{
@@ -65,22 +66,6 @@ body{
     font-size:26px;
     color:white;
     cursor:pointer;
-}
-
-.navbar-logo {
-    display: flex;
-    align-items: center;
-    margin-right: 18px;
-}
-
-.navbar-logo img {
-    max-height: auto;
-    width: 70px;
-    background: white;
-    padding: 0px 1px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 /* ===== CONTAINER ===== */
