@@ -155,11 +155,10 @@ body{
     padding: 32px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;    
+    justify-content: space-between;   
 }
 
 .card-icon {
-    width: 72px;
     height: 72px;
     border-radius: 22px;
     background: rgba(34,197,94,0.13);
@@ -186,7 +185,7 @@ h2{
 }
 
 .card-actions {
-    margin-top: 28px;
+    margin-top: 8px;
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
