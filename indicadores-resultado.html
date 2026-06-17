@@ -556,6 +556,7 @@ body {
     let atualizandoFiltros = false;
     let mesesDisponiveis = [];
     let statusTimeout = null;
+    let uploadDialogOpen = false; /* prevent duplicate file picker opens */
     const scrollFiltros = {};
     const STORAGE_KEY = "indicadores_financeiro_estado";
 
@@ -1351,8 +1352,12 @@ body {
     btnLimpar.addEventListener("click", limparFiltros);
 
     upload.addEventListener("change", (e) => {
+      uploadDialogOpen = true; /* mark dialog as open */
       const file = e.target.files?.[0];
-      if (file) carregarDados(file);
+      if (file) {
+        carregarDados(file);
+        uploadDialogOpen = false; /* mark dialog as closed after loading */
+      }
     });
 
     function toggleMenu() {
