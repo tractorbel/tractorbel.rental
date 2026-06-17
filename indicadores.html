@@ -1002,9 +1002,20 @@ function valorDiferenteDeZero(valor){
     return texto !== "0";
 }
 
+function formatTotalComPercentual(valor, totalAtendimentos){
+    if(totalAtendimentos <= 0){
+        return String(valor);
+    }
+
+    const percentual = (valor / totalAtendimentos) * 100;
+    const percentualFormatado = Number(percentual.toFixed(1));
+    return `${valor} (${percentualFormatado}%)`;
+}
+
 function calcularTotais(dados){
 
-    document.getElementById("totalAtendimento").innerText = dados.length;
+    const totalAtendimentos = dados.length;
+    document.getElementById("totalAtendimento").innerText = totalAtendimentos;
 
     const tagsPreventivas = new Set();
 
@@ -1016,7 +1027,8 @@ function calcularTotais(dados){
         }
     });
 
-    document.getElementById("totalPreventivas").innerText = tagsPreventivas.size;
+    const totalPreventivas = tagsPreventivas.size;
+    document.getElementById("totalPreventivas").innerText = formatTotalComPercentual(totalPreventivas, totalAtendimentos);
 
     const totalCorretivas = dados.filter(linha => {
         const tipoSS = String(linha["TIPO DA SS"] || "").trim().toUpperCase();
@@ -1028,8 +1040,8 @@ function calcularTotais(dados){
         return tipoSS === "AVARIA";
     }).length;
 
-    document.getElementById("totalCorretivas").innerText = totalCorretivas;
-    document.getElementById("totalAvarias").innerText = totalAvarias;
+    document.getElementById("totalCorretivas").innerText = formatTotalComPercentual(totalCorretivas, totalAtendimentos);
+    document.getElementById("totalAvarias").innerText = formatTotalComPercentual(totalAvarias, totalAtendimentos);
 
     const totaisTipo = {};
     const totaisTecnico = {};
@@ -1127,13 +1139,19 @@ function criarGrafico(id,label,labels,data,graficoAtual,salvar,comClickable,clic
         responsive:true,
         plugins:{
             legend:{display:false}
+        },
+        interaction:{
+            mode:'nearest',
+            axis:'x',
+            intersect:true
         }
     };
 
     if(comClickable && typeof clickCallback === "function"){
-        opcoes.onClick = (event, elements) => {
-            if(elements.length > 0){
-                const index = elements[0].index;
+        opcoes.onClick = (event, elements, chart) => {
+            const pontos = chart.getElementsAtEventForMode(event, 'nearest', {intersect:true}, true);
+            if(pontos.length > 0){
+                const index = pontos[0].index;
                 const valor = labels[index];
                 clickCallback(valor);
             }
@@ -1179,6 +1197,11 @@ function criarGraficoPizza(totaisTipo){
         options:{
             responsive:true,
             maintainAspectRatio:false,
+            interaction:{
+                mode:'nearest',
+                axis:'x',
+                intersect:false
+            },
             plugins:{
                 legend:{
                     display:false
@@ -1189,9 +1212,10 @@ function criarGraficoPizza(totaisTipo){
                     beginAtZero:true
                 }
             },
-            onClick: (event, elements) => {
-                if(elements.length > 0){
-                    const index = elements[0].index;
+            onClick: (event) => {
+                const pontos = graficoTipos.getElementsAtEventForMode(event, 'nearest', {intersect:false}, true);
+                if(pontos.length > 0){
+                    const index = pontos[0].index;
                     const tipo = labels[index];
                     filtrarPorTipo(tipo);
                 }
