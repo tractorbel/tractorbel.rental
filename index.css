@@ -127,6 +127,13 @@ body{
     margin-bottom: 14px;
 }
 
+.hero-copy h1 {
+    margin: 0;
+    font-size: clamp(2.4rem, 4vw, 3.5rem);
+    line-height: 1.02;
+    color: #0f172a;
+}
+
 .hero-subtitle {
     margin: 16px auto 0;
     color: #475569;
