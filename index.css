@@ -530,6 +530,14 @@ body{
 
 .empty-item{font-size:12px;color:#777;padding:6px}
         #conteudo {
+            padding: 5px;
+      background: #fff;
+      border-radius: 12px;     
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      display: block;
+    }
+        #navegacao {
+            padding: 5px;
       background: #fff;
       border-radius: 12px;     
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
