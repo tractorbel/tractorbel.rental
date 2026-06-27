@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>documentacao-de-apoio-rental</title>
+    <link rel="prefetch" href="documentos.html" as="document">
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="stylesheet" href="index.css">
     <script type="module" src="login.js"></script>
@@ -185,6 +186,13 @@
 function toggleMenu() {
     document.getElementById("menu").classList.toggle("active");
 }
+
+window.addEventListener("load", () => {
+    requestIdleCallback(() => {
+        fetch("documentos.html", { credentials: "same-origin" })
+            .catch(() => {});
+    });
+});
 </script>
 
 </body>
