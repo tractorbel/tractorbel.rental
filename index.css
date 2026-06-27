@@ -77,12 +77,6 @@ body{
     cursor:pointer;
 }
 
-/* ===== CONTAINER ===== */
-.container{
-    margin: 19px;
-    padding: 0 24px 32px;
-}
-
 .hero {
     padding: 48px 0 24px;
 }
@@ -157,6 +151,8 @@ body{
 
 
 .card {
+    margin-left: 2px;
+    margin-right: 2px;
     background: #ffffff;
     border-radius: 28px;
     box-shadow: 0 22px 50px rgba(15,23,42,0.08);
