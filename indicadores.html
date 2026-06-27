@@ -1030,17 +1030,11 @@ function calcularTotais(dados){
     const totalAtendimentos = dados.length;
     document.getElementById("totalAtendimento").innerText = totalAtendimentos;
 
-    const tagsPreventivas = new Set();
+const totalPreventivas = dados.filter(linha => {
+    const tipoSS = String(linha["TIPO DA SS"] || "").trim().toUpperCase();
+    return tipoSS === "PREVENTIVA";
+}).length;
 
-    dados.forEach(linha => {
-        const tag = String(linha.__TAG_AC || "").trim();
-
-        if(tag && valorDiferenteDeZero(linha.__PREVENTIVA_BG)){
-            tagsPreventivas.add(tag);
-        }
-    });
-
-    const totalPreventivas = tagsPreventivas.size;
     document.getElementById("totalPreventivas").innerText = formatTotalComPercentual(totalPreventivas, totalAtendimentos);
 
     const totalCorretivas = dados.filter(linha => {
