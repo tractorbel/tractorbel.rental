@@ -315,6 +315,9 @@ h3{
     margin-top: 20px;
     padding: 25px 0 10px 0; /* mais espaço para ícones */
     font-size: 13px;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
 }
 
 .footer-container {
