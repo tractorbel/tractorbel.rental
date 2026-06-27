@@ -174,6 +174,7 @@ body{
 }
 
 h2{
+    padding: 15px;
     text-align: center;
 }
 .card h2 {
