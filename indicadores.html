@@ -587,6 +587,12 @@
 <h3>Avarias</h3>
 <div class="total" id="totalAvarias">0</div>
 </div>
+
+<div class="card">
+  <h3>Equipamentos Revisitados</h3>
+  <div class="total" id="totalRevisitados">0</div>
+</div>
+
 </div>
 
 <div class="card grafico-card">
@@ -1045,6 +1051,28 @@ const totalPreventivas = dados.filter(linha => {
         return tipoSS === "AVARIA";
     }).length;
 
+const tiposValidos = new Set([
+    "CORRETIVA PLANEJADA",
+    "CORRETIVA EMERGENCIAL"
+]);
+
+const ocorrenciasTAG = {};
+
+dados.forEach(linha => {
+    const tipo = String(linha["TIPO DA SS"] || "").trim().toUpperCase();
+    if (!tiposValidos.has(tipo)) return;
+
+    const tag = String(linha["AD"] || linha["TAG"] || "").trim();
+    if (!tag) return;
+
+    ocorrenciasTAG[tag] = (ocorrenciasTAG[tag] || 0) + 1;
+});
+
+const equipamentosRevisitados = Object.values(ocorrenciasTAG)
+    .filter(qtd => qtd > 1).length;
+
+document.getElementById("totalRevisitados").innerText = equipamentosRevisitados;
+    
     document.getElementById("totalCorretivas").innerText = formatTotalComPercentual(totalCorretivas, totalAtendimentos);
     document.getElementById("totalAvarias").innerText = formatTotalComPercentual(totalAvarias, totalAtendimentos);
 
