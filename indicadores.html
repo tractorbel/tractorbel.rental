@@ -1100,7 +1100,7 @@ document.getElementById("totalRevisitados").innerText = equipamentosRevisitados;
         horasDesloc += toHoras(linha["HORAS DESLOCAMENTO"]);
         maquinaParada += toHoras(linha["TOTAL DE MÁQUINA PARADA"]);
 
-        const data = excelDateToJS(linha["DATA DE ALTERAÇÃO DA SS"]);
+        const data = excelDateToJS(linha["DATA DE ENCERRAMENTO"]);
         if(data) datas.push(data);
     });
 
