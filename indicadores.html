@@ -605,9 +605,7 @@
 </div>
 
 <div class="card grafico-card"><h3>Total de Horas x Horas Úteis</h3><canvas id="graficoTotalHoras"></canvas></div>
-<div class="card grafico-card"><h3>Horas Trabalhadas</h3><canvas id="graficoTrabalhadas"></canvas></div>
-<div class="card grafico-card"><h3>Horas Aguardando</h3><canvas id="graficoAguardando"></canvas></div>
-<div class="card grafico-card"><h3>Horas Deslocamento</h3><canvas id="graficoDeslocamento"></canvas></div>
+<div class="card grafico-card"><h3>Distribuição das Horas</h3><canvas id="graficoHoras"></canvas></div>
 <div class="card grafico-card"><h3>Total Máquina Parada</h3><canvas id="graficoMaquina"></canvas></div>
 
 </div>
@@ -1128,9 +1126,7 @@ const totalPreventivas = dados.filter(linha => {
         g1,v=>g1=v,false
     );
 
-    criarGrafico("graficoTrabalhadas","Horas Trabalhadas",["Total"],[horasTrab],g2,v=>g2=v,false);
-    criarGrafico("graficoAguardando","Horas Aguardando",["Total"],[horasAguard],g3,v=>g3=v,false);
-    criarGrafico("graficoDeslocamento","Horas Deslocamento",["Total"],[horasDesloc],g4,v=>g4=v,false);
+    criarGrafico("graficoHoras","Horas",["Trabalhadas", "Aguardando", "Deslocamento"],[horasTrab, horasAguard, horasDesloc],g2,v => g2 = v,false);
     criarGrafico("graficoMaquina","Máquina Parada",["Total"],[maquinaParada],g5,v=>g5=v,false);
 
     btnLimpar.classList.toggle("hidden", !existeFiltroAtivo());
@@ -1195,7 +1191,6 @@ function criarGraficoPizza(totaisTipo){
             datasets:[{
                 label: "Atendimentos",
                 data:data,
-                backgroundColor: '#34a853',
                 barPercentage: 0.9,
                 categoryPercentage: 0.8,
                 maxBarThickness: 80
