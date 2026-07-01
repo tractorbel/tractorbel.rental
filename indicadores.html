@@ -336,8 +336,12 @@
       }
 
       canvas {
-        max-height: 350px;
+        width: 100%;
+        max-width: 100%;
+        height: 330px;
+        max-height: 330px;
         cursor: pointer;
+        display: block;
       }
 
       #graficoTecnico {
@@ -352,6 +356,13 @@
 
   .grafico-card {
     display: none;
+    min-width: 0;
+  }
+
+  .grafico-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
   }
 
       .logo-topo {
@@ -383,6 +394,17 @@
 
         .topo-controles {
           grid-template-columns: repeat(2, minmax(140px, 1fr));
+        }
+      }
+
+      @media (min-width: 1024px) {
+        .grafico-row {
+          grid-template-columns: 1fr 1fr;
+          align-items: start;
+        }
+
+        .grafico-row .card {
+          min-height: 380px;
         }
       }
 
@@ -610,14 +632,20 @@
       <canvas id="graficoRevisitados"></canvas>
   </div>
 
-  <div class="card grafico-card">
+  <div class="grafico-row">
+    <div class="card grafico-card">
       <h3>Abertura SS Técnicos x Programadores</h3>
       <canvas id="graficoAbertura"></canvas>
+    </div>
+
+    <div class="card grafico-card">
+      <h3>Total Máquina Parada</h3>
+      <canvas id="graficoMaquina"></canvas>
+    </div>
   </div>
 
   <div class="card grafico-card"><h3>Total de Horas x Horas Úteis</h3><canvas id="graficoTotalHoras"></canvas></div>
   <div class="card grafico-card"><h3>Distribuição das Horas</h3><canvas id="graficoHoras"></canvas></div>
-  <div class="card grafico-card"><h3>Total Máquina Parada</h3><canvas id="graficoMaquina"></canvas></div>
 
   </div>
 
