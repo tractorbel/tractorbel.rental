@@ -21,7 +21,7 @@
   }
 
   function shouldUseDirectNavigation() {
-    return window.location.protocol === 'file:' || window.location.origin === 'null';
+    return window.location.protocol === 'file:' || window.location.origin === 'null' || window.location.hostname !== 'localhost';
   }
 
   function setActiveLink(pageName) {
