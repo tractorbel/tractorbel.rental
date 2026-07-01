@@ -738,6 +738,7 @@
           aplicarEstadoFiltros(estado.filtros);
           atualizarFiltrosOptions();
           calcularTotais(filtrarDados());
+          atualizarVisibilidadeBotaoLimpar();
       } catch (erro) {
           console.error("Erro ao restaurar dados salvos:", erro);
           sessionStorage.removeItem(STORAGE_KEY);
@@ -988,11 +989,13 @@
           .filter(v => v !== "")
           .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
       criarCheckboxes(filtroModelo, modelos, modelosSelecionados);
+      atualizarVisibilidadeBotaoLimpar();
   }
 
   function aplicarFiltros(){
       atualizarFiltrosOptions();
       calcularTotais(filtrarDados());
+      atualizarVisibilidadeBotaoLimpar();
       salvarEstadoPagina();
   }
 
@@ -1540,6 +1543,15 @@ dados.forEach(linha => {
             existeBuscaAtiva;
   }
 
+  function atualizarVisibilidadeBotaoLimpar(){
+      if(!btnLimpar) return;
+      if(existeFiltroAtivo()){
+          btnLimpar.classList.remove("hidden");
+      } else {
+          btnLimpar.classList.add("hidden");
+      }
+  }
+
   function limparFiltros(){
       document.querySelectorAll(".filtro-checkboxes input").forEach(input => {
           input.checked = false;
@@ -1552,6 +1564,7 @@ dados.forEach(linha => {
       atualizarFiltrosOptions();
       calcularTotais(dadosGlobais);
       salvarEstadoPagina();
+      atualizarVisibilidadeBotaoLimpar();
   }
 
   function toggleMenu() {
