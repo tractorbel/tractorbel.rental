@@ -926,7 +926,13 @@ const SETORES = [TODOS_SETOR, "Almoxarifado", "Ass. Técnica Rental", "Compras",
 let currentSector = TODOS_SETOR;
 
 
-const API_BASE_URL = "http://localhost:4000";
+const API_BASE_URL = (function () {
+  try {
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1') return 'http://localhost:4000';
+  } catch (e) {}
+  return null;
+})();
 
 function getRawRepoUrl(path) {
   if (!path) return null;
@@ -952,12 +958,24 @@ function normalizeManifestItem(item) {
 }
 
 async function fetchManifestFromApi() {
-  const response = await fetch(`${API_BASE_URL}/api/manifest`);
-  if (!response.ok) {
-    throw new Error(`Manifest fetch failed: ${response.status}`);
+  if (API_BASE_URL) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/manifest`);
+      if (response.ok) {
+        const manifest = await response.json();
+        return manifest.map(normalizeManifestItem);
+      }
+      console.warn('Backend manifest responded with', response.status);
+    } catch (err) {
+      console.warn('Failed to fetch manifest from backend, falling back to local JSON:', err.message);
+    }
   }
-  const manifest = await response.json();
-  return manifest.map(normalizeManifestItem);
+
+  // Fallback for static hosting (GitHub Pages): load local documentos.json
+  const resp = await fetch('documentos.json');
+  if (!resp.ok) throw new Error('Falha ao carregar documentos locais');
+  const localManifest = await resp.json();
+  return localManifest.map(normalizeManifestItem);
 }
 
 async function getIdToken() {
