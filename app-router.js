@@ -97,7 +97,7 @@
     setActiveLink(pageName);
 
     if (options.pushState !== false) {
-      const targetUrl = pageName === 'index.html' ? '/' : `/${pageName}`;
+      const targetUrl = pageName === 'index.html' ? './' : `${pageName}`;
       history.pushState({ page: pageName }, '', targetUrl);
     }
   }
@@ -117,7 +117,7 @@
       currentPage = pageName;
       setActiveLink(pageName);
       if (options.pushState !== false) {
-        const targetPath = pageName === 'index.html' ? '/' : `/${pageName}`;
+        const targetPath = pageName === 'index.html' ? './' : `${pageName}`;
         history.pushState({ page: pageName }, '', targetPath);
       }
       return Promise.resolve();
