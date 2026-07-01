@@ -628,18 +628,23 @@
   </div>
 
   <div class="card grafico-card">
-      <h3>Análise de Reincidência Top 10 Patrimônios</h3>
+      <h3>Top 10 Patrimônios com Maior Custo de Peças</h3>
+      <canvas id="graficoCustoPecas"></canvas>
+  </div>
+
+  <div class="card grafico-card">
+      <h3>Top 10 Patrimônios com Maior Reincidência</h3>
       <canvas id="graficoRevisitados"></canvas>
   </div>
 
   <div class="grafico-row">
     <div class="card grafico-card">
-      <h3>Abertura SS Técnicos x Programadores</h3>
+      <h3>Abertura SS: Técnicos x Programadores</h3>
       <canvas id="graficoAbertura"></canvas>
     </div>
 
     <div class="card grafico-card">
-      <h3>Total Máquina Parada</h3>
+      <h3>Tempo Total de Máquina Parada</h3>
       <canvas id="graficoMaquina"></canvas>
     </div>
   </div>
@@ -652,7 +657,7 @@
   <script>
 
   let dadosGlobais = [];
-  let grafico, graficoTipos, g1, g2, g3, g4, g5, g6, g7, g8;
+  let grafico, graficoTipos, g1, g2, g3, g4, g5, g6, g7, g8, g9;
   let uploadDialogOpen = false; /* prevent duplicate file picker opens */
 
   const STORAGE_KEY = "indicadores_ss_estado";
@@ -1007,6 +1012,48 @@
       return Number(valor.toString().replace(",", ".")) || 0;
   }
 
+  function toNumber(valor){
+      if(valor === undefined || valor === null || valor === "") return NaN;
+      if(typeof valor === "number") return valor;
+
+      let texto = String(valor).trim();
+      if(texto === "") return NaN;
+
+      // Remove todos os espaços e símbolos não-numéricos, mantendo separadores de milhar e decimal.
+      texto = texto.replace(/\s+/g, "");
+      texto = texto.replace(/[^0-9(),.\-]/g, "");
+
+      const negativo = /^\((.*)\)$/.test(texto);
+      if(negativo){
+          texto = texto.replace(/^\(|\)$/g, "");
+      }
+
+      const temPonto = texto.includes('.');
+      const temVirgula = texto.includes(',');
+
+      if(temPonto && temVirgula){
+          const ultimaPonto = texto.lastIndexOf('.');
+          const ultimaVirgula = texto.lastIndexOf(',');
+          if(ultimaVirgula > ultimaPonto){
+              texto = texto.replace(/\./g, '').replace(',', '.');
+          } else {
+              texto = texto.replace(/,/g, '');
+          }
+      } else if(temVirgula){
+          texto = texto.replace(/,/g, '.');
+      } else if(temPonto){
+          const partes = texto.split('.');
+          if(partes.length > 2){
+              texto = partes.join('');
+          } else if(partes[1].length === 3 && partes[0].length > 3){
+              texto = partes.join('');
+          }
+      }
+
+      const numero = Number(texto);
+      return negativo ? -numero : numero;
+  }
+
   function excelDateToJS(valor){
       if(!valor) return null;
 
@@ -1235,6 +1282,30 @@ dados.forEach(linha => {
       const totCliente = clientesOrdenados.map(cliente => totaisCliente[cliente]);
       criarGrafico("graficoCliente","Atendimentos por Cliente",clientesOrdenados,totCliente,g6,v=>g6=v,true, filtrarPorCliente);
 
+      const custoPecasPorTag = {};
+      dados.forEach(linha => {
+          const tag = String(linha["TAG"] || "").trim();
+          const valorPecasBruto = linha["TOTAL DE PEÇAS"];
+          if (!tag || valorPecasBruto === undefined || valorPecasBruto === null || String(valorPecasBruto).trim() === "") {
+              return;
+          }
+
+          const valorPecas = toNumber(valorPecasBruto);
+          if (Number.isNaN(valorPecas) || valorPecas <= 0) {
+              return;
+          }
+
+          custoPecasPorTag[tag] = (custoPecasPorTag[tag] || 0) + valorPecas;
+      });
+
+      const tagsCustoPecas = Object.entries(custoPecasPorTag)
+          .filter(([, valor]) => Number(valor) > 0)
+          .sort((a,b) => b[1] - a[1] || a[0].localeCompare(b[0], "pt-BR", {numeric:true, sensitivity:'base'}))
+          .slice(0, 10)
+          .map(([tag]) => tag);
+      const valoresCustoPecas = tagsCustoPecas.map(tag => Number(custoPecasPorTag[tag].toFixed(2)));
+      criarGrafico("graficoCustoPecas","Custo de Peças",tagsCustoPecas,valoresCustoPecas,g9,v=>g9=v,false);
+
       criarGrafico("graficoTotalHoras","Horas",
           ["Trabalhadas","Horas Úteis"],
           [horasTrab, horasUteis],
@@ -1252,6 +1323,23 @@ dados.forEach(linha => {
 
       if(graficoAtual){
           graficoAtual.destroy();
+      }
+
+      const cardGrafico = document.getElementById(id)?.closest('.card');
+      const temDadosValidos = Array.isArray(labels) && Array.isArray(data) && labels.length > 0 && data.some(valor => valorDiferenteDeZero(valor));
+
+      if(id === "graficoCustoPecas" && !temDadosValidos){
+          if(cardGrafico){
+              cardGrafico.style.display = 'none';
+          }
+          if(typeof salvar === "function"){
+              salvar(null);
+          }
+          return;
+      }
+
+      if(cardGrafico){
+          cardGrafico.style.display = 'block';
       }
 
       const opcoes = {
