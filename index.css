@@ -280,24 +280,31 @@ h3{
 /* ===== RESPONSIVO INTELIGENTE ===== */
 @media (max-width: 400px){
     .navbar{
-        justify-content: space-between; /* volta para hamburguer */
+        justify-content: space-between;
+        gap: 10px;
+        padding: 8px 14px;
     }
 
     .menu-toggle{
         display:block;
+        margin-right: 6px;
     }
 
     .navbar ul{
         display:none;
         flex-direction: column;
         background: #2e7d32;
-        position:absolute;
-        top:60px;
-        right:20px;
-        left:20px;
-        border-radius:8px;
-        padding:15px 0;
+        position: fixed;
+        top: 60px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: 0 10px;
+        border-radius: 12px;
+        padding: 15px 0;
         box-shadow:0 4px 10px rgba(0,0,0,0.2);
+        z-index: 9999;
+        overflow-y: auto;
     }
 
     .navbar ul.active{
@@ -310,7 +317,19 @@ h3{
     }
 
     .navbar-logo {
-        display: none;
+        display: flex;
+        align-items: center;
+        margin-right: 0;
+        flex: 1 1 auto;
+        justify-content: center;
+        position: relative;
+        z-index: 10000;
+    }
+
+    .navbar-logo img {
+        max-height: 34px;
+        max-width: 110px;
+        padding: 3px 6px;
     }
 }
 
