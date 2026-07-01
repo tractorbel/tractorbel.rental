@@ -47,7 +47,7 @@
     return url.origin === window.location.origin && /\.html$/i.test(url.pathname);
   }
 
-  function extractPageContent(html) {
+  function extractPageContent(html, baseUrl) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
     const root = doc.getElementById(CONTENT_ID) || doc.getElementById('app-content') || doc.getElementById('conteudo');
@@ -56,20 +56,40 @@
       throw new Error('Conteúdo da página não encontrado.');
     }
 
+    const scripts = Array.from(doc.querySelectorAll('script')).filter((script) => {
+      const src = (script.getAttribute('src') || '').toLowerCase();
+      return !src.includes('app-router.js');
+    });
+
+    const styles = Array.from(doc.querySelectorAll('link[rel="stylesheet"]'));
+
     return {
       content: root.innerHTML,
-      scripts: Array.from(doc.querySelectorAll('script')).filter((script) => {
-        const src = (script.getAttribute('src') || '').toLowerCase();
-        return !src.includes('app-router.js');
-      })
+      scripts,
+      styles,
+      baseUrl: baseUrl || window.location.href
     };
   }
 
-  function injectContentAndScripts(contentHtml, scripts) {
+  const INJECTED_STYLES = new Set();
+
+  function injectContentAndScripts(contentHtml, scripts, styles, baseUrl) {
     const root = getContentRoot();
     if (!root) return;
 
     root.innerHTML = contentHtml;
+    // Inject styles into head if not already present
+    (styles || []).forEach((linkEl) => {
+      const href = linkEl.getAttribute('href');
+      if (!href) return;
+      const resolved = new URL(href, baseUrl || window.location.href).href;
+      if (INJECTED_STYLES.has(resolved)) return;
+      INJECTED_STYLES.add(resolved);
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = resolved;
+      document.head.appendChild(link);
+    });
 
     scripts.forEach((scriptSource) => {
       const src = scriptSource.getAttribute('src');
@@ -79,7 +99,7 @@
       EXECUTED_SCRIPTS.add(key);
       const script = document.createElement('script');
       if (src) {
-        script.src = src;
+        script.src = new URL(src, baseUrl || window.location.href).href;
       } else {
         script.textContent = scriptSource.textContent;
       }
@@ -91,14 +111,16 @@
   }
 
   function renderPage(pageName, html, options = {}) {
-    const { content, scripts } = extractPageContent(html);
-    injectContentAndScripts(content, scripts);
+    const base = options.baseUrl || new URL(pageName, window.location.href).href;
+    const { content, scripts, styles, baseUrl } = extractPageContent(html, base);
+    injectContentAndScripts(content, scripts, styles, baseUrl);
     currentPage = pageName;
     setActiveLink(pageName);
 
     if (options.pushState !== false) {
-      const targetUrl = pageName === 'index.html' ? './' : `${pageName}`;
-      history.pushState({ page: pageName }, '', targetUrl);
+      const full = new URL(pageName === 'index.html' ? './' : pageName, base);
+      const pushPath = full.pathname + (full.search || '') + (full.hash || '');
+      history.pushState({ page: pageName }, '', pushPath);
     }
   }
 
@@ -113,12 +135,14 @@
 
     if (CACHE.has(cacheKey)) {
       const cached = CACHE.get(cacheKey);
-      injectContentAndScripts(cached.content, cached.scripts);
+      injectContentAndScripts(cached.content, cached.scripts, cached.styles, cached.baseUrl);
       currentPage = pageName;
       setActiveLink(pageName);
       if (options.pushState !== false) {
-        const targetPath = pageName === 'index.html' ? './' : `${pageName}`;
-        history.pushState({ page: pageName }, '', targetPath);
+        const base = new URL(pageName, window.location.href).href;
+        const full = new URL(pageName === 'index.html' ? './' : pageName, base);
+        const pushPath = full.pathname + (full.search || '') + (full.hash || '');
+        history.pushState({ page: pageName }, '', pushPath);
       }
       return Promise.resolve();
     }
@@ -129,9 +153,10 @@
         return response.text();
       })
       .then((html) => {
-        const parsed = extractPageContent(html);
+        const base = new URL(targetUrl, window.location.href).href;
+        const parsed = extractPageContent(html, base);
         CACHE.set(cacheKey, parsed);
-        renderPage(pageName, html, options);
+        renderPage(pageName, html, Object.assign({}, options, { baseUrl: base }));
       })
       .catch((error) => {
         console.error(error);
@@ -166,7 +191,7 @@
     if (pageName && pageName !== currentPage) {
       const cached = CACHE.get(pageName);
       if (cached) {
-        injectContentAndScripts(cached.content, cached.scripts);
+        injectContentAndScripts(cached.content, cached.scripts, cached.styles, cached.baseUrl);
         currentPage = pageName;
         setActiveLink(pageName);
       } else {
