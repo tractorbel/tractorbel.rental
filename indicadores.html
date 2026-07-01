@@ -585,50 +585,50 @@
   </div>
 
   <div class="cards">
-  <div class="card">
+  <div class="card" id="cardTotalAtendimento">
   <h3>Total de Atendimentos</h3>
   <div class="total" id="totalAtendimento">0</div>
   </div>
 
-  <div class="card">
+  <div class="card" id="cardTotalPreventivas">
   <h3>Preventivas</h3>
   <div class="total" id="totalPreventivas">0</div>
   </div>
 
-  <div class="card">
+  <div class="card" id="cardTotalCorretivas">
   <h3>Corretivas</h3>
   <div class="total" id="totalCorretivas">0</div>
   </div>
 
-  <div class="card">
+  <div class="card" id="cardTotalAvarias">
   <h3>Avarias</h3>
   <div class="total" id="totalAvarias">0</div>
   </div>
 
-  <div class="card">
-    <h3>Equipamentos Revisitados</h3>
+  <div class="card" id="cardTotalRevisitados">
+    <h3>Análise de Reincidência Top 10 Patrimônios</h3>
     <div class="total" id="totalRevisitados">0</div>
   </div>
 
   </div>
 
   <div class="card grafico-card">
-  <h3>Total de Atendimento x Técnico</h3>
+  <h3>Atendimento x Técnico</h3>
   <canvas id="graficoTecnico"></canvas>
   </div>
 
   <div class="card grafico-card">
-  <h3>Total de Atendimento x Tipo</h3>
+  <h3>Atendimento x Tipo</h3>
   <canvas id="graficoTipos"></canvas>
   </div>
 
   <div class="card grafico-card">
-  <h3>Total de Atendimento x Cliente</h3>
+  <h3>Atendimento x Cliente</h3>
   <canvas id="graficoCliente"></canvas>
   </div>
 
   <div class="card grafico-card">
-      <h3>Equipamentos Revisitados</h3>
+      <h3>Equipamentos Reincidentes</h3>
       <canvas id="graficoRevisitados"></canvas>
   </div>
 
@@ -1062,6 +1062,25 @@
       return `${valor} (${percentualFormatado}%)`;
   }
 
+  function atualizarVisibilidadeCards(){
+      const mapeamento = [
+          {elemento: 'totalAtendimento', card: 'cardTotalAtendimento'},
+          {elemento: 'totalPreventivas', card: 'cardTotalPreventivas'},
+          {elemento: 'totalCorretivas', card: 'cardTotalCorretivas'},
+          {elemento: 'totalAvarias', card: 'cardTotalAvarias'},
+          {elemento: 'totalRevisitados', card: 'cardTotalRevisitados'}
+      ];
+
+      mapeamento.forEach(({elemento, card}) => {
+          const valorTexto = String(document.getElementById(elemento)?.innerText || '0').trim();
+          const valor = Number(valorTexto.replace(/[^0-9]/g, '')) || 0;
+          const cardEl = document.getElementById(card);
+          if(cardEl){
+              cardEl.style.display = valor === 0 ? 'none' : 'block';
+          }
+      });
+  }
+
   function calcularTotais(dados){
 
       const totalAtendimentos = dados.length;
@@ -1137,8 +1156,9 @@ dados.forEach(linha => {
 
   const revisitadoTags = dadosRevisitados.slice(0, 10).map(([tag]) => tag);
   const revisitadoContagens = dadosRevisitados.slice(0, 10).map(([, qtd]) => qtd);
+  const revisitadoTemDados = dadosRevisitados.length > 0;
 
-  document.getElementById("totalRevisitados").innerText = equipamentosRevisitados;
+  document.getElementById("totalRevisitados").innerText = formatTotalComPercentual(equipamentosRevisitados, totalAtendimentos);
       
       document.getElementById("totalCorretivas").innerText = formatTotalComPercentual(totalCorretivas, totalAtendimentos);
       document.getElementById("totalAvarias").innerText = formatTotalComPercentual(totalAvarias, totalAtendimentos);
@@ -1223,11 +1243,9 @@ dados.forEach(linha => {
 
       criarGrafico("graficoHoras","Horas",["Trabalhadas", "Aguardando", "Deslocamento"],[horasTrab, horasAguard, horasDesloc],g2,v => g2 = v,false);
       criarGrafico("graficoMaquina","Máquina Parada",["Total"],[maquinaParada],g5,v=>g5=v,false);
-      criarGraficoRevisitados(revisitadoTags, revisitadoContagens);
+      criarGraficoRevisitados(revisitadoTags, revisitadoContagens, revisitadoTemDados);
       criarGraficoAbertura(programadores, tecnicos);
-
-      
-      btnLimpar.classList.toggle("hidden", !existeFiltroAtivo());
+      atualizarVisibilidadeCards();
   }
 
   function criarGrafico(id,label,labels,data,graficoAtual,salvar,comClickable,clickCallback){
@@ -1355,7 +1373,24 @@ dados.forEach(linha => {
     });
 }
 
-  function criarGraficoRevisitados(labels, data){
+  function criarGraficoRevisitados(labels, data, temDados){
+
+    const graficoCard = document.querySelector('#graficoRevisitados')?.closest('.card');
+
+    if(!temDados){
+      if(g8){
+        g8.destroy();
+        g8 = null;
+      }
+      if(graficoCard){
+        graficoCard.style.display = 'none';
+      }
+      return;
+    }
+
+    if(graficoCard){
+      graficoCard.style.display = 'block';
+    }
 
     if(g8){
         g8.destroy();
