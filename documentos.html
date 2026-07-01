@@ -1281,6 +1281,10 @@ function renderDocuments() {
       const img = document.createElement("img");
       img.src = doc.iconUrl;
       img.alt = doc.title;
+      img.onerror = function () {
+        this.onerror = null;
+        this.src = 'png/logo.png';
+      };
       systemIcon.appendChild(img);
     }
     card.appendChild(systemIcon);

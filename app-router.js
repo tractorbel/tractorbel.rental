@@ -96,7 +96,6 @@
       const key = src || scriptSource.textContent;
       if (!key || EXECUTED_SCRIPTS.has(key)) return;
 
-      EXECUTED_SCRIPTS.add(key);
       const script = document.createElement('script');
       if (src) {
         script.src = new URL(src, baseUrl || window.location.href).href;
@@ -106,7 +105,15 @@
       if (scriptSource.type) {
         script.type = scriptSource.type;
       }
-      document.body.appendChild(script);
+      try {
+        document.body.appendChild(script);
+        EXECUTED_SCRIPTS.add(key);
+      } catch (err) {
+        // If a redeclaration or other script execution error occurs, warn and skip
+        console.warn('Script injection failed, skipping:', err && err.message);
+        // Mark as executed to avoid repeating the failing script
+        try { EXECUTED_SCRIPTS.add(key); } catch (e) {}
+      }
     });
   }
 
@@ -205,6 +212,15 @@
     initialized = true;
     currentPage = getPageNameFromUrl(window.location.href);
     setActiveLink(currentPage);
+    // Ensure nav clicks close mobile menu so a single click triggers action
+    try {
+      document.querySelectorAll('nav a').forEach((link) => {
+        link.addEventListener('click', () => {
+          const menu = document.getElementById('menu');
+          if (menu && menu.classList.contains('active')) menu.classList.remove('active');
+        });
+      });
+    } catch (e) {}
   }
 
   if (document.readyState === 'loading') {
