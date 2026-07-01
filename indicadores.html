@@ -606,6 +606,11 @@
   </div>
 
   <div class="card grafico-card">
+      <h3>Equipamentos Revisitados</h3>
+      <canvas id="graficoRevisitados"></canvas>
+  </div>
+
+  <div class="card grafico-card">
       <h3>Abertura SS Técnicos x Programadores</h3>
       <canvas id="graficoAbertura"></canvas>
   </div>
@@ -619,7 +624,7 @@
   <script>
 
   let dadosGlobais = [];
-  let grafico, graficoTipos, g1, g2, g3, g4, g5, g6, g7;
+  let grafico, graficoTipos, g1, g2, g3, g4, g5, g6, g7, g8;
   let uploadDialogOpen = false; /* prevent duplicate file picker opens */
 
   const STORAGE_KEY = "indicadores_ss_estado";
@@ -1098,6 +1103,13 @@ dados.forEach(linha => {
   const equipamentosRevisitados = Object.values(ocorrenciasTAG)
       .filter(qtd => qtd > 1).length;
 
+  const dadosRevisitados = Object.entries(ocorrenciasTAG)
+      .filter(([, qtd]) => qtd > 1)
+      .sort((a, b) => b[1] - a[1]);
+
+  const revisitadoTags = dadosRevisitados.slice(0, 10).map(([tag]) => tag);
+  const revisitadoContagens = dadosRevisitados.slice(0, 10).map(([, qtd]) => qtd);
+
   document.getElementById("totalRevisitados").innerText = equipamentosRevisitados;
       
       document.getElementById("totalCorretivas").innerText = formatTotalComPercentual(totalCorretivas, totalAtendimentos);
@@ -1183,6 +1195,7 @@ dados.forEach(linha => {
 
       criarGrafico("graficoHoras","Horas",["Trabalhadas", "Aguardando", "Deslocamento"],[horasTrab, horasAguard, horasDesloc],g2,v => g2 = v,false);
       criarGrafico("graficoMaquina","Máquina Parada",["Total"],[maquinaParada],g5,v=>g5=v,false);
+      criarGraficoRevisitados(revisitadoTags, revisitadoContagens);
       criarGraficoAbertura(programadores, tecnicos);
 
       
@@ -1299,7 +1312,8 @@ dados.forEach(linha => {
                 `Técnicos - ${tecnicos} (${((tecnicos/total)*100).toFixed(1)}%)`
             ],
             datasets:[{
-                data:[programadores, tecnicos]
+                data:[programadores, tecnicos],
+                backgroundColor:["#2563eb","#10b981"]
             }]
         },
         options:{
@@ -1308,6 +1322,39 @@ dados.forEach(linha => {
                 legend:{
                     position:"bottom"
                 }
+            }
+        }
+    });
+}
+
+  function criarGraficoRevisitados(labels, data){
+
+    if(g8){
+        g8.destroy();
+    }
+
+    g8 = new Chart(document.getElementById("graficoRevisitados"),{
+        type:'bar',
+        data:{
+            labels: labels,
+            datasets:[{
+                label: 'Quantidade Atendimentos',
+                data: data,
+                backgroundColor: labels.map(() => 'rgba(14, 165, 233, 0.8)'),
+                borderColor: labels.map(() => 'rgba(14, 165, 233, 1)'),
+                borderWidth: 1
+            }]
+        },
+        options:{
+            responsive:true,
+            maintainAspectRatio:false,
+            plugins:{
+                legend:{ display:false },
+                tooltip:{ callbacks:{ label: context => `${context.parsed.y}` } }
+            },
+            scales:{
+                x:{ title:{ display:true, text:'TAG' } },
+                y:{ title:{ display:true, text:'Quantidade Atendimentos' }, beginAtZero:true, ticks:{ precision:0 } }
             }
         }
     });
