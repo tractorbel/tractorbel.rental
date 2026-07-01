@@ -903,6 +903,18 @@ const SERVER_ICONS = [
   "fluxograma.png"
 ];
 
+// Icons actually present in the repository (fallback map)
+const AVAILABLE_ICONS = [
+  "logo-linkedin.png",
+  "logo-instagram.png",
+  "logo-facebook.png",
+  "grafico-veiculos.png",
+  "logo_transparent.png",
+  "logo.png",
+  "logo-whatsapp.png",
+  "logo-tractorbel.png"
+];
+
 const ADMIN_EMAIL = "programacaorental04@tractorbel.com.br";
 
 const DB_NAME = "tractorbelDocuments";
@@ -953,6 +965,17 @@ function normalizeManifestItem(item) {
     createdAt: item.createdAt ? Date.parse(item.createdAt) : Date.now(),
     updatedAt: item.updatedAt ? Date.parse(item.updatedAt) : Date.now()
   };
+  // If icon refers to a png that is not available in this static build,
+  // fallback to bundled logo to avoid repeated 404s in production.
+  try {
+    if (doc.iconUrl && doc.iconUrl.startsWith('png/')) {
+      const name = doc.iconUrl.split('/').pop();
+      if (!AVAILABLE_ICONS.includes(name)) {
+        doc.iconUrl = 'png/logo.png';
+      }
+    }
+  } catch (e) {}
+
   doc.sector = doc.sector || inferDocumentSector(doc);
   return doc;
 }

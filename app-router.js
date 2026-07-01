@@ -93,14 +93,32 @@
 
     scripts.forEach((scriptSource) => {
       const src = scriptSource.getAttribute('src');
-      const key = src || scriptSource.textContent;
+      const text = scriptSource.textContent || '';
+      const key = src || text;
       if (!key || EXECUTED_SCRIPTS.has(key)) return;
+
+      // If this is an inline script, detect top-level declarations and skip
+      // if any of the declared identifiers already exist in the global scope.
+      if (!src && text) {
+        const declared = [];
+        const declRegex = /(?:^|[;\n\r\s])(let|const|var|function)\s+([A-Za-z_$][0-9A-Za-z_$]*)/g;
+        let m;
+        while ((m = declRegex.exec(text))) {
+          if (m[2]) declared.push(m[2]);
+        }
+        const already = declared.some((name) => typeof window[name] !== 'undefined');
+        if (already) {
+          // mark as executed to avoid retrying
+          try { EXECUTED_SCRIPTS.add(key); } catch (e) {}
+          return;
+        }
+      }
 
       const script = document.createElement('script');
       if (src) {
         script.src = new URL(src, baseUrl || window.location.href).href;
       } else {
-        script.textContent = scriptSource.textContent;
+        script.textContent = text;
       }
       if (scriptSource.type) {
         script.type = scriptSource.type;
@@ -109,9 +127,7 @@
         document.body.appendChild(script);
         EXECUTED_SCRIPTS.add(key);
       } catch (err) {
-        // If a redeclaration or other script execution error occurs, warn and skip
         console.warn('Script injection failed, skipping:', err && err.message);
-        // Mark as executed to avoid repeating the failing script
         try { EXECUTED_SCRIPTS.add(key); } catch (e) {}
       }
     });
