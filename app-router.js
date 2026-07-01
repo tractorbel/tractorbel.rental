@@ -62,23 +62,25 @@
     });
 
     const styles = Array.from(doc.querySelectorAll('link[rel="stylesheet"]'));
+    const inlineStyles = Array.from(doc.querySelectorAll('style'));
 
     return {
       content: root.innerHTML,
       scripts,
       styles,
+      inlineStyles,
       baseUrl: baseUrl || window.location.href
     };
   }
 
   const INJECTED_STYLES = new Set();
 
-  function injectContentAndScripts(contentHtml, scripts, styles, baseUrl) {
+  function injectContentAndScripts(contentHtml, scripts, styles, inlineStyles, baseUrl) {
     const root = getContentRoot();
     if (!root) return;
 
     root.innerHTML = contentHtml;
-    // Inject styles into head if not already present
+    // Inject linked styles into head if not already present
     (styles || []).forEach((linkEl) => {
       const href = linkEl.getAttribute('href');
       if (!href) return;
@@ -89,6 +91,16 @@
       link.rel = 'stylesheet';
       link.href = resolved;
       document.head.appendChild(link);
+    });
+
+    // Inject inline styles from the page head
+    (inlineStyles || []).forEach((styleEl) => {
+      const key = styleEl.textContent;
+      if (!key || INJECTED_STYLES.has(key)) return;
+      INJECTED_STYLES.add(key);
+      const style = document.createElement('style');
+      style.textContent = key;
+      document.head.appendChild(style);
     });
 
     scripts.forEach((scriptSource) => {
@@ -135,8 +147,8 @@
 
   function renderPage(pageName, html, options = {}) {
     const base = options.baseUrl || new URL(pageName, window.location.href).href;
-    const { content, scripts, styles, baseUrl } = extractPageContent(html, base);
-    injectContentAndScripts(content, scripts, styles, baseUrl);
+    const { content, scripts, styles, inlineStyles, baseUrl } = extractPageContent(html, base);
+    injectContentAndScripts(content, scripts, styles, inlineStyles, baseUrl);
     currentPage = pageName;
     setActiveLink(pageName);
 
@@ -158,7 +170,7 @@
 
     if (CACHE.has(cacheKey)) {
       const cached = CACHE.get(cacheKey);
-      injectContentAndScripts(cached.content, cached.scripts, cached.styles, cached.baseUrl);
+      injectContentAndScripts(cached.content, cached.scripts, cached.styles, cached.inlineStyles, cached.baseUrl);
       currentPage = pageName;
       setActiveLink(pageName);
       if (options.pushState !== false) {
@@ -214,7 +226,7 @@
     if (pageName && pageName !== currentPage) {
       const cached = CACHE.get(pageName);
       if (cached) {
-        injectContentAndScripts(cached.content, cached.scripts, cached.styles, cached.baseUrl);
+        injectContentAndScripts(cached.content, cached.scripts, cached.styles, cached.inlineStyles, cached.baseUrl);
         currentPage = pageName;
         setActiveLink(pageName);
       } else {
