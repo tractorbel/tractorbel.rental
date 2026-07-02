@@ -8,7 +8,7 @@ body{
 
 /* ===== MENU INTELIGENTE ===== */
 .navbar{
-    background: #2e7d32;
+    background: #0b7a3e;
     display:flex;
     justify-content: center; /* CENTRALIZA MENU */
     align-items: center;
@@ -234,7 +234,7 @@ h2{
 /* ===== HEADER ===== */
 header img{
     border-radius: 50%;
-    border:3px solid #2e7d32;
+    border:3px solid #0b7a3e;
     width: 150px;
     height:150px;
 }
@@ -293,7 +293,7 @@ h3{
     .navbar ul{
         display:none;
         flex-direction: column;
-        background: #2e7d32;
+        background: #0b7a3e;
         position: fixed;
         top: 60px;
         left: 0;
