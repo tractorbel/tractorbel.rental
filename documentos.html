@@ -14,6 +14,34 @@ body{
   color:#0f2238;
 }
 
+/* Navbar: center logo and keep hamburger fixed at left on mobile */
+.navbar{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: #0b7a3e;
+  padding:10px 12px;
+}
+.navbar .menu-toggle{
+  position:absolute;
+  left:12px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:20px;
+  color:white;
+  background:transparent;
+  border:none;
+  cursor:pointer;
+}
+.navbar-logo{ display:flex; align-items:center; justify-content:center; }
+.navbar-logo img{ height:38px; width:auto; display:block; }
+
+@media(min-width:801px){
+  .navbar{ justify-content:flex-start; }
+  .navbar .menu-toggle{ position:static; transform:none; color:inherit; }
+}
+
 .barra-pesquisa{
   max-width:1200px;
   margin:0 auto 14px;
@@ -267,6 +295,44 @@ body{
 .icone{
   font-size:32px;
   margin-bottom:8px;
+}
+
+.icone img{
+  width:36px;
+  height:36px;
+  object-fit:contain;
+}
+
+.docs-folder{
+  width:100%;
+  margin-bottom:20px;
+}
+
+.docs-folder-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin:0 0 12px;
+  padding-bottom:8px;
+  border-bottom:1px solid #e2e8f0;
+}
+
+.docs-folder-header h3{
+  margin:0;
+  color:#087a45;
+  font-size:18px;
+}
+
+.docs-folder-header span{
+  color:#64748b;
+  font-size:13px;
+}
+
+.docs-folder-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));
+  gap:12px;
 }
 
 .sistema-icon{
@@ -558,135 +624,6 @@ header h2 {
       </div>
     </div>
 
-<div class="galeria" id="galeria">
-
-<div class="card">
-<div class="sistema-icon"><img src="organograma.png" alt=""></div>
-<div class="icone">📄</div>
-<a href="pdf/ORGANOGRAMA RENTAL SERRA - ES.pdf" target="_blank" rel="noopener noreferrer">
-Organograma Serra ES
-</a>
-</div>
-
-<div class="card">
-<div class="sistema-icon"><img src="organograma.png" alt=""></div>
-<div class="icone">📄</div>
-<a href="pdf/ORGANOGRAMA RENTAL CONTAGEM - MG.pdf" target="_blank" rel="noopener noreferrer">
-Organograma Contagem MG
-</a>
-</div>
-
-<div class="card">
-<div class="sistema-icon"><img src="organograma.png" alt=""></div>
-<div class="icone">📄</div>
-<a href="pdf/ORGANOGRAMA RENTAL DUQUE DE CAXIAS - RJ.pdf" target="_blank" rel="noopener noreferrer">
-Organograma Duque de Caxias RJ
-</a>
-</div>
-
-<div class="card">
-<div class="sistema-icon"><img src="organograma.png" alt=""></div>
-<div class="icone">📄</div>
-<a href="pdf/ORGANOGRAMA RENTAL POUSO ALEGRE - PA.pdf" target="_blank" rel="noopener noreferrer">
-Organograma Pouso Alegre
-</a>
-</div>
-
-<div class="card">
-<div class="sistema-icon"><img src="fluig.png" alt="fluig"></div>
-<div class="icone">📄</div>
-<a href="pdf/FLUIG Consulta de peças fluig.pdf" target="_blank" rel="noopener noreferrer">
-FLUIG POP Consulta de peças
-</a>
-</div>
-
-<div class="card">
-<div class="sistema-icon"><img src="senior.png" alt=""></div>
-<div class="icone">📄</div>
-<a href="pdf/SENIOR Transferência entre depósito.pdf" target="_blank" rel="noopener noreferrer">
-SENIOR POP Transferência entre depósito
-</a>
-</div>
-
-<div class="card">
-<div class="sistema-icon"><img src="sisloc.png" alt=""></div>
-<div class="icone">📄</div>
-<a href="pdf/SISLOC Histórico de manutenção.pdf" target="_blank" rel="noopener noreferrer">
-SISLOC POP Relatório de histórico de manutenção
-</a>
-</div>
-
-<div class="card">
-<div class="sistema-icon"><img src="sisloc.png" alt=""></div>
-<div class="icone">📄</div>
-<a href="pdf/SISLOC Orçamento de avaria.pdf" target="_blank" rel="noopener noreferrer">
-SISLOC POP Orçamento de avaria
-</a>
-</div>
-
-<div class="card">
-<div class="sistema-icon"><img src="sisloc.png" alt=""></div>
-<div class="icone">📄</div>
-<a href="pdf/SISLOC Solicitação de compra vinculado a OM.pdf" target="_blank" rel="noopener noreferrer">
-SISLOC POP Solicitação de compra vinculado a OM
-</a>
-</div>
-
-<div class="card">
-<div class="sistema-icon"><img src="sisloc.png" alt=""></div>
-<div class="icone">📄</div>
-<a href="pdf/SISLOC Solicitação de compra.pdf" target="_blank" rel="noopener noreferrer">
-SISLOC POP Solicitação de compra
-</a>
-</div>
-
-<div class="card">
-<div class="sistema-icon"><img src="sismetro.png" alt=""></div>
-<div class="icone">📄</div>
-<a href="pdf/SISMETRO Procedimento equipamentos vendidos.pdf" target="_blank" rel="noopener noreferrer">
-SISMETRO Procedimento de atualização de equipamentos vendidos
-</a>
-</div>
-
-<div class="card">
-<div class="sistema-icon"><img src="sismetro.png" alt=""></div>
-<div class="icone">📄</div>
-<a href="pdf/SISMETRO Orientação de utilização técnicos.pdf" target="_blank" rel="noopener noreferrer">
-SISMETRO Orientação de utilização técnicos
-</a>
-</div>
-
-<div class="card">
-<div class="sistema-icon"><img src="sismetro.png" alt=""></div>
-<div class="icone">📄</div>
-<a href="pdf/SISMETRO Cadastro de Patrimônio Acessórios.pdf" target="_blank" rel="noopener noreferrer">
-SISMETRO Cadastro de Patrimônio Acessórios
-</a>
-</div>
-
-<div class="card">
-<div class="sistema-icon"><img src="sisloc.png" alt="sisloc"><img src="gestaox.png" alt="gestaox"></div>
-<div class="icone">📄</div>
-<a href="pdf/SISLOC + GESTÃO X Aprovação avaria e solicitação faturamento.pdf" target="_blank" rel="noopener noreferrer">
-SISLOC + GESTÃO X Aprovação avaria e solicitação faturamento
-</a>
-</div>
-
-<div class="card">
-<div class="sistema-icon"><img src="info.png" alt="info"></div>
-<div class="icone">📄</div>
-<a href="pdf/APRENDIZ Orientações de arquivamento relatórios.pdf" target="_blank" rel="noopener noreferrer">
-APRENDIZ Orientações de arquivamento relatórios
-</a>
-</div>
-
-<div class="card">
-<div class="sistema-icon"><img src="gestaox.png" alt=""></div>
-<div class="icone">📄</div>
-<a href="pdf/GESTÃO X Solicitação de cadastro de produtos.pdf" target="_blank" rel="noopener noreferrer">
-GESTÃO X Solicitação de cadastro de produtos
-</a>
-</div>
 
 
 <div class="galeria" id="galeria">
@@ -900,6 +837,7 @@ const SERVER_ICONS = [
   "gestaox.png",
   "info.png",
   "icon.png",
+  "Icone-pdf.png",
   "fluxograma.png"
 ];
 
@@ -921,6 +859,7 @@ const AVAILABLE_ICONS = [
   "gestaox.png",
   "info.png",
   "icon.png",
+  "Icone-pdf.png",
   "fluxograma.png"
 ];
 
@@ -943,7 +882,7 @@ const setoresLista = document.getElementById("setoresLista");
 const tituloSetorAtual = document.getElementById("tituloSetorAtual");
 const contadorDocumentos = document.getElementById("contadorDocumentos");
 const TODOS_SETOR = "Todos os Documentos";
-const SETORES = [TODOS_SETOR, "Almoxarifado", "Ass. Técnica Rental", "Compras", "Recursos Humanos", "Técnicos"];
+const SETORES = [TODOS_SETOR, "Documentos Técnicos", "Almoxarifado", "Ass. Técnica Rental", "Compras", "Recursos Humanos", "Técnicos"];
 let currentSector = TODOS_SETOR;
 
 
