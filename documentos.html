@@ -24,6 +24,7 @@ body{
   padding:10px 12px;
 }
 .navbar .menu-toggle{
+  z-index: 10;
   position:absolute;
   left:12px;
   top:50%;
@@ -34,7 +35,10 @@ body{
   border:none;
   cursor:pointer;
 }
-.navbar-logo{ display:flex; align-items:center; justify-content:center; }
+.navbar-logo{ 
+  position: relative;
+  z-index: 1;
+  display:flex; align-items:center; justify-content:center; }
 .navbar-logo img{ height:38px; width:auto; display:block; }
 
 @media(min-width:801px){
