@@ -995,6 +995,7 @@
   function aplicarFiltros(){
       atualizarFiltrosOptions();
       calcularTotais(filtrarDados());
+      atualizarVisibilidadeGraficoTotalHoras();
       atualizarVisibilidadeBotaoLimpar();
       salvarEstadoPagina();
   }
@@ -1130,6 +1131,20 @@
               cardEl.style.display = valor === 0 ? 'none' : 'block';
           }
       });
+  }
+
+  function atualizarVisibilidadeGraficoTotalHoras(){
+      const cardGrafico = document.getElementById("graficoTotalHoras")?.closest('.card');
+      const deveExibir = getSelecionados("filtroTecnico").length === 1;
+
+      if(cardGrafico){
+          cardGrafico.style.display = deveExibir ? 'block' : 'none';
+      }
+
+      if(!deveExibir && g1){
+          g1.destroy();
+          g1 = null;
+      }
   }
 
   function calcularTotais(dados){
@@ -1350,11 +1365,19 @@ dados.forEach(linha => {
       const valoresCustoPecas = tagsCustoPecas.map(tag => Number(custoPecasPorTag[tag].toFixed(2)));
       criarGrafico("graficoCustoPecas","Custo de Peças",tagsCustoPecas,valoresCustoPecas,g9,v=>g9=v,false);
 
-      criarGrafico("graficoTotalHoras","Horas",
-          ["Trabalhadas","Horas Úteis"],
-          [horasTrab, horasUteis],
-          g1,v=>g1=v,false
-      );
+      const tecnicosSelecionados = getSelecionados("filtroTecnico");
+      if(tecnicosSelecionados.length === 1){
+          criarGrafico("graficoTotalHoras","Horas",
+              ["Trabalhadas","Horas Úteis"],
+              [horasTrab, horasUteis],
+              g1,v=>g1=v,false
+          );
+      } else if(g1){
+          g1.destroy();
+          g1 = null;
+      }
+
+      atualizarVisibilidadeGraficoTotalHoras();
 
       criarGrafico("graficoHoras","Horas",["Trabalhadas", "Aguardando", "Deslocamento"],[horasTrab, horasAguard, horasDesloc],g2,v => g2 = v,false);
       criarGrafico("graficoMaquina","Máquina Parada",["Total"],[maquinaParada],g5,v=>g5=v,false);
