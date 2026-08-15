@@ -20,24 +20,25 @@ const {
   PORT = 4000
 } = process.env;
 
+const USE_LOCAL_FILES = process.env.USE_LOCAL_FILES === '1';
 const DEV_MODE = process.env.DEV_ALLOW_NO_ENV === '1';
 
 if (!GITHUB_TOKEN || !GITHUB_OWNER || !GITHUB_REPO) {
-  if (!DEV_MODE) {
+  if (!DEV_MODE && !USE_LOCAL_FILES) {
     throw new Error("Missing GitHub configuration in environment variables.");
   }
 }
 
 if (!FIREBASE_PROJECT_ID || !FIREBASE_CLIENT_EMAIL || !FIREBASE_PRIVATE_KEY) {
-  if (!DEV_MODE) {
+  if (!DEV_MODE && !USE_LOCAL_FILES) {
     throw new Error("Missing Firebase service account configuration in environment variables.");
   }
 }
 
-const octokit = DEV_MODE ? null : new Octokit({ auth: GITHUB_TOKEN });
+const octokit = DEV_MODE || USE_LOCAL_FILES ? null : new Octokit({ auth: GITHUB_TOKEN });
 
 let verifyIdTokenFn;
-if (!DEV_MODE) {
+if (!DEV_MODE && !USE_LOCAL_FILES) {
   admin.initializeApp({
     credential: admin.credential.cert({
       projectId: FIREBASE_PROJECT_ID,
@@ -47,7 +48,8 @@ if (!DEV_MODE) {
   });
   verifyIdTokenFn = async (token) => await admin.auth().verifyIdToken(token);
 } else {
-  // Dev mode: accept any token and provide a fake user for easier local testing
+  // Dev mode: accept any token and provide a fake user for easier local testing.
+  // This is only enabled intentionally for local testing; production defaults to GitHub-based storage.
   verifyIdTokenFn = async (token) => ({ uid: 'dev', email: 'dev@local' });
 }
 
@@ -94,8 +96,7 @@ async function getFileSha(path) {
 }
 
 async function saveRepoFile(path, contentBuffer, message) {
-  if (DEV_MODE) {
-    // In dev mode, skip saving to GitHub and return a fake response
+  if (USE_LOCAL_FILES) {
     const localPath = path.startsWith('png/') || path.startsWith('pdf/') ? path.split('/')[0] : '';
     const outDir = localPath ? path.join(process.cwd(), '..', localPath) : process.cwd();
     try {
@@ -119,8 +120,8 @@ async function saveRepoFile(path, contentBuffer, message) {
 }
 
 async function deleteRepoFile(path, message) {
-  if (DEV_MODE) {
-    // no-op in dev mode
+  if (USE_LOCAL_FILES) {
+    // no-op when intentionally using local files for testing
     return null;
   }
   const sha = await getFileSha(path);
@@ -136,7 +137,7 @@ async function deleteRepoFile(path, message) {
 }
 
 async function loadManifest() {
-  if (DEV_MODE) {
+  if (USE_LOCAL_FILES) {
     try {
       const local = path.join(process.cwd(), '..', MANIFEST_PATH);
       const txt = fs.readFileSync(local, 'utf8');
@@ -170,7 +171,7 @@ async function saveManifest(manifest) {
   }
   const normalized = Array.from(map.values()).sort((a, b) => (a.id || '').localeCompare(b.id || ''));
 
-  if (DEV_MODE) {
+  if (USE_LOCAL_FILES) {
     const local = path.join(process.cwd(), '..', MANIFEST_PATH);
     fs.writeFileSync(local, JSON.stringify(normalized, null, 2), 'utf8');
     return;

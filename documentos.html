@@ -887,18 +887,21 @@ const API_BASE_URL = (function () {
   // Set via `localStorage.setItem('API_BASE_URL', 'https://...')` in DevTools.
   try {
     const override = localStorage.getItem('API_BASE_URL');
-    if (override) return override;
+    if (override && override.trim()) return override.trim().replace(/\/+$/, '');
   } catch (e) {
     // ignore localStorage errors in restrictive environments
   }
 
   try {
     const host = window.location.hostname;
-    if (host === 'localhost' || host === '127.0.0.1') return 'http://localhost:4000';
+    if (host === 'localhost' || host === '127.0.0.1' || host.endsWith('.local')) {
+      return 'http://localhost:4000';
+    }
   } catch (e) {}
 
-  // Default to local backend for development unless overridden
-  return 'http://localhost:4000';
+  // Never default to loopback addresses when the app is hosted on GitHub Pages or another public origin.
+  // Use a public backend URL via `localStorage.setItem('API_BASE_URL', 'https://...')` instead.
+  return '';
 })();
 
 function getRawRepoUrl(path) {
@@ -970,6 +973,8 @@ async function fetchManifestFromApi() {
         console.warn('Override fetch also failed:', err2 && err2.message ? err2.message : err2);
       }
     }
+  } else {
+    console.warn('No public API backend configured. Falling back to local manifest. Set localStorage.API_BASE_URL to a public HTTPS URL when using a remote backend.');
   }
 
   // Fallback for static hosting (GitHub Pages): load local documentos.json
@@ -986,6 +991,9 @@ async function getIdToken() {
 }
 
 async function postDocumentToApi(formData) {
+  if (!API_BASE_URL) {
+    throw new Error("Backend não configurado. Defina localStorage.setItem('API_BASE_URL', 'https://...') antes de adicionar documentos.");
+  }
   const token = await getIdToken();
   const response = await fetch(`${API_BASE_URL}/api/documents`, {
     method: "POST",
@@ -1004,6 +1012,9 @@ async function postDocumentToApi(formData) {
 }
 
 async function putDocumentToApi(id, formData) {
+  if (!API_BASE_URL) {
+    throw new Error("Backend não configurado. Defina localStorage.setItem('API_BASE_URL', 'https://...') antes de atualizar documentos.");
+  }
   const token = await getIdToken();
   const response = await fetch(`${API_BASE_URL}/api/documents/${id}`, {
     method: "PUT",
@@ -1022,6 +1033,9 @@ async function putDocumentToApi(id, formData) {
 }
 
 async function deleteDocumentFromApi(id) {
+  if (!API_BASE_URL) {
+    throw new Error("Backend não configurado. Defina localStorage.setItem('API_BASE_URL', 'https://...') antes de excluir documentos.");
+  }
   const token = await getIdToken();
   const response = await fetch(`${API_BASE_URL}/api/documents/${id}`, {
     method: "DELETE",
