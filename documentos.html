@@ -1426,6 +1426,7 @@ async function handleModalSave() {
 
   renderDocuments();
   closeModal();
+  await loadDocuments();
 }
 
 async function confirmDeleteDocument(id) {
@@ -1445,7 +1446,7 @@ async function confirmDeleteDocument(id) {
 
   await removeDocument(id);
   documentsCache = documentsCache.filter((item) => item.id !== id);
-  renderDocuments();
+  await loadDocuments();
   showToast("Documento removido com sucesso.");
 }
 
