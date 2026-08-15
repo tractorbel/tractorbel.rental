@@ -883,11 +883,21 @@ let currentSector = TODOS_SETOR;
 
 
 const API_BASE_URL = (function () {
+  // Allow overriding the API base URL from the browser for testing (e.g. localtunnel/ngrok).
+  // Set via `localStorage.setItem('API_BASE_URL', 'https://...')` in DevTools.
+  try {
+    const override = localStorage.getItem('API_BASE_URL');
+    if (override) return override;
+  } catch (e) {
+    // ignore localStorage errors in restrictive environments
+  }
+
   try {
     const host = window.location.hostname;
     if (host === 'localhost' || host === '127.0.0.1') return 'http://localhost:4000';
   } catch (e) {}
-  // Force localhost for easier local testing
+
+  // Default to local backend for development unless overridden
   return 'http://localhost:4000';
 })();
 
