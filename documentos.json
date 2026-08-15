@@ -20,16 +20,6 @@
     "updatedAt": "2026-05-23T03:37:58.071Z"
   },
   {
-    "id": "organograma-rental-duque-de-caxias-rj-pdf",
-    "title": "Organograma Duque de Caxias RJ",
-    "filePath": "pdf/ORGANOGRAMA RENTAL DUQUE DE CAXIAS - RJ.pdf",
-    "fileName": "ORGANOGRAMA RENTAL DUQUE DE CAXIAS - RJ.pdf",
-    "iconPath": "png/organograma.png",
-    "notes": "",
-    "createdAt": "2026-05-23T03:37:58.071Z",
-    "updatedAt": "2026-05-23T03:37:58.071Z"
-  },
-  {
     "id": "organograma-rental-pouso-alegre-pa-pdf",
     "title": "Organograma Pouso Alegre",
     "filePath": "pdf/ORGANOGRAMA RENTAL POUSO ALEGRE - PA.pdf",
@@ -368,8 +358,7 @@
     "notes": "",
     "createdAt": "2026-05-23T03:37:58.071Z",
     "updatedAt": "2026-05-23T03:37:58.071Z"
-  }
-  ,
+  },
   {
     "id": "catalogo-0100091-catalogo-de-pecas-erx-rev40-pdf",
     "title": "0100091-Catalogo de pecas ERX Rev40.pdf",
