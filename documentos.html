@@ -951,7 +951,24 @@ async function fetchManifestFromApi() {
       }
       console.warn('Backend manifest responded with', response.status);
     } catch (err) {
-      console.warn('Failed to fetch manifest from backend, falling back to local JSON:', err.message);
+      console.warn('Failed to fetch manifest from backend:', err && err.message ? err.message : err);
+      // If a different API base URL is set in localStorage (eg. a tunnel HTTPS URL),
+      // try it before falling back to the local JSON file. This helps when the
+      // page is served from GitHub Pages (HTTPS) and the backend is exposed via
+      // a tunnel (HTTPS) stored in localStorage as `API_BASE_URL`.
+      try {
+        const override = localStorage.getItem('API_BASE_URL');
+        if (override && override !== API_BASE_URL) {
+          const resp2 = await fetch(`${override}/api/manifest`);
+          if (resp2.ok) {
+            const manifest2 = await resp2.json();
+            return manifest2.map(normalizeManifestItem);
+          }
+          console.warn('Override manifest responded with', resp2.status);
+        }
+      } catch (err2) {
+        console.warn('Override fetch also failed:', err2 && err2.message ? err2.message : err2);
+      }
     }
   }
 
