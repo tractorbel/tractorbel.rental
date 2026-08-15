@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="stylesheet" href="index.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Documentos</title>
+<link rel="icon" type="image/png" href="https://raw.githubusercontent.com/tractorbel/tractorbel.rental/main/icon.png">
+<style>
+body{
+  font-family: Arial, sans-serif;
+  margin:0;
+  background:#f5f7f9;
+  color:#0f2238;
+}
+
+/* Navbar: center logo and keep hamburger fixed at left on mobile */
+.navbar{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: #0b7a3e;
+  padding:10px 12px;
+}
+.navbar .menu-toggle{
+  z-index: 10;
+  position:absolute;
+  left:12px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:20px;
+  color:white;
+  background:transparent;
+  border:none;
+  cursor:pointer;
+}
+.navbar-logo{ 
+  position: relative;
+  z-index: 1;
+  display:flex; align-items:center; justify-content:center; }
+.navbar-logo img{ height:38px; width:auto; display:block; }
+
+@media(min-width:801px){
+  .navbar{ justify-content:flex-start; }
+  .navbar .menu-toggle{ position:static; transform:none; color:inherit; }
+}
+
+.barra-pesquisa{
+  max-width:1200px;
+  margin:0 auto 14px;
+  padding:0 18px;
+  background:transparent;
+}
+
+.search-actions{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.barra-pesquisa input{
+  width:100%;
+  max-width:520px;
+  padding:12px 14px;
+  border-radius:10px;
+  border:1px solid #d6dee8;
+  font-size:15px;
+  background:#fff;
+  box-shadow:0 1px 4px rgba(15,34,56,0.06);
+}
+
+.barra-pesquisa .btn{
+  border:1px solid #0b7a3e;
+  background:#0b7a3e;
+  color:white;
+  font-weight:600;
+  border-radius:8px;
+  padding:12px 18px;
+  cursor:pointer;
+}
+
+.docs-hero{
+  max-width:1200px;
+  margin:0 auto 16px;
+  padding:0 18px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(320px,0.72fr);
+  gap:18px;
+  align-items:stretch;
+  margin-top: 19px;
+}
+
+.hero-title,
+.hero-tip{
+  background:#fff;
+  border:1px solid #e2e8f0;
+  border-radius:8px;
+  box-shadow:0 2px 10px rgba(15,34,56,0.06);
+  padding:16px 20px;
+}
+
+.hero-title{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.hero-icon{
+  color:#2f5f98;
+  font-size:30px;
+  line-height:1;
+}
+
+.hero-title h1{
+  margin:0 0 4px;
+  font-size:28px;
+  line-height:1.1;
+  color:#132b46;
+}
+
+.hero-title p,
+.hero-tip p{
+  margin:0;
+  color:#475569;
+  font-size:15px;
+  line-height:1.5;
+}
+
+.hero-tip{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.hero-tip strong{
+  color:#087a45;
+}
+
+.docs-shell{
+  max-width:1200px;
+  margin:0 auto;
+  padding:0 18px 24px;
+  display:grid;
+  grid-template-columns:265px minmax(0,1fr);
+  gap:20px;
+}
+
+.setores-panel,
+.docs-panel{
+  background:#fff;
+  border:1px solid #e2e8f0;
+  border-radius:8px;
+  box-shadow:0 2px 10px rgba(15,34,56,0.06);
+}
+
+.setores-panel{
+  padding:20px 14px;
+}
+
+.setores-panel h2{
+  margin:0 0 14px;
+  font-size:15px;
+  color:#132b46;
+  letter-spacing:.02em;
+  text-transform:uppercase;
+}
+
+.setor-lista{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.setor-btn{
+  width:100%;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:10px;
+  padding:12px;
+  border:1px solid #e2e8f0;
+  border-radius:7px;
+  background:#fff;
+  color:#0f2238;
+  text-align:left;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.setor-btn:hover,
+.setor-btn.active{
+  border-color:#9bd9b6;
+  background:#f0fdf4;
+  color:#087a45;
+}
+
+.setor-icon{
+  color:#e4a500;
+  font-size:20px;
+}
+
+.setor-count{
+  padding:4px 8px;
+  border-radius:6px;
+  background:#dcfce7;
+  color:#087a45;
+  font-size:12px;
+}
+
+.docs-panel{
+  padding:18px 18px 24px;
+}
+
+.docs-panel-header{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:center;
+  border-bottom:1px solid #e2e8f0;
+  padding-bottom:16px;
+  margin-bottom:16px;
+}
+
+.docs-panel-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.docs-panel-title h2{
+  margin:0 0 6px;
+  color:#087a45;
+  font-size:20px;
+}
+
+.docs-panel-title p{
+  margin:0;
+  color:#64748b;
+  font-size:14px;
+}
+
+.view-buttons{
+  display:flex;
+  gap:8px;
+}
+
+.view-buttons button{
+  width:42px;
+  height:38px;
+  border:1px solid #d6dee8;
+  border-radius:6px;
+  background:#fff;
+  color:#64748b;
+  font-size:18px;
+}
+
+.view-buttons button.active{
+  border-color:#0b7a3e;
+  color:#0b7a3e;
+  background:#f0fdf4;
+}
+
+.galeria{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap:12px;
+  padding:0;
+}
+
+.card{
+  background:white;
+  min-height:145px;
+  padding:16px 14px;
+  border:1px solid #e5e7eb;
+  border-radius:8px;
+  box-shadow:0 2px 8px rgba(15,34,56,0.05);
+  text-align:center;
+  transition:0.2s;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.card:hover{
+  transform:translateY(-5px);
+}
+
+.card a{
+  text-decoration:none;
+  color:#087a45;
+  font-weight:700;
+  display:block;
+  line-height:1.35;
+}
+
+.icone{
+  font-size:32px;
+  margin-bottom:8px;
+}
+
+.icone img{
+  width:36px;
+  height:36px;
+  object-fit:contain;
+}
+
+.docs-folder{
+  width:100%;
+  margin-bottom:20px;
+}
+
+.docs-folder-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin:0 0 12px;
+  padding-bottom:8px;
+  border-bottom:1px solid #e2e8f0;
+}
+
+.docs-folder-header h3{
+  margin:0;
+  color:#087a45;
+  font-size:18px;
+}
+
+.docs-folder-header span{
+  color:#64748b;
+  font-size:13px;
+}
+
+.docs-folder-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));
+  gap:12px;
+}
+
+.sistema-icon{
+  display:flex;
+  justify-content:flex-end;
+  margin-bottom:8px;
+  gap:6px;
+  height:24px;
+}
+
+.sistema-icon img{
+  height:24px;
+  width:auto;
+}
+
+header {
+  display:none;
+  background: white;
+  text-align: center;
+  padding: 20px;
+  border-bottom: 2px solid #ddd;
+}
+
+header h2 {
+  color: black;
+  margin: 0;
+  font-size: 24px;
+}
+
+.admin-area{
+  max-width:1200px;
+  margin:20px auto 0;
+  padding:0 20px;
+}
+
+.admin-toolbar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  justify-content:space-between;
+  align-items:center;
+  background:#ffffff;
+  border:1px solid #d1d5db;
+  border-radius:12px;
+  padding:16px 20px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.05);
+}
+
+.admin-toolbar .btn{
+  border:1px solid #0b7a3e;
+  background:#0b7a3e;
+  color:white;
+  font-weight:600;
+  border-radius:8px;
+  padding:10px 18px;
+  cursor:pointer;
+}
+
+.admin-toolbar .btn.secondary{
+  background:white;
+  color:#0b7a3e;
+  color:#0b7a3e;
+}
+
+.admin-toolbar input{
+  border:1px solid #cbd5e1;
+  border-radius:10px;
+  padding:10px 14px;
+  width:180px;
+}
+
+.admin-info{
+  color:#334155;
+  font-size:0.95rem;
+}
+
+#toast{
+  margin-top:12px;
+  padding:14px 18px;
+  border-radius:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:600;
+}
+
+.hidden{display:none !important;}
+
+#toast.hidden{display:none;}
+
+#toast.success{background:#d1fae5;color:#064e3b;}
+#toast.error{background:#fee2e2;color:#991b1b;}
+
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,0.55);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+  padding:20px;
+}
+
+.modal-overlay.hidden{display:none;}
+
+.modal{
+  width:min(720px,100%);
+  background:white;
+  border-radius:16px;
+  box-shadow:0 20px 60px rgba(15,23,42,0.2);
+  padding:24px;
+  max-height:90vh;
+  overflow:auto;
+}
+
+.modal h2{
+  margin-top:0;
+}
+
+.modal label{
+  display:block;
+  margin-bottom:6px;
+  font-weight:600;
+  color:#0f172a;
+}
+
+.modal input[type="text"],
+.modal input[type="email"],
+.modal input[type="password"],
+.modal input[type="file"],
+.modal select,
+.modal textarea{
+  width:100%;
+  border:1px solid #cbd5e1;
+  border-radius:10px;
+  padding:12px 14px;
+  margin-bottom:14px;
+  font-size:1rem;
+  color:#0f172a;
+}
+
+.modal textarea{min-height:120px;resize:vertical;}
+
+.modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.modal-actions .btn{
+  border:1px solid #0b7a3e;
+  background:#0b7a3e;
+  color:white;
+}
+
+.modal-actions .btn.secondary{
+  background:white;
+  color:#0b7a3e;
+}
+
+.card-actions{
+  display:none;
+}
+
+.is-admin .card-actions{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin-top:14px;
+  flex-wrap:wrap;
+}
+
+.card-actions button{
+  border:none;
+  background:#0b7a3e;
+  color:white;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:0.88rem;
+}
+
+.card-actions button.danger{
+  background:#b91c1c;
+}
+
+.doc-title{
+  font-size:1rem;
+  font-weight:700;
+  margin:0 0 10px;
+  line-height:1.3;
+  cursor:text;
+}
+
+.doc-title[contenteditable="true"]{
+  border:1px dashed transparent;
+  padding:6px 8px;
+}
+
+.doc-title[contenteditable="true"]:focus{
+  outline:none;
+  border-color:#0b7a3e;
+  border-radius:8px;
+  background:#f0fdf4;
+}
+
+@media (max-width: 800px) {
+  .docs-hero,
+  .docs-shell{
+    grid-template-columns:1fr;
+  }
+
+  .admin-toolbar{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .admin-toolbar input{width:100%;}
+}
+
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+  <div class="navbar-logo">
+    <img src="png/logo-tractorbel.png" alt="Logo Tractorbel">
+  </div>
+  <ul id="menu">
+    <li><a href="index.html">INICIO</a></li>
+    <li><a href="documentos.html">DOCUMENTOS</a></li>
+    <li><a href="indicadores.html">KPI MANUT.</a></li>
+    <li><a href="indicadores-resultado.html">KPI FINAN.</a></li>
+    <li><a href="#" onclick="logout(); return false;" class="logout-btn">SAIR</a></li>
+  </ul>
+</nav>
+
+
+<div id="page-content">
+<section class="docs-hero">
+  <div class="hero-title">
+    <div class="hero-icon">&#128193;</div>
+    <div>
+      <h1>Organização por Setores</h1>
+      <p>Pastas por setor com exibição de documentos em grade</p>
+    </div>
+  </div>
+  <div class="hero-tip">
+    <span>&#128161;</span>
+    <p><strong>Dica:</strong> Use a busca de documentos para encontrar o processo de maneira mais fácil!</p>
+  </div>
+</section>
+
+<div class="barra-pesquisa">
+  <div class="search-actions">
+    <input
+      id="pesquisa"
+      placeholder="🔎 Buscar documento..."
+      onkeyup="filtrarDocumentos()"
+    >
+    <button id="btnShowAddModal" class="btn hidden">Adicionar Documento</button>
+  </div>
+</div>
+
+<div class="admin-area">
+  <div id="toast" class="toast hidden"></div>
+</div>
+
+<main class="docs-shell">
+  <aside class="setores-panel">
+    <h2>Setores</h2>
+    <div id="setoresLista" class="setor-lista"></div>
+  </aside>
+
+  <section class="docs-panel">
+    <div class="docs-panel-header">
+      <div class="docs-panel-title">
+        <span class="setor-icon">&#128193;</span>
+        <div>
+          <h2 id="tituloSetorAtual">Todos os Documentos</h2>
+          <p id="contadorDocumentos">0 documentos</p>
+        </div>
+      </div>
+      <div class="view-buttons" aria-label="Visualizacao">
+        <button type="button" class="active" title="Grade">&#9638;</button>
+        <button type="button" title="Lista">&#9776;</button>
+      </div>
+    </div>
+
+
+
+<div class="galeria" id="galeria">
+
+<div class="card">
+<div class="sistema-icon"><img src="organograma.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/ORGANOGRAMA RENTAL SERRA - ES.pdf" target="_blank" rel="noopener noreferrer">
+Organograma Serra ES
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="organograma.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/ORGANOGRAMA RENTAL CONTAGEM - MG.pdf" target="_blank" rel="noopener noreferrer">
+Organograma Contagem MG
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="organograma.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/ORGANOGRAMA RENTAL DUQUE DE CAXIAS - RJ.pdf" target="_blank" rel="noopener noreferrer">
+Organograma Duque de Caxias RJ
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="organograma.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/ORGANOGRAMA RENTAL POUSO ALEGRE - PA.pdf" target="_blank" rel="noopener noreferrer">
+Organograma Pouso Alegre
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="organograma.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/FLUIG Consulta de peças fluig.pdf" target="_blank" rel="noopener noreferrer">
+FLUIG POP Consulta de peças
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="senior.png" alt="senior"></div>
+<div class="icone">📄</div>
+<a href="pdf/SENIOR Transferência entre depósito.pdf" target="_blank" rel="noopener noreferrer">
+SENIOR POP Transferência entre depósito
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="sisloc.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/SISLOC Histórico de manutenção.pdf" target="_blank" rel="noopener noreferrer">
+SISLOC POP Relatório de histórico de manutenção
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="sisloc.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/SISLOC Orçamento de avaria.pdf" target="_blank" rel="noopener noreferrer">
+SISLOC POP Orçamento de avaria
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="sisloc.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/SISLOC Solicitação de compra vinculado a OM.pdf" target="_blank" rel="noopener noreferrer">
+SISLOC POP Solicitação de compra vinculado a OM
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="sisloc.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/SISLOC Solicitação de compra.pdf" target="_blank" rel="noopener noreferrer">
+SISLOC POP Solicitação de compra
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="sismetro.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/SISMETRO Procedimento equipamentos vendidos.pdf" target="_blank" rel="noopener noreferrer">
+SISMETRO Procedimento de atualização de equipamentos vendidos
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="sismetro.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/SISMETRO Orientação de utilização técnicos.pdf" target="_blank" rel="noopener noreferrer">
+SISMETRO Orientação de utilização técnicos
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="sismetro.png" alt=""></div>
+<div class="icone">📄</div>
+<a href="pdf/SISMETRO Cadastro de Patrimônio Acessórios.pdf" target="_blank" rel="noopener noreferrer">
+SISMETRO Cadastro de Patrimônio Acessórios
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="sisloc.png" alt="sisloc"><img src="gestaox.png" alt="gestaox"></div>
+<div class="icone">📄</div>
+<a href="pdf/SISLOC + GESTÃO X Aprovação avaria e solicitação faturamento.pdf" target="_blank" rel="noopener noreferrer">
+SISLOC + GESTÃO X Aprovação avaria e solicitação faturamento
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="info.png" alt="info"></div>
+<div class="icone">📄</div>
+<a href="pdf/APRENDIZ Orientações de arquivamento relatórios.pdf" target="_blank" rel="noopener noreferrer">
+APRENDIZ Orientações de arquivamento relatórios
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="gestaox.png" alt="gestaox"></div>
+<div class="icone">📄</div>
+<a href="pdf/GESTÃO X Solicitação de cadastro de produtos.pdf" target="_blank" rel="noopener noreferrer">
+GESTÃO X Solicitação de cadastro de produtos
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="gestaox.png" alt="gestaox"></div>
+<div class="icone">📄</div>
+<a href="pdf/GESTÃO X Solicitação de emissão nota fiscal remessa para concerto.pdf" target="_blank" rel="noopener noreferrer">
+GESTÃO X Solicitação de emissão nota fiscal remessa para concerto
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="icon.png" alt="gv"><img src="gestaox.png" alt="gestaox"></div>
+<div class="icone">📄</div>
+<a href="pdf/GV + GESTÃO X Pedido de venda e solicitação NF consumo.pdf" target="_blank" rel="noopener noreferrer">
+GV + GESTÃO X Pedido de venda e solicitação NF consumo
+</a>
+</div>
+
+<div class="card">
+<div class="sistema-icon"><img src="info.png" alt="info"></div>
+<div class="icone">📄</div>
+<a href="pdf/Cartilha de orientação para o técnico.pdf" target="_blank" rel="noopener noreferrer">
+Cartilha de orientação para o técnico
+
+</a>
+</div>
+
+<div class="card"><div class="sistema-icon"><img src="fluxograma.png" alt=""></div><div class="icone">📄</div>
+<a href="pdf/FLUXOGRAMA DE TRANSFERÊNCIA CONTRATO MESMA FILIAL.pdf" target="_blank" rel="noopener noreferrer">
+FLUXOGRAMA Transferência produto contrato da mesma filial
+
+</a>
+</div>
+    
+<div class="card"><div class="sistema-icon"><img src="fluxograma.png" alt=""></div><div class="icone">📄</div>
+<a href="pdf/FLUXOGRAMA DE TRANSFERÊNCIA CONTRATO FILIAIS DIFERENTE.pdf" target="_blank" rel="noopener noreferrer">
+FLUXOGRAMA Transferência produto contrato da filial diferente
+
+</a>
+</div>
+    
+</div>
+  </section>
+</main>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAAF5FLl8xawkivYCcjQGJyb2jo1_A1V7g",
+  authDomain: "tractorbel-8ceb8.firebaseapp.com",
+  projectId: "tractorbel-8ceb8",
+  storageBucket: "tractorbel-8ceb8.firebasestorage.app",
+  messagingSenderId: "720471893475",
+  appId: "1:720471893475:web:e6eb1d64cae5f7aa27ecd6"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+const ALLOWED_DOC_TYPES = ["application/pdf"];
+const ALLOWED_ICON_TYPES = ["image/png", "image/jpeg"];
+const MAX_FILE_BYTES = 15 * 1024 * 1024;
+const MAX_ICON_BYTES = 3 * 1024 * 1024;
+const SERVER_ICONS = [
+  "organograma.png",
+  "fluig.png",
+  "senior.png",
+  "sisloc.png",
+  "sismetro.png",
+  "gestaox.png",
+  "info.png",
+  "icon.png",
+  "Icone-pdf.png",
+  "fluxograma.png"
+];
+
+// Icons actually present in the repository (fallback map)
+const AVAILABLE_ICONS = [
+  "logo-linkedin.png",
+  "logo-instagram.png",
+  "logo-facebook.png",
+  "grafico-veiculos.png",
+  "logo_transparent.png",
+  "logo.png",
+  "logo-whatsapp.png",
+  "logo-tractorbel.png",
+  "organograma.png",
+  "fluig.png",
+  "senior.png",
+  "sisloc.png",
+  "sismetro.png",
+  "gestaox.png",
+  "info.png",
+  "icon.png",
+  "Icone-pdf.png",
+  "fluxograma.png"
+];
+
+const ADMIN_EMAIL = "programacaorental04@tractorbel.com.br";
+
+const DB_NAME = "tractorbelDocuments";
+const STORE_NAME = "documents";
+let documentsCache = [];
+let documentsLoaded = false;
+let urlCache = new Map();
+let isAdmin = false;
+let currentModalMode = "add";
+let currentEditingId = null;
+
+const gallery = document.getElementById("galeria");
+const staticDocumentCards = [...gallery.querySelectorAll(".card")].map((card) => card.cloneNode(true));
+const toast = document.getElementById("toast");
+const btnShowAddModal = document.getElementById("btnShowAddModal");
+const setoresLista = document.getElementById("setoresLista");
+const tituloSetorAtual = document.getElementById("tituloSetorAtual");
+const contadorDocumentos = document.getElementById("contadorDocumentos");
+const TODOS_SETOR = "Todos os Documentos";
+const SETORES = [TODOS_SETOR, "Documentos Técnicos", "Almoxarifado", "Ass. Técnica Rental", "Compras", "Recursos Humanos", "Técnicos"];
+let currentSector = TODOS_SETOR;
+
+
+const API_BASE_URL = (function () {
+  try {
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1') return 'http://localhost:4000';
+  } catch (e) {}
+  // Force localhost for easier local testing
+  return 'http://localhost:4000';
+})();
+
+function getRawRepoUrl(path) {
+  if (!path) return null;
+  return path.startsWith("http") ? path : path;
+}
+
+function normalizeManifestItem(item) {
+  const doc = {
+    id: item.id,
+    title: item.title,
+    fileName: item.fileName,
+    fileUrl: getRawRepoUrl(item.filePath || item.fileUrl),
+    fileBlob: null,
+    iconUrl: getRawRepoUrl(item.iconPath || item.iconUrl),
+    iconBlob: null,
+    notes: item.notes || "",
+    sector: item.sector || "",
+    createdAt: item.createdAt ? Date.parse(item.createdAt) : Date.now(),
+    updatedAt: item.updatedAt ? Date.parse(item.updatedAt) : Date.now()
+  };
+  // If icon refers to a png that is not available in this static build,
+  // fallback to bundled logo to avoid repeated 404s in production.
+  try {
+    if (doc.iconUrl && doc.iconUrl.startsWith('png/')) {
+      const name = doc.iconUrl.split('/').pop();
+      if (AVAILABLE_ICONS.includes(name)) {
+        // Some document icons are stored at the app root rather than inside a
+        // png/ subfolder, so normalize this path where necessary.
+        if (SERVER_ICONS.includes(name)) {
+          doc.iconUrl = name;
+        }
+      } else {
+        doc.iconUrl = 'png/logo.png';
+      }
+    }
+  } catch (e) {}
+
+  doc.sector = doc.sector || inferDocumentSector(doc);
+  return doc;
+}
+
+async function fetchManifestFromApi() {
+  if (API_BASE_URL) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/manifest`);
+      if (response.ok) {
+        const manifest = await response.json();
+        return manifest.map(normalizeManifestItem);
+      }
+      console.warn('Backend manifest responded with', response.status);
+    } catch (err) {
+      console.warn('Failed to fetch manifest from backend, falling back to local JSON:', err.message);
+    }
+  }
+
+  // Fallback for static hosting (GitHub Pages): load local documentos.json
+  const resp = await fetch('documentos.json');
+  if (!resp.ok) throw new Error('Falha ao carregar documentos locais');
+  const localManifest = await resp.json();
+  return localManifest.map(normalizeManifestItem);
+}
+
+async function getIdToken() {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Usuário não autenticado.");
+  return await user.getIdToken();
+}
+
+async function postDocumentToApi(formData) {
+  const token = await getIdToken();
+  const response = await fetch(`${API_BASE_URL}/api/documents`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    body: formData
+  });
+  if (!response.ok) {
+    const errorText = await response.text().catch(()=>null);
+    let parsed;
+    try { parsed = JSON.parse(errorText); } catch(e) { parsed = null; }
+    throw new Error((parsed && parsed.error) ? parsed.error : errorText || "Falha ao criar documento.");
+  }
+  return await response.json();
+}
+
+async function putDocumentToApi(id, formData) {
+  const token = await getIdToken();
+  const response = await fetch(`${API_BASE_URL}/api/documents/${id}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    body: formData
+  });
+  if (!response.ok) {
+    const errorText = await response.text().catch(()=>null);
+    let parsed;
+    try { parsed = JSON.parse(errorText); } catch(e) { parsed = null; }
+    throw new Error((parsed && parsed.error) ? parsed.error : errorText || "Falha ao atualizar documento.");
+  }
+  return await response.json();
+}
+
+async function deleteDocumentFromApi(id) {
+  const token = await getIdToken();
+  const response = await fetch(`${API_BASE_URL}/api/documents/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  if (!response.ok) {
+    const errorText = await response.text().catch(()=>null);
+    let parsed;
+    try { parsed = JSON.parse(errorText); } catch(e) { parsed = null; }
+    throw new Error((parsed && parsed.error) ? parsed.error : errorText || "Falha ao excluir documento.");
+  }
+  return await response.json();
+}
+
+const modalOverlay = document.createElement("div");
+modalOverlay.className = "modal-overlay hidden";
+modalOverlay.innerHTML = `
+  <div class="modal" role="dialog" aria-modal="true">
+    <h2 id="modalTitle">Adicionar documento</h2>
+    <label for="modalTitleInput">Título do documento</label>
+    <input type="text" id="modalTitleInput" placeholder="Nome do documento" />
+
+    <label for="modalFileInput">Arquivo do documento <span class="small-text">(PDF)</span></label>
+    <input type="file" id="modalFileInput" accept="application/pdf" />
+
+    <label for="modalIconSelect">Ícone disponível no servidor</label>
+    <select id="modalIconSelect">
+      <option value="">-- Selecionar ícone --</option>
+    </select>
+
+    <label for="modalIconUpload">Ou enviar novo ícone <span class="small-text">(PNG/JPG)</span></label>
+    <input type="file" id="modalIconUpload" accept="image/png, image/jpeg" />
+
+    <label for="modalNotes">Observações</label>
+    <textarea id="modalNotes" placeholder="Notas ou descrição opcional"></textarea>
+
+    <div class="modal-actions">
+      <button id="modalCancelBtn" class="btn secondary">Cancelar</button>
+      <button id="modalSaveBtn" class="btn">Salvar</button>
+    </div>
+  </div>
+`;
+document.body.appendChild(modalOverlay);
+
+const modalTitleInput = modalOverlay.querySelector("#modalTitleInput");
+const modalFileInput = modalOverlay.querySelector("#modalFileInput");
+const modalIconSelect = modalOverlay.querySelector("#modalIconSelect");
+const modalIconUpload = modalOverlay.querySelector("#modalIconUpload");
+const modalNotes = modalOverlay.querySelector("#modalNotes");
+const modalCancelBtn = modalOverlay.querySelector("#modalCancelBtn");
+const modalSaveBtn = modalOverlay.querySelector("#modalSaveBtn");
+const modalTitleLabel = modalOverlay.querySelector("#modalTitle");
+
+function showToast(message, type = "success") {
+  toast.textContent = message;
+  toast.className = `toast ${type}`;
+  toast.classList.remove("hidden");
+  clearTimeout(toast._timeout);
+  toast._timeout = setTimeout(() => toast.classList.add("hidden"), 4200);
+}
+
+function openDb() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, 1);
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: "id" });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function getAllDocuments() {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, "readonly");
+    const store = tx.objectStore(STORE_NAME);
+    const request = store.getAll();
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function saveDocument(doc) {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    const store = tx.objectStore(STORE_NAME);
+    const request = store.put(doc);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function removeDocument(id) {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    const store = tx.objectStore(STORE_NAME);
+    const request = store.delete(id);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+}
+
+function makeObjectUrl(key, blob) {
+  if (!blob) return null;
+  if (urlCache.has(key)) return urlCache.get(key);
+  const url = URL.createObjectURL(blob);
+  urlCache.set(key, url);
+  return url;
+}
+
+function inferDocumentSector(doc) {
+  const title = (doc.title || doc.fileName || "").toLowerCase();
+  const icon = (doc.iconUrl || "").toLowerCase();
+
+  if (title.includes("nota fiscal") || title.includes("faturamento")) return "Ass. Técnica Rental";
+  if (title.includes("tecnico") || title.includes("aprendiz") || title.includes("orientacao")) return "Ass. Técnica Rental";
+  if (title.includes("manutenc") || title.includes("avaria") || title.includes("equipamento") || title.includes("patrimonio")) return "Ass. Técnica Rental";
+  if (title.includes("compra") || title.includes("orcamento") || title.includes("peca")) return "Ass. Técnica Rental";
+  if (title.includes("sisloc") || title.includes("sismetro") || title.includes("fluig") || title.includes("senior") || icon.includes("sisloc") || icon.includes("sismetro") || icon.includes("fluig")) return "Ass. Técnica Rental";
+  if (title.includes("gestao") || title.includes("gv") || title.includes("fluxograma") || icon.includes("gestaox")) return "Ass. Técnica Rental";
+  return "Ass. Técnica Rental";
+}
+
+function getDocumentSector(doc) {
+  return doc.sector || inferDocumentSector(doc);
+}
+
+function dedupeDocuments(docs) {
+  const seen = new Set();
+
+  return docs.filter((doc) => {
+    const key = `${doc.fileUrl || doc.fileName || ""}|${doc.title || ""}`.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function getSectorCounts() {
+  const counts = Object.fromEntries(SETORES.map((setor) => [setor, 0]));
+  counts[TODOS_SETOR] = documentsCache.length;
+
+  documentsCache.forEach((doc) => {
+    const setor = getDocumentSector(doc);
+    counts[setor] = (counts[setor] || 0) + 1;
+  });
+
+  return counts;
+}
+
+function renderSectorList() {
+  if (!setoresLista) return;
+
+  const counts = getSectorCounts();
+  setoresLista.innerHTML = "";
+
+  SETORES.forEach((setor) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "setor-btn" + (setor === currentSector ? " active" : "");
+    button.innerHTML = `
+      <span class="setor-icon">&#128193;</span>
+      <span>${setor}</span>
+      <span class="setor-count">${counts[setor] || 0}</span>
+    `;
+    button.addEventListener("click", () => {
+      currentSector = setor;
+      renderDocuments();
+    });
+    setoresLista.appendChild(button);
+  });
+}
+
+function parseStaticDocuments() {
+  const staticCards = staticDocumentCards;
+  const docs = staticCards.map((card) => {
+    const link = card.querySelector('a');
+    const iconImg = card.querySelector('.sistema-icon img');
+    const iconUrl = iconImg ? iconImg.getAttribute('src') : null;
+    const href = link ? link.getAttribute('href') : "";
+    const doc = {
+      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random(),
+      title: link ? link.textContent.trim() : "Documento",
+      fileName: link ? link.textContent.trim() : "Documento",
+      fileUrl: href,
+      fileBlob: null,
+      iconUrl: iconUrl,
+      iconBlob: null,
+      notes: "",
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+    doc.sector = inferDocumentSector(doc);
+    return doc;
+  });
+
+  return dedupeDocuments(docs);
+}
+
+async function loadDocuments() {
+  try {
+    const apiDocs = await fetchManifestFromApi();
+    if (apiDocs.length) {
+      documentsCache = dedupeDocuments(apiDocs);
+      documentsLoaded = true;
+      renderDocuments();
+      return;
+    }
+  } catch (error) {
+    console.warn("Falha ao carregar manifest do backend:", error);
+  }
+
+  const storedDocs = await getAllDocuments();
+  if (!storedDocs.length) {
+    const fallbackDocs = parseStaticDocuments();
+    if (fallbackDocs.length) {
+      await Promise.all(fallbackDocs.map((doc) => saveDocument(doc)));
+      documentsCache = fallbackDocs;
+    }
+  } else {
+    documentsCache = dedupeDocuments(storedDocs);
+  }
+  documentsLoaded = true;
+  renderDocuments();
+}
+
+function renderDocuments() {
+  gallery.innerHTML = "";
+  const fragment = document.createDocumentFragment();
+  renderSectorList();
+
+  const filtered = documentsCache.filter((doc) => {
+    const query = document.getElementById("pesquisa").value.toLowerCase();
+    const matchesSearch = !query || doc.title.toLowerCase().includes(query);
+    const matchesSector = currentSector === TODOS_SETOR || getDocumentSector(doc) === currentSector;
+    return matchesSearch && matchesSector;
+  });
+
+  if (tituloSetorAtual) tituloSetorAtual.textContent = currentSector;
+  if (contadorDocumentos) {
+    contadorDocumentos.textContent = `${filtered.length} ${filtered.length === 1 ? "documento" : "documentos"}`;
+  }
+
+  filtered.sort((a, b) => b.updatedAt - a.updatedAt).forEach((doc) => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const systemIcon = document.createElement("div");
+    systemIcon.className = "sistema-icon";
+    if (doc.iconBlob) {
+      const img = document.createElement("img");
+      img.src = makeObjectUrl(`${doc.id}-icon`, doc.iconBlob);
+      img.alt = doc.title;
+      systemIcon.appendChild(img);
+    } else if (doc.iconUrl) {
+      const img = document.createElement("img");
+      img.src = doc.iconUrl;
+      img.alt = doc.title;
+      img.onerror = function () {
+        this.onerror = null;
+        this.src = 'png/logo.png';
+      };
+      systemIcon.appendChild(img);
+    }
+    card.appendChild(systemIcon);
+
+    const iconEl = document.createElement("div");
+    iconEl.className = "icone";
+    iconEl.textContent = "📄";
+    card.appendChild(iconEl);
+
+    const link = document.createElement("a");
+    link.href = doc.fileBlob ? makeObjectUrl(`${doc.id}-file`, doc.fileBlob) : doc.fileUrl;
+    link.target = "_blank";
+    link.textContent = doc.title || doc.fileName || "Abrir documento";
+    card.appendChild(link);
+
+    const actions = document.createElement("div");
+    actions.className = "card-actions";
+
+    const replaceBtn = document.createElement("button");
+    replaceBtn.textContent = "Substituir";
+    replaceBtn.addEventListener("click", () => openModal("replace", doc.id));
+    actions.appendChild(replaceBtn);
+
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "Editar";
+    editBtn.addEventListener("click", () => openModal("edit", doc.id));
+    actions.appendChild(editBtn);
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "danger";
+    deleteBtn.textContent = "Excluir";
+    deleteBtn.addEventListener("click", () => confirmDeleteDocument(doc.id));
+    actions.appendChild(deleteBtn);
+
+    card.appendChild(actions);
+    fragment.appendChild(card);
+  });
+
+  gallery.appendChild(fragment);
+}
+
+function openModal(mode, docId = null) {
+  currentModalMode = mode;
+  currentEditingId = docId;
+  modalOverlay.classList.remove("hidden");
+  modalTitleInput.value = "";
+  modalFileInput.value = "";
+  modalIconSelect.value = "";
+  modalIconUpload.value = "";
+  modalNotes.value = "";
+
+  modalIconSelect.innerHTML = '<option value="">-- Selecionar ícone --</option>';
+  SERVER_ICONS.forEach((icon) => {
+    const option = document.createElement("option");
+    option.value = icon;
+    option.textContent = icon;
+    modalIconSelect.appendChild(option);
+  });
+
+  if (mode === "edit" || mode === "replace") {
+    const doc = documentsCache.find((item) => item.id === docId);
+    if (!doc) return;
+    modalTitleInput.value = doc.title;
+    modalNotes.value = doc.notes || "";
+    if (doc.iconUrl) {
+      modalIconSelect.value = doc.iconUrl;
+    }
+    modalTitleLabel.textContent = mode === "replace" ? "Substituir documento" : "Editar documento";
+  } else {
+    modalTitleLabel.textContent = "Adicionar documento";
+  }
+}
+
+function closeModal() {
+  modalOverlay.classList.add("hidden");
+}
+
+async function handleModalSave() {
+  if (!isAdmin) {
+    showToast("Faça login para salvar alterações.", "error");
+    return;
+  }
+
+  const title = modalTitleInput.value.trim();
+  const file = modalFileInput.files[0];
+  const iconUpload = modalIconUpload.files[0];
+  const iconSelection = modalIconSelect.value;
+  const notes = modalNotes.value.trim();
+
+  if (!title) {
+    showToast("Informe o título do documento.", "error");
+    return;
+  }
+
+  if (currentModalMode === "add" && !file) {
+    showToast("Selecione um arquivo PDF para adicionar.", "error");
+    return;
+  }
+
+  let doc = null;
+  if (currentModalMode === "edit" || currentModalMode === "replace") {
+    doc = documentsCache.find((item) => item.id === currentEditingId);
+    if (!doc) {
+      showToast("Documento não encontrado.", "error");
+      closeModal();
+      return;
+    }
+  }
+
+  if (file) {
+    if (!ALLOWED_DOC_TYPES.includes(file.type)) {
+      showToast("Formato inválido. Somente PDF é permitido.", "error");
+      return;
+    }
+    if (file.size > MAX_FILE_BYTES) {
+      showToast("Arquivo muito grande. Máximo 15MB.", "error");
+      return;
+    }
+  }
+
+  if (iconUpload) {
+    if (!ALLOWED_ICON_TYPES.includes(iconUpload.type)) {
+      showToast("Formato de ícone inválido.", "error");
+      return;
+    }
+    if (iconUpload.size > MAX_ICON_BYTES) {
+      showToast("Ícone muito grande. Máximo 3MB.", "error");
+      return;
+    }
+  }
+
+  const formData = new FormData();
+  formData.append("title", title);
+  formData.append("notes", notes);
+  if (iconSelection) formData.append("iconSelection", iconSelection);
+  if (file) formData.append("document", file);
+  if (iconUpload) formData.append("icon", iconUpload);
+
+  try {
+    let apiResult;
+    if (currentModalMode === "add") {
+      apiResult = await postDocumentToApi(formData);
+      doc = normalizeManifestItem(apiResult);
+      documentsCache.unshift(doc);
+      await saveDocument(doc);
+      showToast("Documento adicionado com sucesso.");
+    } else {
+      apiResult = await putDocumentToApi(currentEditingId, formData);
+      doc = normalizeManifestItem(apiResult);
+      documentsCache = documentsCache.map((item) => item.id === doc.id ? doc : item);
+      await saveDocument(doc);
+      showToast(currentModalMode === "replace" ? "Documento substituído com sucesso." : "Documento atualizado com sucesso.");
+    }
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || "Falha ao salvar documento.", "error");
+    return;
+  }
+
+  renderDocuments();
+  closeModal();
+}
+
+async function confirmDeleteDocument(id) {
+  if (!isAdmin) {
+    showToast("Faça login para excluir documentos.", "error");
+    return;
+  }
+  if (!confirm("Deseja realmente excluir este documento?")) return;
+
+  try {
+    await deleteDocumentFromApi(id);
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || "Falha ao excluir documento.", "error");
+    return;
+  }
+
+  await removeDocument(id);
+  documentsCache = documentsCache.filter((item) => item.id !== id);
+  renderDocuments();
+  showToast("Documento removido com sucesso.");
+}
+
+function filterDocuments() {
+  renderDocuments();
+}
+
+function updateAdminState(user) {
+  isAdmin = !!(user && user.email === ADMIN_EMAIL);
+  document.body.classList.toggle("is-admin", isAdmin);
+  btnShowAddModal.classList.toggle("hidden", !isAdmin);
+  if (documentsLoaded) renderDocuments();
+}
+
+btnShowAddModal.addEventListener("click", () => {
+  if (!isAdmin) {
+    showToast("Faça login para adicionar documentos.", "error");
+    return;
+  }
+  openModal("add");
+});
+
+modalCancelBtn.addEventListener("click", closeModal);
+modalOverlay.addEventListener("click", (event) => {
+  if (event.target === modalOverlay) closeModal();
+});
+modalSaveBtn.addEventListener("click", handleModalSave);
+
+onAuthStateChanged(auth, (user) => {
+  updateAdminState(user);
+});
+
+window.filtrarDocumentos = filterDocuments;
+window.toggleMenu = function () {
+  const menu = document.getElementById("menu");
+  if (menu) {
+    menu.classList.toggle("active");
+  }
+};
+
+window.logout = function () {
+  signOut(auth).then(() => {
+    try { window.location.replace('index.html'); } catch(e){}
+  }).catch(() => {});
+};
+
+loadDocuments();
+</script>
+        <!-- RODAPÉ -->
+        <footer class="footer">
+            <div class="footer-container">
+                <div class="footer-col">
+                    <h3>Tractorbel Equipamentos</h3>
+                    <p>BR-040, 8245 - KM 523 - Chácaras Boa Vista, Contagem - MG, 32150-193</p>
+                    <p>programacaorental04@tractorbel.com.br</p>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Contato</h3>
+                    <div class="footer-social">
+                        <a href="https://br.linkedin.com/company/tractorbel-equipamentos" target="_blank" rel="noopener noreferrer" title="LinkedIn Tractorbel">
+                            <img src="png/logo-linkedin.png" alt="LinkedIn">
+                        </a>
+                        <a href="https://api.whatsapp.com/send/?phone=558008801422" target="_blank" rel="noopener noreferrer" title="WhatsApp Tractorbel">
+                            <img src="png/logo-whatsapp.png" alt="WhatsApp">
+                        </a>
+                        <a href="https://www.instagram.com/tractorbelequip/" target="_blank" rel="noopener noreferrer" title="Instagram Tractorbel">
+                            <img src="png/logo-instagram.png" alt="Instagram">
+                        </a>
+                    </div>
+                    <p>© 2026 Tractorbel Equipamentos - Todos os direitos reservados</p>
+                    <p>Desenvolvido por Tâmmer Leonel</p>
+                </div>
+            </div>
+        </footer>
+</div>
+</div>
+<script src="app-router.js"></script>
+</body>
+</html>
