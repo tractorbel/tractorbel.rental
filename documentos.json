@@ -1,15 +1,5 @@
 [
   {
-    "id": "organograma-rental-serra-es-pdf",
-    "title": "Organograma Serra ES",
-    "filePath": "pdf/ORGANOGRAMA RENTAL SERRA - ES.pdf",
-    "fileName": "ORGANOGRAMA RENTAL SERRA - ES.pdf",
-    "iconPath": "png/organograma.png",
-    "notes": "",
-    "createdAt": "2026-05-23T03:37:58.070Z",
-    "updatedAt": "2026-05-23T03:37:58.070Z"
-  },
-  {
     "id": "organograma-rental-contagem-mg-pdf",
     "title": "Organograma Contagem MG",
     "filePath": "pdf/ORGANOGRAMA RENTAL CONTAGEM - MG.pdf",
