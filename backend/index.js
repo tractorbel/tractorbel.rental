@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import multer from "multer";
 import { Octokit } from "@octokit/rest";
 import admin from "firebase-admin";
+import fs from "fs";
+import path from "path";
 
 dotenv.config();
 
@@ -18,23 +20,36 @@ const {
   PORT = 4000
 } = process.env;
 
+const DEV_MODE = process.env.DEV_ALLOW_NO_ENV === '1';
+
 if (!GITHUB_TOKEN || !GITHUB_OWNER || !GITHUB_REPO) {
-  throw new Error("Missing GitHub configuration in environment variables.");
+  if (!DEV_MODE) {
+    throw new Error("Missing GitHub configuration in environment variables.");
+  }
 }
 
 if (!FIREBASE_PROJECT_ID || !FIREBASE_CLIENT_EMAIL || !FIREBASE_PRIVATE_KEY) {
-  throw new Error("Missing Firebase service account configuration in environment variables.");
+  if (!DEV_MODE) {
+    throw new Error("Missing Firebase service account configuration in environment variables.");
+  }
 }
 
-const octokit = new Octokit({ auth: GITHUB_TOKEN });
+const octokit = DEV_MODE ? null : new Octokit({ auth: GITHUB_TOKEN });
 
-admin.initializeApp({
-  credential: admin.credential.cert({
-    projectId: FIREBASE_PROJECT_ID,
-    clientEmail: FIREBASE_CLIENT_EMAIL,
-    privateKey: FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n")
-  })
-});
+let verifyIdTokenFn;
+if (!DEV_MODE) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: FIREBASE_PROJECT_ID,
+      clientEmail: FIREBASE_CLIENT_EMAIL,
+      privateKey: FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n")
+    })
+  });
+  verifyIdTokenFn = async (token) => await admin.auth().verifyIdToken(token);
+} else {
+  // Dev mode: accept any token and provide a fake user for easier local testing
+  verifyIdTokenFn = async (token) => ({ uid: 'dev', email: 'dev@local' });
+}
 
 const upload = multer({ storage: multer.memoryStorage() });
 const app = express();
@@ -44,6 +59,7 @@ app.use(express.json({ limit: "30mb" }));
 const MANIFEST_PATH = "documentos.json";
 
 async function getRepoContent(path) {
+  if (DEV_MODE) return null;
   try {
     const response = await octokit.repos.getContent({
       owner: GITHUB_OWNER,
@@ -64,6 +80,17 @@ async function getFileSha(path) {
 }
 
 async function saveRepoFile(path, contentBuffer, message) {
+  if (DEV_MODE) {
+    // In dev mode, skip saving to GitHub and return a fake response
+    const localPath = path.startsWith('png/') || path.startsWith('pdf/') ? path.split('/')[0] : '';
+    const outDir = localPath ? path.join(process.cwd(), '..', localPath) : process.cwd();
+    try {
+      fs.mkdirSync(outDir, { recursive: true });
+    } catch (e) {}
+    const filename = path.split('/').pop();
+    fs.writeFileSync(path.join(process.cwd(), '..', localPath, filename), contentBuffer);
+    return { data: { content: { sha: 'dev-sha' } } };
+  }
   const content = contentBuffer.toString("base64");
   const sha = await getFileSha(path);
   return octokit.repos.createOrUpdateFileContents({
@@ -78,6 +105,10 @@ async function saveRepoFile(path, contentBuffer, message) {
 }
 
 async function deleteRepoFile(path, message) {
+  if (DEV_MODE) {
+    // no-op in dev mode
+    return null;
+  }
   const sha = await getFileSha(path);
   if (!sha) return null;
   return octokit.repos.deleteFile({
@@ -91,6 +122,15 @@ async function deleteRepoFile(path, message) {
 }
 
 async function loadManifest() {
+  if (DEV_MODE) {
+    try {
+      const local = path.join(process.cwd(), '..', MANIFEST_PATH);
+      const txt = fs.readFileSync(local, 'utf8');
+      return JSON.parse(txt);
+    } catch (e) {
+      return [];
+    }
+  }
   const file = await getRepoContent(MANIFEST_PATH);
   if (!file) return [];
   const decoded = Buffer.from(file.content, "base64").toString("utf8");
@@ -98,6 +138,11 @@ async function loadManifest() {
 }
 
 async function saveManifest(manifest) {
+  if (DEV_MODE) {
+    const local = path.join(process.cwd(), '..', MANIFEST_PATH);
+    fs.writeFileSync(local, JSON.stringify(manifest, null, 2), 'utf8');
+    return;
+  }
   const content = Buffer.from(JSON.stringify(manifest, null, 2), "utf8");
   await saveRepoFile(MANIFEST_PATH, content, "Atualiza manifesto de documentos");
 }
@@ -109,7 +154,7 @@ async function verifyFirebaseToken(req, res, next) {
   }
   const idToken = authHeader.replace("Bearer ", "");
   try {
-    const decoded = await admin.auth().verifyIdToken(idToken);
+    const decoded = await verifyIdTokenFn(idToken);
     req.user = decoded;
     next();
   } catch (err) {
