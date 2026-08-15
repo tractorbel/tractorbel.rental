@@ -1405,19 +1405,75 @@ async function handleModalSave() {
   if (iconUpload) formData.append("icon", iconUpload);
 
   try {
-    let apiResult;
-    if (currentModalMode === "add") {
-      apiResult = await postDocumentToApi(formData);
-      doc = normalizeManifestItem(apiResult);
-      documentsCache.unshift(doc);
-      await saveDocument(doc);
-      showToast("Documento adicionado com sucesso.");
+    // If no backend is configured, perform local IndexedDB operations
+    if (!API_BASE_URL) {
+      if (currentModalMode === "add") {
+        const id = crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random();
+        const fileBlob = file || null;
+        const iconBlob = iconUpload || null;
+        const newDoc = {
+          id,
+          title,
+          fileName: file ? (file.name || "document.pdf") : "",
+          fileUrl: file ? "" : "",
+          fileBlob,
+          iconUrl: iconSelection || (iconBlob ? iconBlob.name : ""),
+          iconBlob,
+          notes,
+          sector: "",
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        };
+        doc = normalizeManifestItem(newDoc);
+        // preserve blobs for local rendering
+        doc.fileBlob = newDoc.fileBlob;
+        doc.iconBlob = newDoc.iconBlob;
+        documentsCache.unshift(doc);
+        await saveDocument(doc);
+        showToast("Documento adicionado com sucesso.");
+      } else {
+        const existing = documentsCache.find((item) => item.id === currentEditingId);
+        if (!existing) {
+          showToast("Documento não encontrado.", "error");
+          closeModal();
+          return;
+        }
+        if (file) {
+          existing.fileBlob = file;
+          existing.fileName = file.name || existing.fileName;
+        }
+        if (iconUpload) {
+          existing.iconBlob = iconUpload;
+          existing.iconUrl = iconUpload.name;
+        } else if (iconSelection) {
+          existing.iconUrl = iconSelection;
+          existing.iconBlob = null;
+        }
+        existing.title = title;
+        existing.notes = notes;
+        existing.updatedAt = Date.now();
+        doc = normalizeManifestItem(existing);
+        doc.fileBlob = existing.fileBlob || null;
+        doc.iconBlob = existing.iconBlob || null;
+        documentsCache = documentsCache.map((item) => item.id === doc.id ? doc : item);
+        await saveDocument(doc);
+        showToast(currentModalMode === "replace" ? "Documento substituído com sucesso." : "Documento atualizado com sucesso.");
+      }
     } else {
-      apiResult = await putDocumentToApi(currentEditingId, formData);
-      doc = normalizeManifestItem(apiResult);
-      documentsCache = documentsCache.map((item) => item.id === doc.id ? doc : item);
-      await saveDocument(doc);
-      showToast(currentModalMode === "replace" ? "Documento substituído com sucesso." : "Documento atualizado com sucesso.");
+      let apiResult;
+      if (currentModalMode === "add") {
+        apiResult = await postDocumentToApi(formData);
+        doc = normalizeManifestItem(apiResult);
+        documentsCache.unshift(doc);
+        await saveDocument(doc);
+        showToast("Documento adicionado com sucesso.");
+      } else {
+        apiResult = await putDocumentToApi(currentEditingId, formData);
+        doc = normalizeManifestItem(apiResult);
+        documentsCache = documentsCache.map((item) => item.id === doc.id ? doc : item);
+        await saveDocument(doc);
+        showToast(currentModalMode === "replace" ? "Documento substituído com sucesso." : "Documento atualizado com sucesso.");
+      }
     }
   } catch (error) {
     console.error(error);
@@ -1437,14 +1493,17 @@ async function confirmDeleteDocument(id) {
   if (!confirm("Deseja realmente excluir este documento?")) return;
 
   try {
-    await deleteDocumentFromApi(id);
+    if (!API_BASE_URL) {
+      await removeDocument(id);
+    } else {
+      await deleteDocumentFromApi(id);
+    }
   } catch (error) {
     console.error(error);
     showToast(error.message || "Falha ao excluir documento.", "error");
     return;
   }
 
-  await removeDocument(id);
   documentsCache = documentsCache.filter((item) => item.id !== id);
   renderDocuments();
   showToast("Documento removido com sucesso.");
