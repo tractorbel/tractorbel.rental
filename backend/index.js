@@ -152,12 +152,30 @@ async function loadManifest() {
 }
 
 async function saveManifest(manifest) {
+  // Normalize manifest before saving to keep deterministic ordering and avoid conflicts
+  function getTime(item) {
+    if (!item) return 0;
+    const t = item.updatedAt || item.createdAt || item._ts;
+    const v = Date.parse(t);
+    return isNaN(v) ? 0 : v;
+  }
+  const map = new Map();
+  for (const item of manifest || []) {
+    if (!item || !item.id) continue;
+    if (!map.has(item.id)) map.set(item.id, item);
+    else {
+      const existing = map.get(item.id);
+      if (getTime(item) >= getTime(existing)) map.set(item.id, item);
+    }
+  }
+  const normalized = Array.from(map.values()).sort((a, b) => (a.id || '').localeCompare(b.id || ''));
+
   if (DEV_MODE) {
     const local = path.join(process.cwd(), '..', MANIFEST_PATH);
-    fs.writeFileSync(local, JSON.stringify(manifest, null, 2), 'utf8');
+    fs.writeFileSync(local, JSON.stringify(normalized, null, 2), 'utf8');
     return;
   }
-  const content = Buffer.from(JSON.stringify(manifest, null, 2), "utf8");
+  const content = Buffer.from(JSON.stringify(normalized, null, 2), "utf8");
   await saveRepoFile(MANIFEST_PATH, content, "Atualiza manifesto de documentos");
 }
 
