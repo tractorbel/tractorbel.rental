@@ -1,2 +1,8 @@
+documentos.json merge=jsonmerge
 # Auto detect text files and perform LF normalization
 * text=auto
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+.gitattributes text eol=lf
+*.json text eol=lf

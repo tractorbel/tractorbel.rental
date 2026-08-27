@@ -1,1063 +1,1688 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Totais SS</title>
-<link rel="stylesheet" href="index.css">
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!DOCTYPE html>
+  <html lang="pt-BR">
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Totais SS</title>
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="stylesheet" href="index.css">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f5f7f9;
-      color: #222;
-    }
-
-    h2 {
-      margin: 0;
-    }
-
-    .cabecalho-analise {
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-
-    .periodo-cabecalho {
-      font-size: 14px;
-      font-weight: 600;
-      color: #2e7d32;
-      text-align: center;
-    }
-
-    .acoes-cabecalho {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .topo-controles {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(160px, 1fr));
-      gap: 10px;
-      align-items: start;
-      margin-bottom: 14px;
-    }
-
-    .filtro-box {
-      display: flex;
-      flex-direction: column;
-      border: 1px solid #d8e8da;
-      border-radius: 12px;
-      padding: 10px;
-      background: #fff;
-      box-shadow: 0 2px 8px rgba(46, 125, 50, 0.08);
-      min-width: 0;
-    }
-
-    .filtro-box label.titulo-filtro {
-      font-size: 13px;
-      font-weight: 700;
-      color: #2e7d32;
-      margin: 0 0 6px 0;
-    }
-
-    .filtro-seletor {
-      width: 100%;
-      min-height: 48px;
-      border: 1px solid #cfd8dc;
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 14px;
-      color: #111;
-      background: linear-gradient(180deg, #ffffff 0%, #f7faf8 100%);
-      outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .filtro-seletor:focus {
-      border-color: #34a853;
-      box-shadow: 0 0 0 3px rgba(52, 168, 83, 0.12);
-    }
-
-.filtro-busca {
-  width: 100%;
-  padding: 7px 9px;
-  border: 1px solid #cfd8dc;
-  border-radius: 8px;
-  font-size: 12px;
-  margin-bottom: 6px;
-  outline: none;
-}
-
-.filtro-busca:focus {
-  border-color: #34a853;
-  box-shadow: 0 0 0 2px rgba(52, 168, 83, 0.12);
-}
-
-.filtro-checkboxes {
-  width: 100%;
-  max-height: 130px;
-  overflow-y: auto;
-  border: 1px solid #cfd8dc;
-  border-radius: 10px;
-  padding: 8px 10px;
-  background: linear-gradient(180deg, #ffffff 0%, #f7faf8 100%);
-}
-
-.filtro-checkbox-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  padding: 4px 0;
-  cursor: pointer;
-  text-align: left;
-}
-
-.filtro-checkbox-item input {
-  accent-color: #34a853;
-}
-
-    .btn-google {
-      display: inline-block;
-      padding: 10px 20px;
-      border: 2px solid #34a853;
-      border-radius: 24px;
-      background-color: white;
-      color: #34a853;
-      font-weight: 600;
-      font-size: 0.9em;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-      text-align: center;
-    }
-
-    .btn-google:hover {
-      background-color: #34a853;
-      color: white;
-    }
-
-    .btn-google:active {
-      transform: scale(0.98);
-    }
-
-    label.btn-google {
-      display: inline-block;
-      cursor: pointer;
-    }
-
-.cards {
-  display: none;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 10px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: #f5f7f9;
-  padding: 14px 10px 10px;
-  margin-bottom: 18px;
-  border-bottom: 1px solid rgba(46, 125, 50, 0.12);
-}
-
-    .card {
-      background: #ffffff;
-      border-radius: 10px;
-      padding: 12px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-      border-left: 6px solid #2e7d32;
-      margin-bottom: 12px;
-      text-align: center;
-    }
-
-    .card h3,
-    .card h4 {
-      margin: 0 0 8px 0;
-      color: #333;
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .card h4 {
-      font-size: 13px;
-      color: #555;
-    }
-
-    .card .total {
-      font-size: 18px;
-      font-weight: bold;
-      color: #2e7d32;
-      margin-top: 4px;
-    }
-
-    .card table {
-      width: 100%;
-      font-size: 12px;
-      border-collapse: collapse;
-    }
-
-    .card table th,
-    .card table td {
-      padding: 6px;
-      text-align: left;
-      border-bottom: 1px solid #eee;
-    }
-
-    .card table th {
-      font-weight: 600;
-      color: #2e7d32;
-      background: #f5f7f9;
-    }
-
-    canvas {
-      max-height: 350px;
-      cursor: pointer;
-    }
-
-    #graficoTecnico {
-      cursor: pointer;
-    }
-
-    #graficoTipos {
-      height: 350px !important;
-      max-height: none;
-      cursor: pointer;
-    }
-
-.grafico-card {
-  display: none;
-}
-
-    .logo-topo {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 18px;
-    }
-
-     @media (max-width: 768px) {
+  <style>
+      *  
       body {
-        margin: 12px;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f5f7f9;
+        color: #222;
       }
 
-      .cards {
-        position: static;
+      h2 {
+        margin: 0;
       }
 
       .cabecalho-analise {
-        grid-template-columns: 1fr;
-        align-items: flex-start;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+        margin-top: 19px;
       }
 
       .periodo-cabecalho {
+        font-size: 14px;
+        font-weight: 600;
+        color: #2e7d32;
+        text-align: center;
+        display: none; /* só exibir após carregar dados */
+      }
+
+      /* centralizar o título na linha do cabeçalho */
+      .cabecalho-analise h2 {
+        grid-column: 1 / -1;
+        text-align: center;
+        margin-bottom: 8px;
+        margin-top: 19px;
+      }
+
+      .acoes-cabecalho {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .topo-controles {
+        display: grid;
+        grid-template-columns:
+          minmax(145px, 1fr)
+          minmax(175px, 1.2fr)
+          minmax(145px, 1fr)
+          minmax(165px, 1.15fr)
+          minmax(90px, 0.65fr)
+          minmax(105px, 0.75fr);
+        gap: 8px;
+        align-items: start;
+        margin-bottom: 14px;
+      }
+
+      /* Inicialmente mantenha a interface limpa: mostrar apenas o upload até o usuário carregar uma planilha */
+      .topo-controles,
+      .cards,
+      .grafico-card {
+        display: none;
+      }
+
+      .filtro-box {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #d8e8da;
+        border-radius: 12px;
+        padding: 8px;
+        background: #fff;
+        box-shadow: 0 2px 8px rgba(46, 125, 50, 0.08);
+        min-width: 0;
+      }
+
+      /* reduzir altura padrão dos cards nesta página */
+      .card {
+        min-height: 60px;
+        padding: 14px;
+      }
+
+      /* Upload area styles */
+      .upload-area {
+        max-width: 920px;
+        margin: 18px auto 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 12px;
+      }
+
+      .upload-area--large .upload-box {
+        width: 100%;
+        border: 2px dashed #cfead9;
+        border-radius: 12px;
+        background: #fff;
+        padding: 36px 28px;
+        text-align: center;
+        color: #475569;
+      }
+
+      .upload-icon{display:inline-flex;padding:16px;border-radius:50%;margin-bottom:12px;align-items:center;justify-content:center;}
+      .upload-box h3{margin:6px 0 4px;color:#0f172a}
+      .upload-box p{margin:0 0 12px;font-size:0.95rem}
+      .upload-btn{display:inline-block;background:#fff;border:1px solid #22c55e;color:#14532d;padding:10px 18px;border-radius:10px;cursor:pointer}
+
+      /* Small state: keep only the icon compact */
+      .upload-area--small{
+        max-width:auto;
+        margin:0;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:0;
+      }
+      .upload-area--small .upload-box{
+        padding:0;
+        text-align:center;
+        background:transparent;
+        border:none;
+        box-shadow:none;
+        min-width:0;
+        min-height:0;
+      }
+      .upload-area--small .upload-box h3,
+      .upload-area--small .upload-box p,
+      .upload-area--small .upload-btn{
+        display:none;
+      }
+      .upload-area--small .upload-icon{
+        padding:0;
+        margin:0;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        cursor:pointer;
+        border:none;
+        background:transparent;
+        border-radius:0;
+      }
+      .upload-area--small .upload-icon svg{
+        width:18px;
+        height:18px;
+        display:block;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      /* quando o upload estiver compacto ao lado do período */
+      .periodo-cabecalho{display:none}
+      .periodo-cabecalho.show{display:flex;align-items:center;gap:8px}
+      .periodo-cabecalho .upload-area--small{margin:0 0 0 8px;}
+
+      .filtro-box label.titulo-filtro {
+        font-size: 13px;
+        font-weight: 700;
+        color: #2e7d32;
+        margin: 0 0 6px 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .filtro-seletor {
+        width: 100%;
+        min-height: 48px;
+        border: 1px solid #cfd8dc;
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 14px;
+        color: #111;
+        background: linear-gradient(180deg, #ffffff 0%, #f7faf8 100%);
+        outline: none;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .filtro-seletor:focus {
+        border-color: #34a853;
+        box-shadow: 0 0 0 3px rgba(52, 168, 83, 0.12);
+      }
+
+  .filtro-busca {
+    padding: 7px 8px;
+    border: 1px solid #cfd8dc;
+    border-radius: 8px;
+    font-size: 12px;
+    margin-bottom: 6px;
+    outline: none;
+  }
+
+  .filtro-busca:focus {
+    border-color: #34a853;
+    box-shadow: 0 0 0 2px rgba(52, 168, 83, 0.12);
+  }
+
+  .filtro-checkboxes {
+    max-height: 130px;
+    overflow-y: auto;
+    border: 1px solid #cfd8dc;
+    border-radius: 10px;
+    padding: 7px 8px;
+    background: linear-gradient(180deg, #ffffff 0%, #f7faf8 100%);
+  }
+
+  .filtro-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    padding: 4px 0;
+    cursor: pointer;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .filtro-checkbox-item input {
+    accent-color: #34a853;
+    flex: 0 0 auto;
+  }
+
+      .btn-google {
+        display: inline-block;
+        padding: 10px 20px;
+        border: 2px solid #34a853;
+        border-radius: 24px;
+        background-color: white;
+        color: #34a853;
+        font-weight: 600;
+        font-size: 0.9em;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+        text-align: center;
+      }
+
+      .btn-google:hover {
+        background-color: #34a853;
+        color: white;
+      }
+
+      .btn-google:active {
+        transform: scale(0.98);
+      }
+
+      label.btn-google {
+        display: inline-block;
+        cursor: pointer;
+      }
+
+  .cards {
+    display: none;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #f5f7f9;
+    padding: 14px 10px 10px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid rgba(46, 125, 50, 0.12);
+  }
+
+      .card {
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 12px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        border-left: 6px solid #2e7d32;
+        margin-bottom: 12px;
+        text-align: center;
+      }
+
+      .card h3,
+      .card h4 {
+        margin: 0 0 8px 0;
+        color: #333;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .card h4 {
+        font-size: 13px;
+        color: #555;
+      }
+
+      .card .total {
+        font-size: 18px;
+        font-weight: bold;
+        color: #2e7d32;
+        margin-top: 4px;
+      }
+
+      .card table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+      }
+
+      .card table th,
+      .card table td {
+        padding: 6px;
         text-align: left;
+        border-bottom: 1px solid #eee;
       }
 
-      .topo-controles {
-        grid-template-columns: repeat(2, minmax(140px, 1fr));
-      }
-    }
-
-    @media (max-width: 520px) {
-      .cards {
-        grid-template-columns: 1fr;
+      .card table th {
+        font-weight: 600;
+        color: #2e7d32;
+        background: #f5f7f9;
       }
 
-      .topo-controles {
-        grid-template-columns: 1fr;
+      canvas {
+        width: 100%;
+        max-width: 100%;
+        height: 330px;
+        max-height: 330px;
+        cursor: pointer;
+        display: block;
       }
-    }
 
-.footer {
-  background: #1f2937;
-  color: #fff;
-  margin-top: 20px;
-  padding: 25px 0 10px 0;
-  font-size: 13px;
-}
+      #graficoTecnico {
+        cursor: pointer;
+      }
 
-.footer-container {
-  display: flex;
-  justify-content: space-between;
-  max-width: 1000px;
-  margin: auto;
-  flex-wrap: wrap;
-  padding: 10px;
-}
+      #graficoTipos {
+        height: 350px !important;
+        max-height: none;
+        cursor: pointer;
+      }
 
-.footer-col {
-  flex: 1;
-  min-width: 200px;
-  margin: 10px 5px;
-  text-align: center;
-}
+  .grafico-card {
+    display: none;
+    min-width: 0;
+  }
 
-.footer-col h3 {
-  margin-bottom: 8px;
-  font-size: 15px;
-  border-bottom: 2px solid #22c55e;
-  display: inline-block;
-  padding-bottom: 3px;
-  color: white;
-}
+  .grafico-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
 
-.footer-col p {
-  font-size: 12px;
-  line-height: 1.4;
-  color: #d1d5db;
-  margin: 2px 0;
-}
+      .logo-topo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        max-width: 280px;
+        margin: 0 auto 18px;
+      }
 
-.footer-social {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 10px;
-}
+      @media (max-width: 768px) {
+        body {
+          margin: 0px;
+        }
 
-.footer-social img {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 2px solid #22c55e;
-  transition: 0.3s;
-  text-decoration: none;
-}
+        .cards {
+          position: static;
+        }
 
-.footer-social img:hover {
-  transform: scale(1.1);
-}
+        .cabecalho-analise {
+          grid-template-columns: 1fr;
+          align-items: flex-start;
+        }
 
-.footer-bottom {
-  background: #111827;
-  text-align: center;
-  padding: 8px;
-  font-size: 11px;
-  margin-top: 10px;
-  color: #d1d5db;
-}
+        .periodo-cabecalho {
+          text-align: left;
+        }
 
-@media (max-width: 768px) {
+        .topo-controles {
+          grid-template-columns: repeat(2, minmax(140px, 1fr));
+        }
+      }
+
+      @media (min-width: 1024px) {
+        .grafico-row {
+          grid-template-columns: 1fr 1fr;
+          align-items: start;
+        }
+
+        .grafico-row .card {
+          min-height: 380px;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .cards {
+          grid-template-columns: 1fr;
+        }
+
+        .topo-controles {
+          grid-template-columns: 1fr;
+        }
+      }
+
+  .footer {
+    background: #1f2937;
+    color: #fff;
+    margin-top: 20px;
+    padding: 25px 0 10px 0;
+    font-size: 13px;
+  }
+
   .footer-container {
-    flex-direction: column;
+    display: flex;
+    justify-content: space-between;
+    max-width: 1000px;
+    margin: auto;
+    flex-wrap: wrap;
+    padding: 10px;
+  }
+
+  .footer-col {
+    flex: 1;
+    min-width: 200px;
+    margin: 10px 5px;
     text-align: center;
   }
-}
 
-</style>
+  .footer-col h3 {
+    margin-bottom: 8px;
+    font-size: 15px;
+    border-bottom: 2px solid #22c55e;
+    display: inline-block;
+    padding-bottom: 3px;
+    color: white;
+  }
 
-</head>
+  .footer-col p {
+    font-size: 12px;
+    line-height: 1.4;
+    color: #d1d5db;
+    margin: 2px 0;
+  }
 
-<body>
+  .footer-social {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
 
-<nav class="navbar">
+  .footer-social img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid #22c55e;
+    transition: 0.3s;
+    text-decoration: none;
+  }
+
+  .footer-social img:hover {
+    transform: scale(1.1);
+  }
+
+  .footer-bottom {
+    background: #111827;
+    text-align: center;
+    padding: 8px;
+    font-size: 11px;
+    margin-top: 10px;
+    color: #d1d5db;
+  }
+
+  @media (max-width: 768px) {
+    .footer-container {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+
+  </style>
+
+  </head>
+
+  <body>
+
+  <nav class="navbar">
     <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+    <div class="navbar-logo">
+      <img src="png/logo-tractorbel.png" alt="Logo Tractorbel">
+    </div>
     <ul id="menu">
-        <li><a href="index.html">INICIO</a></li>
-        <li><a href="documentos.html">DOCUMENTOS</a></li>
-        <li><a href="indicadores.html">KPI MANUT.</a></li>
-        <li><a href="indicadores-resultado.html">KPI FINAN.</a></li>
-        <li><a href="veiculos.html">KPI VEICULOS</a></li>
-        <li><a href="#" onclick="logout(); return false;" class="logout-btn">SAIR</a></li>
+      <li><a href="index.html">INICIO</a></li>
+      <li><a href="documentos.html">DOCUMENTOS</a></li>
+      <li><a href="indicadores.html">KPI MANUT.</a></li>
+      <li><a href="indicadores-resultado.html">KPI FINAN.</a></li>
+      <li><a href="#" onclick="logout(); return false;" class="logout-btn">SAIR</a></li>
     </ul>
-</nav>
+  </nav>
 
-<div class="logo-topo">
-  <img src="png/logo.png" alt="Logo" />
-</div>
+  <div id="page-content">
+  <div id="conteudo">
 
-<div id="conteudo">
+  <div class="cabecalho-analise">
+    <h2>Análise de Atendimento SS</h2>
 
-<div class="cabecalho-analise">
-  <h2>Análise de Atendimento SS</h2>
+    <div class="periodo-cabecalho" id="periodoAnalisado">
+      Período analisado: -
+    </div>
 
-  <div class="periodo-cabecalho" id="periodoAnalisado">
-    Período analisado: -
+    <div class="acoes-cabecalho">
+      <label for="upload" class="sr-only">Upload de planilha</label>
+      <input type="file" id="upload" accept=".xls,.xlsx" class="hidden" aria-label="Upload de planilha">
+      <button id="btnLimpar" class="btn-google hidden">Limpar Filtros</button>
+    </div>
   </div>
 
-  <div class="acoes-cabecalho">
-    <label for="upload" class="btn-google">Enviar Planilha</label>
-    <input type="file" id="upload" accept=".xls,.xlsx" style="display:none;">
-    <button id="btnLimpar" class="btn-google" style="display:none;">Limpar Filtros</button>
-  </div>
-</div>
-
-<div class="topo-controles">
-  <div class="filtro-box">
-    <label class="titulo-filtro">Técnico</label>
-    <input class="filtro-busca" id="buscaFiltroTecnico" placeholder="Buscar..." />
-    <div id="filtroTecnico" class="filtro-checkboxes"></div>
-  </div>
-
-  <div class="filtro-box">
-    <label class="titulo-filtro">Tipo de Atendimento</label>
-    <input class="filtro-busca" id="buscaFiltroTipo" placeholder="Buscar..." />
-    <div id="filtroTipo" class="filtro-checkboxes"></div>
+  <!-- Área de upload centralizada (visível inicialmente) -->
+  <div class="upload-area upload-area--large" id="uploadArea">
+    <div class="upload-box">
+      <div class="upload-icon">
+        <!-- SVG upload icon (transparent background) -->
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M12 3v10" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8 7l4-4 4 4" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3>Envie sua planilha</h3>
+      <p>Selecione a planilha exportada do SISMETRO para iniciar a Análise</p>
+    </div>
   </div>
 
-  <div class="filtro-box">
-    <label class="titulo-filtro">Tipo do Equipamento</label>
-    <input class="filtro-busca" id="buscaFiltroEquipamento" placeholder="Buscar..." />
-    <div id="filtroEquipamento" class="filtro-checkboxes"></div>
+  <div class="topo-controles">
+    <div class="filtro-box">
+      <label class="titulo-filtro">Técnico</label>
+      <input class="filtro-busca" id="buscaFiltroTecnico" placeholder="Buscar..." />
+      <div id="filtroTecnico" class="filtro-checkboxes"></div>
+    </div>
+
+    <div class="filtro-box">
+      <label class="titulo-filtro">Tipo de Atendimento</label>
+      <input class="filtro-busca" id="buscaFiltroTipo" placeholder="Buscar..." />
+      <div id="filtroTipo" class="filtro-checkboxes"></div>
+    </div>
+
+    <div class="filtro-box">
+      <label class="titulo-filtro">Cliente</label>
+      <input class="filtro-busca" id="buscaFiltroCliente" placeholder="Buscar..." />
+      <div id="filtroCliente" class="filtro-checkboxes"></div>
+    </div>
+
+    <div class="filtro-box">
+      <label class="titulo-filtro">Tipo do Equipamento</label>
+      <input class="filtro-busca" id="buscaFiltroEquipamento" placeholder="Buscar..." />
+      <div id="filtroEquipamento" class="filtro-checkboxes"></div>
+    </div>
+
+    <div class="filtro-box">
+      <label class="titulo-filtro">Marca</label>
+      <input class="filtro-busca" id="buscaFiltroMarca" placeholder="Buscar..." />
+      <div id="filtroMarca" class="filtro-checkboxes"></div>
+    </div>
+
+    <div class="filtro-box">
+      <label class="titulo-filtro">Modelo</label>
+      <input class="filtro-busca" id="buscaFiltroModelo" placeholder="Buscar..." />
+      <div id="filtroModelo" class="filtro-checkboxes"></div>
+    </div>
   </div>
 
-  <div class="filtro-box">
-    <label class="titulo-filtro">Marca</label>
-    <input class="filtro-busca" id="buscaFiltroMarca" placeholder="Buscar..." />
-    <div id="filtroMarca" class="filtro-checkboxes"></div>
+  <div class="cards">
+  <div class="card" id="cardTotalAtendimento">
+  <h3>Total de Atendimentos</h3>
+  <div class="total" id="totalAtendimento">0</div>
   </div>
 
-  <div class="filtro-box">
-    <label class="titulo-filtro">Modelo</label>
-    <input class="filtro-busca" id="buscaFiltroModelo" placeholder="Buscar..." />
-    <div id="filtroModelo" class="filtro-checkboxes"></div>
+  <div class="card" id="cardTotalPreventivas">
+  <h3>Preventivas</h3>
+  <div class="total" id="totalPreventivas">0</div>
   </div>
-</div>
 
-<div class="cards">
-<div class="card">
-<h3>Total de Atendimentos</h3>
-<div class="total" id="totalAtendimento">0</div>
-</div>
+  <div class="card" id="cardTotalCorretivas">
+  <h3>Corretivas</h3>
+  <div class="total" id="totalCorretivas">0</div>
+  </div>
 
-<div class="card">
-<h3>Preventivas</h3>
-<div class="total" id="totalPreventivas">0</div>
-</div>
+  <div class="card" id="cardTotalAvarias">
+  <h3>Avarias</h3>
+  <div class="total" id="totalAvarias">0</div>
+  </div>
 
-<div class="card">
-<h3>Corretivas</h3>
-<div class="total" id="totalCorretivas">0</div>
-</div>
+  <div class="card" id="cardTotalRevisitados">
+    <h3>Equipamentos Reincidentes</h3>
+    <div class="total" id="totalRevisitados">0</div>
+  </div>
 
-<div class="card">
-<h3>Avarias</h3>
-<div class="total" id="totalAvarias">0</div>
-</div>
-</div>
+  </div>
 
-<div class="card grafico-card">
-<h3>Total de Atendimento x Técnico</h3>
-<canvas id="graficoTecnico"></canvas>
-</div>
+  <div class="card grafico-card">
+  <h3>Atendimento x Técnico</h3>
+  <canvas id="graficoTecnico"></canvas>
+  </div>
 
-<div class="card grafico-card">
-<h3>Total de Atendimento x Tipo</h3>
-<canvas id="graficoTipos"></canvas>
-</div>
+  <div class="card grafico-card">
+  <h3>Atendimento x Tipo</h3>
+  <canvas id="graficoTipos"></canvas>
+  </div>
 
-<div class="card grafico-card"><h3>Total de Horas x Horas Úteis</h3><canvas id="graficoTotalHoras"></canvas></div>
-<div class="card grafico-card"><h3>Horas Trabalhadas</h3><canvas id="graficoTrabalhadas"></canvas></div>
-<div class="card grafico-card"><h3>Horas Aguardando</h3><canvas id="graficoAguardando"></canvas></div>
-<div class="card grafico-card"><h3>Horas Deslocamento</h3><canvas id="graficoDeslocamento"></canvas></div>
-<div class="card grafico-card"><h3>Total Máquina Parada</h3><canvas id="graficoMaquina"></canvas></div>
+  <div class="card grafico-card">
+  <h3>Atendimento x Cliente</h3>
+  <canvas id="graficoCliente"></canvas>
+  </div>
 
-</div>
+  <div class="card grafico-card">
+      <h3>Top 10 Patrimônios com Maior Custo de Peças</h3>
+      <canvas id="graficoCustoPecas"></canvas>
+  </div>
 
-<script>
+  <div class="card grafico-card">
+      <h3>Top 10 Patrimônios com Maior Reincidência</h3>
+      <canvas id="graficoRevisitados"></canvas>
+  </div>
 
-let dadosGlobais = [];
-let grafico, graficoTipos, g1, g2, g3, g4, g5;
+  <div class="grafico-row">
+    <div class="card grafico-card">
+      <h3>Abertura SS: Técnicos x Programadores</h3>
+      <canvas id="graficoAbertura"></canvas>
+    </div>
 
-const STORAGE_KEY = "indicadores_ss_estado";
-const btnLimpar = document.getElementById("btnLimpar");
+    <div class="card grafico-card">
+      <h3>Tempo Total de Máquina Parada</h3>
+      <canvas id="graficoMaquina"></canvas>
+    </div>
+  </div>
 
-btnLimpar.style.display = "none";
+  <div class="card grafico-card"><h3>Total de Horas x Horas Úteis</h3><canvas id="graficoTotalHoras"></canvas></div>
+  <div class="card grafico-card"><h3>Distribuição das Horas</h3><canvas id="graficoHoras"></canvas></div>
 
-function getEstadoFiltros(){
-    return {
-        filtroTecnico: getSelecionados("filtroTecnico"),
-        filtroTipo: getSelecionados("filtroTipo"),
-        filtroEquipamento: getSelecionados("filtroEquipamento"),
-        filtroMarca: getSelecionados("filtroMarca"),
-        filtroModelo: getSelecionados("filtroModelo")
-    };
-}
+  </div>
 
-function aplicarEstadoFiltros(filtros){
-    if(!filtros) return;
+  <script>
 
-    Object.keys(filtros).forEach(id => {
-        const valores = filtros[id] || [];
+  let dadosGlobais = [];
+  let grafico, graficoTipos, g1, g2, g3, g4, g5, g6, g7, g8, g9;
+  let uploadDialogOpen = false; /* prevent duplicate file picker opens */
 
-        document.querySelectorAll(`#${id} input`).forEach(input => {
-            input.checked = valores.includes(input.value);
-        });
+  const STORAGE_KEY = "indicadores_ss_estado";
+  const btnLimpar = document.getElementById("btnLimpar");
+
+  btnLimpar.classList.add("hidden");
+
+  function getEstadoFiltros(){
+      return {
+          filtroTecnico: getSelecionados("filtroTecnico"),
+          filtroTipo: getSelecionados("filtroTipo"),
+          filtroCliente: getSelecionados("filtroCliente"),
+          filtroEquipamento: getSelecionados("filtroEquipamento"),
+          filtroMarca: getSelecionados("filtroMarca"),
+          filtroModelo: getSelecionados("filtroModelo")
+      };
+  }
+
+  function aplicarEstadoFiltros(filtros){
+      if(!filtros) return;
+
+      Object.keys(filtros).forEach(id => {
+          const valores = filtros[id] || [];
+
+          document.querySelectorAll(`#${id} input`).forEach(input => {
+              input.checked = valores.includes(input.value);
+          });
+      });
+  }
+
+  function salvarEstadoPagina(){
+      if(!dadosGlobais.length) return;
+
+      try {
+          sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+              dados: dadosGlobais,
+              filtros: getEstadoFiltros()
+          }));
+      } catch (erro) {
+          console.warn("Nao foi possivel salvar o estado da pagina no navegador:", erro);
+          sessionStorage.removeItem(STORAGE_KEY);
+      }
+  }
+
+  function restaurarEstadoPagina(){
+      const estadoSalvo = sessionStorage.getItem(STORAGE_KEY);
+      if(!estadoSalvo) return;
+
+      try {
+          const estado = JSON.parse(estadoSalvo);
+
+          if(!estado.dados || !estado.dados.length) return;
+
+          dadosGlobais = estado.dados;
+
+          document.querySelector(".cards").style.display = "grid";
+          document.querySelectorAll(".grafico-card").forEach(card => {
+              card.style.display = "block";
+          });
+
+          const topo = document.querySelector(".topo-controles");
+          if(topo) topo.style.display = "grid";
+          try{ btnLimpar.classList.remove("hidden"); }catch(e){}
+
+          // reduzir área de upload para ícone disponível após restauração de dados
+          const ua_restore = document.getElementById('uploadArea');
+          const periodoEl_restore = document.getElementById('periodoAnalisado');
+          const acoesCabecalho_restore = document.querySelector('.acoes-cabecalho');
+          if(ua_restore){
+            ua_restore.classList.remove('upload-area--large'); ua_restore.classList.add('upload-area--small');
+            ua_restore.style.display = 'flex';
+            if(acoesCabecalho_restore && !acoesCabecalho_restore.contains(ua_restore)) acoesCabecalho_restore.appendChild(ua_restore);
+            if(periodoEl_restore){ periodoEl_restore.classList.add('show'); }
+          }
+
+          popularFiltro(dadosGlobais);
+          aplicarEstadoFiltros(estado.filtros);
+          atualizarFiltrosOptions();
+          calcularTotais(filtrarDados());
+          atualizarVisibilidadeBotaoLimpar();
+      } catch (erro) {
+          console.error("Erro ao restaurar dados salvos:", erro);
+          sessionStorage.removeItem(STORAGE_KEY);
+      }
+  }
+
+  document.getElementById('upload').addEventListener('change', function(e){
+
+      uploadDialogOpen = true; /* mark dialog as open */
+      const file = e.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function(event){
+
+          const data = new Uint8Array(event.target.result);
+          const workbook = XLSX.read(data, {type:'array', cellDates:true});
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+          const linhas = XLSX.utils.sheet_to_json(sheet, {header: 1, defval: ""});
+          const cabecalhos = linhas[0];
+
+          const json = linhas.slice(1).map(linha => {
+              const obj = {};
+
+              cabecalhos.forEach((cabecalho, index) => {
+                  if(cabecalho){
+                      obj[cabecalho] = linha[index];
+                  }
+              });
+
+              obj.__TAG_AC = linha[28];
+              obj.__PREVENTIVA_BG = linha[58];
+
+              return obj;
+          }).filter(row =>
+              Object.values(row).some(value => value !== "" && value !== null && value !== undefined)
+          );
+
+          dadosGlobais = json;
+          const topo = document.querySelector(".topo-controles");
+          if(topo) topo.style.display = "grid";
+          document.querySelector(".cards").style.display = "grid";
+          document.querySelectorAll(".grafico-card").forEach(card => {
+            card.style.display = "block";
+          });
+          try{ btnLimpar.classList.remove("hidden"); }catch(e){}
+          // reduzir área de upload para ícone disponível após upload e mantê-lo no cabeçalho
+          const ua = document.getElementById('uploadArea');
+          const periodoEl = document.getElementById('periodoAnalisado');
+          const acoesCabecalho = document.querySelector('.acoes-cabecalho');
+          if(ua){
+            ua.classList.remove('upload-area--large'); ua.classList.add('upload-area--small');
+            ua.style.display = 'flex';
+            if(acoesCabecalho && !acoesCabecalho.contains(ua)) acoesCabecalho.appendChild(ua);
+            if(periodoEl){ periodoEl.classList.add('show'); }
+          }
+          popularFiltro(json);
+          calcularTotais(json);
+          salvarEstadoPagina();
+          uploadDialogOpen = false; /* mark dialog as closed after loading */
+      };
+
+      reader.readAsArrayBuffer(file);
+  });
+
+  ["filtroTecnico", "filtroTipo", "filtroCliente", "filtroEquipamento", "filtroMarca", "filtroModelo"].forEach(id => {
+      document.getElementById(id).addEventListener("change", aplicarFiltros);
+  });
+
+  ["buscaFiltroTecnico", "buscaFiltroTipo", "buscaFiltroCliente", "buscaFiltroEquipamento", "buscaFiltroMarca", "buscaFiltroModelo"].forEach(id => {
+      document.getElementById(id).addEventListener("input", atualizarFiltrosOptions);
+  });
+
+  btnLimpar.addEventListener("click", limparFiltros);
+
+  function popularFiltro(dados){
+      atualizarFiltrosOptions();
+  }
+
+  // Permite clicar na área de upload (ícone pequeno) para selecionar novo arquivo
+  const uploadAreaEl = document.getElementById('uploadArea');
+  if(uploadAreaEl){
+    uploadAreaEl.addEventListener('click', function(e){
+      // Se o clique for no label ou no input, deixe o comportamento nativo abrir o seletor
+      if(e.target.closest('label') || e.target.closest('input')) return;
+
+      const input = document.getElementById('upload');
+      if(input) {
+        input.click();
+      }
     });
-}
+  }
 
-function salvarEstadoPagina(){
-    if(!dadosGlobais.length) return;
+  function getSelecionados(id){
+      return Array.from(document.querySelectorAll(`#${id} input:checked`)).map(input => input.value);
+  }
 
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
-        dados: dadosGlobais,
-        filtros: getEstadoFiltros()
-    }));
-}
+  function getTextoBuscaFiltro(id){
+      const mapaBusca = {
+          filtroTecnico: "buscaFiltroTecnico",
+          filtroTipo: "buscaFiltroTipo",
+          filtroCliente: "buscaFiltroCliente",
+          filtroEquipamento: "buscaFiltroEquipamento",
+          filtroMarca: "buscaFiltroMarca",
+          filtroModelo: "buscaFiltroModelo"
+      };
 
-function restaurarEstadoPagina(){
-    const estadoSalvo = sessionStorage.getItem(STORAGE_KEY);
-    if(!estadoSalvo) return;
+      const input = document.getElementById(mapaBusca[id]);
+      return input ? input.value.trim().toLowerCase() : "";
+  }
 
-    try {
-        const estado = JSON.parse(estadoSalvo);
+  function criarCheckboxes(container, valores, selecionados){
+      container.innerHTML = "";
 
-        if(!estado.dados || !estado.dados.length) return;
+      const busca = getTextoBuscaFiltro(container.id);
 
-        dadosGlobais = estado.dados;
+      const valoresFiltrados = busca
+          ? valores.filter(valor => valor.toLowerCase().includes(busca))
+          : valores;
 
-        document.querySelector(".cards").style.display = "grid";
-        document.querySelectorAll(".grafico-card").forEach(card => {
-            card.style.display = "block";
-        });
+      const valoresFinais = [
+          ...selecionados.filter(valor => !valoresFiltrados.includes(valor)),
+          ...valoresFiltrados
+      ];
 
-        popularFiltro(dadosGlobais);
-        aplicarEstadoFiltros(estado.filtros);
-        atualizarFiltrosOptions();
-        calcularTotais(filtrarDados());
-    } catch (erro) {
-        console.error("Erro ao restaurar dados salvos:", erro);
-        sessionStorage.removeItem(STORAGE_KEY);
-    }
-}
-
-document.getElementById('upload').addEventListener('change', function(e){
-
-    const file = e.target.files[0];
-    const reader = new FileReader();
-
-    reader.onload = function(event){
-
-        const data = new Uint8Array(event.target.result);
-        const workbook = XLSX.read(data, {type:'array', cellDates:true});
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-
-        const linhas = XLSX.utils.sheet_to_json(sheet, {header: 1, defval: ""});
-        const cabecalhos = linhas[0];
-
-        const json = linhas.slice(1).map(linha => {
-            const obj = {};
-
-            cabecalhos.forEach((cabecalho, index) => {
-                if(cabecalho){
-                    obj[cabecalho] = linha[index];
-                }
-            });
-
-            obj.__TAG_AC = linha[28];
-            obj.__PREVENTIVA_BG = linha[58];
-
-            return obj;
-        });
-
-        dadosGlobais = json;
-        document.querySelector(".cards").style.display = "grid";
-        document.querySelectorAll(".grafico-card").forEach(card => {
-            card.style.display = "block";
-        });
-        popularFiltro(json);
-        calcularTotais(json);
-        salvarEstadoPagina();
-    };
-
-    reader.readAsArrayBuffer(file);
-});
-
-["filtroTecnico", "filtroTipo", "filtroEquipamento", "filtroMarca", "filtroModelo"].forEach(id => {
-    document.getElementById(id).addEventListener("change", aplicarFiltros);
-});
-
-["buscaFiltroTecnico", "buscaFiltroTipo", "buscaFiltroEquipamento", "buscaFiltroMarca", "buscaFiltroModelo"].forEach(id => {
-    document.getElementById(id).addEventListener("input", atualizarFiltrosOptions);
-});
-
-btnLimpar.addEventListener("click", limparFiltros);
-
-function popularFiltro(dados){
-    atualizarFiltrosOptions();
-}
-
-function getSelecionados(id){
-    return Array.from(document.querySelectorAll(`#${id} input:checked`)).map(input => input.value);
-}
-
-function getTextoBuscaFiltro(id){
-    const mapaBusca = {
-        filtroTecnico: "buscaFiltroTecnico",
-        filtroTipo: "buscaFiltroTipo",
-        filtroEquipamento: "buscaFiltroEquipamento",
-        filtroMarca: "buscaFiltroMarca",
-        filtroModelo: "buscaFiltroModelo"
-    };
-
-    const input = document.getElementById(mapaBusca[id]);
-    return input ? input.value.trim().toLowerCase() : "";
-}
-
-function criarCheckboxes(container, valores, selecionados){
-    container.innerHTML = "";
-
-    const busca = getTextoBuscaFiltro(container.id);
-
-    const valoresFiltrados = busca
-        ? valores.filter(valor => valor.toLowerCase().includes(busca))
-        : valores;
-
-    const valoresFinais = [
-        ...selecionados.filter(valor => !valoresFiltrados.includes(valor)),
-        ...valoresFiltrados
-    ];
-
-    if(!valoresFinais.length){
-        container.innerHTML = '<div style="font-size:12px;color:#777;padding:6px;">Nenhum item</div>';
+      if(!valoresFinais.length){
+        container.innerHTML = '<div class="empty-item">Nenhum item</div>';
         return;
-    }
+      }
 
-    valoresFinais.forEach(valor => {
-        const label = document.createElement("label");
-        label.className = "filtro-checkbox-item";
+      valoresFinais.forEach(valor => {
+          const label = document.createElement("label");
+          label.className = "filtro-checkbox-item";
 
-        const input = document.createElement("input");
-        input.type = "checkbox";
-        input.value = valor;
-        input.checked = selecionados.includes(valor);
+          const input = document.createElement("input");
+          input.type = "checkbox";
+          input.value = valor;
+          input.checked = selecionados.includes(valor);
 
-        label.appendChild(input);
-        label.appendChild(document.createTextNode(valor));
-        container.appendChild(label);
-    });
-}
+          label.appendChild(input);
+          label.appendChild(document.createTextNode(valor));
+          container.appendChild(label);
+      });
+  }
 
-function marcarFiltroUnico(id, valor){
-    document.querySelectorAll(`#${id} input`).forEach(input => {
-        input.checked = input.value === valor;
-    });
-}
+  function marcarFiltroUnico(id, valor){
+      document.querySelectorAll(`#${id} input`).forEach(input => {
+          input.checked = input.value === valor;
+      });
+  }
 
-function filtrarDados(excluirFiltroId = null){
-    let dados = dadosGlobais;
+  function filtrarDados(excluirFiltroId = null){
+      let dados = dadosGlobais;
 
-    const tecnicosSelecionados = getSelecionados("filtroTecnico");
-    const tiposSelecionados = getSelecionados("filtroTipo");
-    const equipamentosSelecionados = getSelecionados("filtroEquipamento");
-    const marcasSelecionadas = getSelecionados("filtroMarca");
-    const modelosSelecionados = getSelecionados("filtroModelo");
+      const tecnicosSelecionados = getSelecionados("filtroTecnico");
+      const tiposSelecionados = getSelecionados("filtroTipo");
+      const equipamentosSelecionados = getSelecionados("filtroEquipamento");
+      const marcasSelecionadas = getSelecionados("filtroMarca");
+      const modelosSelecionados = getSelecionados("filtroModelo");
 
-    if(excluirFiltroId !== "filtroTecnico" && tecnicosSelecionados.length){
-        dados = dados.filter(linha =>
-            tecnicosSelecionados.includes(String(linha["TÉCNICO DESIGNADO"] || "Não informado").trim())
-        );
-    }
+      if(excluirFiltroId !== "filtroTecnico" && tecnicosSelecionados.length){
+          dados = dados.filter(linha =>
+            tecnicosSelecionados.includes(String(linha["TÉCNICO DESIGNADO"] ?? "Não informado").trim())
+          );
+      }
 
-    if(excluirFiltroId !== "filtroTipo" && tiposSelecionados.length){
-        dados = dados.filter(linha =>
-            tiposSelecionados.includes(String(linha["TIPO DA SS"] || "Não informado").trim())
-        );
-    }
+      if(excluirFiltroId !== "filtroTipo" && tiposSelecionados.length){
+          dados = dados.filter(linha =>
+            tiposSelecionados.includes(String(linha["TIPO DA SS"] ?? "Não informado").trim())
+          );
+      }
 
-    if(excluirFiltroId !== "filtroEquipamento" && equipamentosSelecionados.length){
-        dados = dados.filter(linha =>
-            equipamentosSelecionados.includes(String(linha["TIPO DO EQUIPAMENTO"] || "Não informado").trim())
-        );
-    }
+      const clientesSelecionados = getSelecionados("filtroCliente");
+      if(excluirFiltroId !== "filtroCliente" && clientesSelecionados.length){
+          dados = dados.filter(linha =>
+            clientesSelecionados.includes(String(linha["SOLICITANTE"] ?? "Não informado").trim())
+          );
+      }
 
-    if(excluirFiltroId !== "filtroMarca" && marcasSelecionadas.length){
-        dados = dados.filter(linha =>
-            marcasSelecionadas.includes(String(linha["MARCA"] || "Não informado").trim())
-        );
-    }
+      if(excluirFiltroId !== "filtroEquipamento" && equipamentosSelecionados.length){
+          dados = dados.filter(linha =>
+            equipamentosSelecionados.includes(String(linha["TIPO DO EQUIPAMENTO"] ?? "Não informado").trim())
+          );
+      }
 
-    if(excluirFiltroId !== "filtroModelo" && modelosSelecionados.length){
-        dados = dados.filter(linha =>
-            modelosSelecionados.includes(String(linha["MODELO"] || "Não informado").trim())
-        );
-    }
+      if(excluirFiltroId !== "filtroMarca" && marcasSelecionadas.length){
+          dados = dados.filter(linha =>
+            marcasSelecionadas.includes(String(linha["MARCA"] ?? "Não informado").trim())
+          );
+      }
 
-    return dados;
-}
+      if(excluirFiltroId !== "filtroModelo" && modelosSelecionados.length){
+          dados = dados.filter(linha =>
+            modelosSelecionados.includes(String(linha["MODELO"] ?? "Não informado").trim())
+          );
+      }
 
-function atualizarFiltrosOptions(){
-    const filtroTecnico = document.getElementById("filtroTecnico");
-    const filtroTipo = document.getElementById("filtroTipo");
-    const filtroEquipamento = document.getElementById("filtroEquipamento");
-    const filtroMarca = document.getElementById("filtroMarca");
-    const filtroModelo = document.getElementById("filtroModelo");
+      return dados;
+  }
 
-    const tecnicosSelecionados = getSelecionados("filtroTecnico");
-    const tiposSelecionados = getSelecionados("filtroTipo");
-    const equipamentosSelecionados = getSelecionados("filtroEquipamento");
-    const marcasSelecionadas = getSelecionados("filtroMarca");
-    const modelosSelecionados = getSelecionados("filtroModelo");
+  function atualizarFiltrosOptions(){
+      const filtroTecnico = document.getElementById("filtroTecnico");
+      const filtroTipo = document.getElementById("filtroTipo");
+      const filtroCliente = document.getElementById("filtroCliente");
+      const filtroEquipamento = document.getElementById("filtroEquipamento");
+      const filtroMarca = document.getElementById("filtroMarca");
+      const filtroModelo = document.getElementById("filtroModelo");
 
-    const dadosParaTecnico = filtrarDados("filtroTecnico");
-    const tecnicos = [...new Set(dadosParaTecnico.map(l => String(l["TÉCNICO DESIGNADO"] || "Não informado").trim()))]
-        .filter(v => v !== "")
-        .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
-    criarCheckboxes(filtroTecnico, tecnicos, tecnicosSelecionados);
+      const tecnicosSelecionados = getSelecionados("filtroTecnico");
+      const tiposSelecionados = getSelecionados("filtroTipo");
+      const clientesSelecionados = getSelecionados("filtroCliente");
+      const equipamentosSelecionados = getSelecionados("filtroEquipamento");
+      const marcasSelecionadas = getSelecionados("filtroMarca");
+      const modelosSelecionados = getSelecionados("filtroModelo");
 
-    const dadosParaTipo = filtrarDados("filtroTipo");
-    const tipos = [...new Set(dadosParaTipo.map(l => String(l["TIPO DA SS"] || "Não informado").trim()))]
-        .filter(v => v !== "")
-        .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
-    criarCheckboxes(filtroTipo, tipos, tiposSelecionados);
+      const dadosParaTecnico = filtrarDados("filtroTecnico");
+      const tecnicos = [...new Set(dadosParaTecnico.map(l => String(l["TÉCNICO DESIGNADO"] ?? "Não informado").trim()))]
+          .filter(v => v !== "")
+          .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
+      criarCheckboxes(filtroTecnico, tecnicos, tecnicosSelecionados);
 
-    const dadosParaEquipamento = filtrarDados("filtroEquipamento");
-    const equipamentos = [...new Set(dadosParaEquipamento.map(l => String(l["TIPO DO EQUIPAMENTO"] || "Não informado").trim()))]
-        .filter(v => v !== "")
-        .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
-    criarCheckboxes(filtroEquipamento, equipamentos, equipamentosSelecionados);
+      const dadosParaTipo = filtrarDados("filtroTipo");
+      const tipos = [...new Set(dadosParaTipo.map(l => String(l["TIPO DA SS"] ?? "Não informado").trim()))]
+          .filter(v => v !== "")
+          .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
+      criarCheckboxes(filtroTipo, tipos, tiposSelecionados);
 
-    const dadosParaMarca = filtrarDados("filtroMarca");
-    const marcas = [...new Set(dadosParaMarca.map(l => String(l["MARCA"] || "Não informado").trim()))]
-        .filter(v => v !== "")
-        .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
-    criarCheckboxes(filtroMarca, marcas, marcasSelecionadas);
+      const dadosParaCliente = filtrarDados("filtroCliente");
+      const clientes = [...new Set(dadosParaCliente.map(l => String(l["SOLICITANTE"] ?? "Não informado").trim()))]
+          .filter(v => v !== "")
+          .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
+      criarCheckboxes(filtroCliente, clientes, clientesSelecionados);
 
-    const dadosParaModelo = filtrarDados("filtroModelo");
-    const modelos = [...new Set(dadosParaModelo.map(l => String(l["MODELO"] || "Não informado").trim()))]
-        .filter(v => v !== "")
-        .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
-    criarCheckboxes(filtroModelo, modelos, modelosSelecionados);
-}
+      const dadosParaEquipamento = filtrarDados("filtroEquipamento");
+      const equipamentos = [...new Set(dadosParaEquipamento.map(l => String(l["TIPO DO EQUIPAMENTO"] ?? "Não informado").trim()))]
+          .filter(v => v !== "")
+          .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
+      criarCheckboxes(filtroEquipamento, equipamentos, equipamentosSelecionados);
 
-function aplicarFiltros(){
-    atualizarFiltrosOptions();
-    calcularTotais(filtrarDados());
-    salvarEstadoPagina();
-}
+      const dadosParaMarca = filtrarDados("filtroMarca");
+      const marcas = [...new Set(dadosParaMarca.map(l => String(l["MARCA"] ?? "Não informado").trim()))]
+          .filter(v => v !== "")
+          .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
+      criarCheckboxes(filtroMarca, marcas, marcasSelecionadas);
 
-function toHoras(valor){
-    if(valor === undefined || valor === null || valor === "") return 0;
+      const dadosParaModelo = filtrarDados("filtroModelo");
+      const modelos = [...new Set(dadosParaModelo.map(l => String(l["MODELO"] ?? "Não informado").trim()))]
+          .filter(v => v !== "")
+          .sort((a,b) => a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
+      criarCheckboxes(filtroModelo, modelos, modelosSelecionados);
+      atualizarVisibilidadeBotaoLimpar();
+  }
 
-    if(typeof valor === "number"){
-        return valor * 24;
-    }
+  function aplicarFiltros(){
+      atualizarFiltrosOptions();
+      calcularTotais(filtrarDados());
+      atualizarVisibilidadeGraficoTotalHoras();
+      atualizarVisibilidadeBotaoLimpar();
+      salvarEstadoPagina();
+  }
 
-    if(typeof valor === "string" && valor.includes(":")){
-        const partes = valor.split(":");
-        const h = parseFloat(partes[0]) || 0;
-        const m = parseFloat(partes[1]) || 0;
-        return h + (m/60);
-    }
+  function toHoras(valor){
+      if(valor === undefined || valor === null || valor === "") return 0;
 
-    return Number(valor.toString().replace(",", ".")) || 0;
-}
+      if(typeof valor === "number"){
+          return valor * 24;
+      }
 
-function excelDateToJS(valor){
-    if(!valor) return null;
+      if(typeof valor === "string" && valor.includes(":")){
+          const partes = valor.split(":");
+          const h = parseFloat(partes[0]) || 0;
+          const m = parseFloat(partes[1]) || 0;
+          return h + (m/60);
+      }
 
-    if(valor instanceof Date) return valor;
+      return Number(valor.toString().replace(",", ".")) || 0;
+  }
 
-    if(typeof valor === "number"){
-        return new Date((valor - 25569) * 86400 * 1000);
-    }
+  function toNumber(valor){
+      if(valor === undefined || valor === null || valor === "") return NaN;
+      if(typeof valor === "number") return valor;
 
-    const d = new Date(valor);
-    return isNaN(d) ? null : d;
-}
+      let texto = String(valor).trim();
+      if(texto === "") return NaN;
 
-function calcularDiasUteis(dataInicio, dataFim){
+      // Remove todos os espaços e símbolos não-numéricos, mantendo separadores de milhar e decimal.
+      texto = texto.replace(/\s+/g, "");
+      texto = texto.replace(/[^0-9(),.\-]/g, "");
 
-    let dias = 0;
-    let atual = new Date(dataInicio);
+      const negativo = /^\((.*)\)$/.test(texto);
+      if(negativo){
+          texto = texto.replace(/^\(|\)$/g, "");
+      }
 
-    while(atual <= dataFim){
-        const dia = atual.getDay();
-        if(dia !== 0 && dia !== 6){
-            dias++;
+      const temPonto = texto.includes('.');
+      const temVirgula = texto.includes(',');
+
+      if(temPonto && temVirgula){
+          const ultimaPonto = texto.lastIndexOf('.');
+          const ultimaVirgula = texto.lastIndexOf(',');
+          if(ultimaVirgula > ultimaPonto){
+              texto = texto.replace(/\./g, '').replace(',', '.');
+          } else {
+              texto = texto.replace(/,/g, '');
+          }
+      } else if(temVirgula){
+          texto = texto.replace(/,/g, '.');
+      } else if(temPonto){
+          const partes = texto.split('.');
+          if(partes.length > 2){
+              texto = partes.join('');
+          } else if(partes[1].length === 3 && partes[0].length > 3){
+              texto = partes.join('');
+          }
+      }
+
+      const numero = Number(texto);
+      return negativo ? -numero : numero;
+  }
+
+  function excelDateToJS(valor){
+      if(!valor) return null;
+
+      if(valor instanceof Date) return valor;
+
+      if(typeof valor === "number"){
+          return new Date((valor - 25569) * 86400 * 1000);
+      }
+
+      const d = new Date(valor);
+      return isNaN(d) ? null : d;
+  }
+
+  function calcularDiasUteis(dataInicio, dataFim){
+
+      let dias = 0;
+      let atual = new Date(dataInicio);
+
+      while(atual <= dataFim){
+          const dia = atual.getDay();
+          if(dia !== 0 && dia !== 6){
+              dias++;
+          }
+          atual.setDate(atual.getDate() + 1);
+      }
+
+      return dias;
+  }
+
+  function valorDiferenteDeZero(valor){
+      if(valor === undefined || valor === null || valor === "") return false;
+
+      const texto = String(valor).trim();
+
+      if(texto === "") return false;
+
+      const numero = Number(texto.replace(",", "."));
+
+      if(!isNaN(numero)){
+          return numero !== 0;
+      }
+
+      return texto !== "0";
+  }
+
+  function formatTotalComPercentual(valor, totalAtendimentos){
+      if(totalAtendimentos <= 0){
+          return String(valor);
+      }
+
+      const percentual = (valor / totalAtendimentos) * 100;
+      const percentualFormatado = Number(percentual.toFixed(1));
+      return `${valor} (${percentualFormatado}%)`;
+  }
+
+  function atualizarVisibilidadeCards(){
+      const mapeamento = [
+          {elemento: 'totalAtendimento', card: 'cardTotalAtendimento'},
+          {elemento: 'totalPreventivas', card: 'cardTotalPreventivas'},
+          {elemento: 'totalCorretivas', card: 'cardTotalCorretivas'},
+          {elemento: 'totalAvarias', card: 'cardTotalAvarias'},
+          {elemento: 'totalRevisitados', card: 'cardTotalRevisitados'}
+      ];
+
+      mapeamento.forEach(({elemento, card}) => {
+          const valorTexto = String(document.getElementById(elemento)?.innerText || '0').trim();
+          const valor = Number(valorTexto.replace(/[^0-9]/g, '')) || 0;
+          const cardEl = document.getElementById(card);
+          if(cardEl){
+              cardEl.style.display = valor === 0 ? 'none' : 'block';
+          }
+      });
+  }
+
+  function atualizarVisibilidadeGraficoTotalHoras(){
+      const cardGrafico = document.getElementById("graficoTotalHoras")?.closest('.card');
+      const deveExibir = getSelecionados("filtroTecnico").length === 1;
+
+      if(cardGrafico){
+          cardGrafico.style.display = deveExibir ? 'block' : 'none';
+      }
+
+      if(!deveExibir && g1){
+          g1.destroy();
+          g1 = null;
+      }
+  }
+
+  function calcularTotais(dados){
+
+      const totalAtendimentos = dados.length;
+      document.getElementById("totalAtendimento").innerText = totalAtendimentos;
+
+  const totalPreventivas = dados.filter(linha => {
+      const tipoSS = String(linha["TIPO DA SS"] || "").trim().toUpperCase();
+      return tipoSS === "PREVENTIVA";
+  }).length;
+
+      document.getElementById("totalPreventivas").innerText = formatTotalComPercentual(totalPreventivas, totalAtendimentos);
+
+      const totalCorretivas = dados.filter(linha => {
+          const tipoSS = String(linha["TIPO DA SS"] || "").trim().toUpperCase();
+          return tipoSS === "CORRETIVA EMERGENCIAL" || tipoSS === "CORRETIVA PLANEJADA";
+      }).length;
+
+      const totalAvarias = dados.filter(linha => {
+          const tipoSS = String(linha["TIPO DA SS"] || "").trim().toUpperCase();
+          return tipoSS === "AVARIA";
+      }).length;
+
+  const tiposValidos = new Set([
+      "CORRETIVA PLANEJADA",
+      "CORRETIVA EMERGENCIAL"
+  ]);
+
+  const ocorrenciasTAG = {};
+
+  let programadores = 0;
+  let tecnicos = 0;
+
+  const nomesProgramadores = new Set([
+      "CRISTIANE FERNANDES MARTINS - RENTAL CT",
+      "TAMMER LAGE LEONEL - RENTAL CT",
+      "RENATO CASTRO DE ALMEIDA - RENTAL CT",
+      "MATHEUS GOMES DE ALMEIDA CABRAL - RENTAL CT",
+      "MAURICIO",
+      "ROTINA AUTOMATICA",
+      "AMANDA DE PAULA DA SILVA - SERVICE RJ",
+      "BIANCA THAIS DE OLIVEIRA - SERVICE PA",
+      "EDINEA APARECIDA DA SILVA - SERVICE CT",
+      "EDUARDO ANTONIO MARTINS VIEIRA - SERVICE CT",
+      "FLAVIO DA SILVA ANTONIO - SERVICE RJ",
+      "HELBERT PORTO SANTOS SILVA - SERVICE CT",
+      "HUDSON BRAVIN VIANNA - SERVICE RJ",
+      "JOAO MARCOS RIBEIRO DE ANDRADE - SERVICE PA",
+      "JUAN CORREA PESTANA - SERVICE ES",
+      "JULIO CESAR MOREIRA - SERVICE UDI",
+      "LUANA GOMES DIAS - SERVICE CT",
+      "MARGARETH DA PAIXAO LIMA - SERVICE ES",
+      "MARIANA ALVES RESENDE - SERVICE CT",
+      "RAFAEL ANTONIO DA SILVA - SERVICE CT",
+      "RAICA LORENA MIRANDA DE ASSIS - SERVICE CT",
+      "RENE ROSA ARRUDA JUNIOR - SERVICE CT",
+      "RODRIGO MONTALVAO RIBEIRO - SERVICE CT",
+      "TAYANE APARECIDA SILVA - SERVICE PI",
+      "TIAGO LUIZ DE OLIVEIRA - SERVICE PA",
+      "TIAGO ROCHA RISSI - SERVICE PI",
+      "VICTORIA KAREM DE FREITAS MARTINS - SERVICE CT",
+      "VINICIUS REIS PEREIRA DE OLIVEIRA - SERVICE CT",
+      "ADILSON DARIO DE ALMEIDA - RENTAL CT",
+      "CRISTIANE FERNANDES MARTINS - RENTAL CT",
+      "DOUGLAS DOS SANTOS DANTAS - BOZEL",
+      "HENRRIQUE PEREIRA SOARES",
+      "INARA CRISTINA DE ABREU LOPES - RENTAL CT",
+      "JOVEM APRENDIZ - SERVICE ES",
+      "KENIA RAYRA DIAS VIEIRA - SERVICE CT",
+      "LUIZ GUILHERME LEAO SILVA - BOZEL",
+      "MAICON DOUGLAS LOPES - BOZEL",
+      "MARCELA RAMALHO - SERVICE PA",
+      "MATHEUS GOMES DE ALMEIDA CABRAL - RENTAL CT",
+      "PAULO ADRIANO DE SOUZA - RENTAL CT",
+      "PEDRO HENRIQUE VIEIRA DOS SANTOS",
+      "RENATO CASTRO DE ALMEIDA - RENTAL CT",
+      "SACHA APARECIDA ROCHA - SERVICE PA",
+      "TAMMER LAGE LEONEL - RENTAL CT",
+      "TERESA CRISTINA SILVA - RENTAL CT",
+      "DENIS MAGNO DE AMORIM - RENTAL CT"    
+
+  ]);
+
+dados.forEach(linha => {
+
+    // ===== Equipamentos Revisitados (somente corretivas) =====
+    const tipo = String(linha["TIPO DA SS"] || "").trim().toUpperCase();
+
+    if (tiposValidos.has(tipo)) {
+        const tag = String(linha["AD"] || linha["TAG"] || "").trim();
+
+        if (tag) {
+            ocorrenciasTAG[tag] = (ocorrenciasTAG[tag] || 0) + 1;
         }
-        atual.setDate(atual.getDate() + 1);
     }
 
-    return dias;
-}
+    // ===== Abertura SS Técnicos x Programadores (TODAS as SS) =====
+    const abertoPor = String(linha["ABERTO POR"] || "").trim();
 
-function valorDiferenteDeZero(valor){
-    if(valor === undefined || valor === null || valor === "") return false;
-
-    const texto = String(valor).trim();
-
-    if(texto === "") return false;
-
-    const numero = Number(texto.replace(",", "."));
-
-    if(!isNaN(numero)){
-        return numero !== 0;
+    if (nomesProgramadores.has(abertoPor)) {
+        programadores++;
+    } else {
+        tecnicos++;
     }
 
-    return texto !== "0";
-}
+});
 
-function calcularTotais(dados){
+  const equipamentosRevisitados = Object.values(ocorrenciasTAG)
+      .filter(qtd => qtd > 1).length;
 
-    document.getElementById("totalAtendimento").innerText = dados.length;
+  const dadosRevisitados = Object.entries(ocorrenciasTAG)
+      .filter(([, qtd]) => qtd > 1)
+      .sort((a, b) => b[1] - a[1]);
 
-    const tagsPreventivas = new Set();
+  const revisitadoTags = dadosRevisitados.slice(0, 10).map(([tag]) => tag);
+  const revisitadoContagens = dadosRevisitados.slice(0, 10).map(([, qtd]) => qtd);
+  const revisitadoTemDados = dadosRevisitados.length > 0;
 
-    dados.forEach(linha => {
-        const tag = String(linha.__TAG_AC || "").trim();
+  document.getElementById("totalRevisitados").innerText = formatTotalComPercentual(equipamentosRevisitados, totalAtendimentos);
+      
+      document.getElementById("totalCorretivas").innerText = formatTotalComPercentual(totalCorretivas, totalAtendimentos);
+      document.getElementById("totalAvarias").innerText = formatTotalComPercentual(totalAvarias, totalAtendimentos);
 
-        if(tag && valorDiferenteDeZero(linha.__PREVENTIVA_BG)){
-            tagsPreventivas.add(tag);
-        }
-    });
+      const totaisTipo = {};
+      const totaisTecnico = {};
+      const totaisCliente = {};
 
-    document.getElementById("totalPreventivas").innerText = tagsPreventivas.size;
+      let totalHoras = 0;
+      let horasTrab = 0;
+      let horasAguard = 0;
+      let horasDesloc = 0;
+      let maquinaParada = 0;
 
-    const totalCorretivas = dados.filter(linha => {
-        const tipoSS = String(linha["TIPO DA SS"] || "").trim().toUpperCase();
-        return tipoSS === "CORRETIVA EMERGENCIAL" || tipoSS === "CORRETIVA PLANEJADA";
-    }).length;
+      let datas = [];
 
-    const totalAvarias = dados.filter(linha => {
-        const tipoSS = String(linha["TIPO DA SS"] || "").trim().toUpperCase();
-        return tipoSS === "AVARIA";
-    }).length;
+      dados.forEach(linha => {
 
-    document.getElementById("totalCorretivas").innerText = totalCorretivas;
-    document.getElementById("totalAvarias").innerText = totalAvarias;
+          const tipo = linha["TIPO DA SS"];
+          totaisTipo[tipo] = (totaisTipo[tipo] || 0) + 1;
 
-    const totaisTipo = {};
-    const totaisTecnico = {};
+          const tecnico = linha["TÉCNICO DESIGNADO"] || "Não informado";
+          totaisTecnico[tecnico] = (totaisTecnico[tecnico] || 0) + 1;
 
-    let totalHoras = 0;
-    let horasTrab = 0;
-    let horasAguard = 0;
-    let horasDesloc = 0;
-    let maquinaParada = 0;
+          const cliente = String(linha["SOLICITANTE"] || "Não informado").trim() || "Não informado";
+          totaisCliente[cliente] = (totaisCliente[cliente] || 0) + 1;
 
-    let datas = [];
+          totalHoras += toHoras(linha["TOTAL DE HORAS"]);
+          horasTrab += toHoras(linha["HORAS TRABALHADAS"]);
+          horasAguard += toHoras(linha["HORAS AGUARDANDO"]);
+          horasDesloc += toHoras(linha["HORAS DESLOCAMENTO"]);
+          maquinaParada += toHoras(linha["TOTAL DE MÁQUINA PARADA"]);
 
-    dados.forEach(linha => {
+          const data = excelDateToJS(linha["DATA DE ENCERRAMENTO"]);
+          if(data) datas.push(data);
+      });
 
-        const tipo = linha["TIPO DA SS"];
-        totaisTipo[tipo] = (totaisTipo[tipo] || 0) + 1;
+      criarGraficoPizza(totaisTipo);
 
-        const tecnico = linha["TÉCNICO DESIGNADO"] || "Não informado";
-        totaisTecnico[tecnico] = (totaisTecnico[tecnico] || 0) + 1;
+      let horasUteis = 0;
 
-        totalHoras += toHoras(linha["TOTAL DE HORAS"]);
-        horasTrab += toHoras(linha["HORAS TRABALHADAS"]);
-        horasAguard += toHoras(linha["HORAS AGUARDANDO"]);
-        horasDesloc += toHoras(linha["HORAS DESLOCAMENTO"]);
-        maquinaParada += toHoras(linha["TOTAL DE MÁQUINA PARADA"]);
+      const periodoEl = document.getElementById("periodoAnalisado");
+      periodoEl.innerText = "Período analisado: -";
 
-        const data = excelDateToJS(linha["DATA DE ALTERAÇÃO DA SS"]);
-        if(data) datas.push(data);
-    });
-
-    criarGraficoPizza(totaisTipo);
-
-    let horasUteis = 0;
-
-    document.getElementById("periodoAnalisado").innerText = "Período analisado: -";
-
-    if(datas.length){
+      if(datas.length){
 
         datas.sort((a,b)=>a-b);
 
         const dataMin = datas[0];
         const dataMax = datas[datas.length-1];
 
-        document.getElementById("periodoAnalisado").innerText =
-        `Período analisado: ${dataMin.toLocaleDateString("pt-BR")} a ${dataMax.toLocaleDateString("pt-BR")}`;
+        periodoEl.innerText = `Período analisado: ${dataMin.toLocaleDateString("pt-BR")} a ${dataMax.toLocaleDateString("pt-BR")}`;
+
+        // mostrar o período e manter o ícone compacto no cabeçalho
+        periodoEl.classList.add('show');
+        const ua = document.getElementById('uploadArea');
+        const acoesCabecalho = document.querySelector('.acoes-cabecalho');
+        if(ua){
+          ua.classList.remove('upload-area--large');
+          ua.classList.add('upload-area--small');
+          ua.style.display = 'flex';
+          if(acoesCabecalho && !acoesCabecalho.contains(ua)) acoesCabecalho.appendChild(ua);
+        }
 
         const diasUteis = calcularDiasUteis(dataMin, dataMax);
 
         horasUteis = diasUteis * 8.8;
+      }
+
+      criarGrafico("graficoTecnico","Atendimentos",Object.keys(totaisTecnico),Object.values(totaisTecnico),grafico,v=>grafico=v,true, filtrarPorTecnico);
+
+      const clientesOrdenados = Object.keys(totaisCliente)
+          .sort((a,b) => totaisCliente[b] - totaisCliente[a] || a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
+      const totCliente = clientesOrdenados.map(cliente => totaisCliente[cliente]);
+      criarGrafico("graficoCliente","Atendimentos por Cliente",clientesOrdenados,totCliente,g6,v=>g6=v,true, filtrarPorCliente);
+
+      const custoPecasPorTag = {};
+      dados.forEach(linha => {
+          const tag = String(linha["TAG"] || "").trim();
+          const valorPecasBruto = linha["TOTAL DE PEÇAS"];
+          if (!tag || valorPecasBruto === undefined || valorPecasBruto === null || String(valorPecasBruto).trim() === "") {
+              return;
+          }
+
+          const valorPecas = toNumber(valorPecasBruto);
+          if (Number.isNaN(valorPecas) || valorPecas <= 0) {
+              return;
+          }
+
+          custoPecasPorTag[tag] = (custoPecasPorTag[tag] || 0) + valorPecas;
+      });
+
+      const tagsCustoPecas = Object.entries(custoPecasPorTag)
+          .filter(([, valor]) => Number(valor) > 0)
+          .sort((a,b) => b[1] - a[1] || a[0].localeCompare(b[0], "pt-BR", {numeric:true, sensitivity:'base'}))
+          .slice(0, 10)
+          .map(([tag]) => tag);
+      const valoresCustoPecas = tagsCustoPecas.map(tag => Number(custoPecasPorTag[tag].toFixed(2)));
+      criarGrafico("graficoCustoPecas","Custo de Peças",tagsCustoPecas,valoresCustoPecas,g9,v=>g9=v,false);
+
+      const tecnicosSelecionados = getSelecionados("filtroTecnico");
+      if(tecnicosSelecionados.length === 1){
+          criarGrafico("graficoTotalHoras","Horas",
+              ["Trabalhadas","Horas Úteis"],
+              [horasTrab, horasUteis],
+              g1,v=>g1=v,false
+          );
+      } else if(g1){
+          g1.destroy();
+          g1 = null;
+      }
+
+      atualizarVisibilidadeGraficoTotalHoras();
+
+      criarGrafico("graficoHoras","Horas",["Trabalhadas", "Aguardando", "Deslocamento"],[horasTrab, horasAguard, horasDesloc],g2,v => g2 = v,false);
+      criarGrafico("graficoMaquina","Máquina Parada",["Total"],[maquinaParada],g5,v=>g5=v,false);
+      criarGraficoRevisitados(revisitadoTags, revisitadoContagens, revisitadoTemDados);
+      criarGraficoAbertura(programadores, tecnicos);
+      atualizarVisibilidadeCards();
+  }
+
+  function criarGrafico(id,label,labels,data,graficoAtual,salvar,comClickable,clickCallback){
+
+      if(graficoAtual){
+          graficoAtual.destroy();
+      }
+
+      const cardGrafico = document.getElementById(id)?.closest('.card');
+      const temDadosValidos = Array.isArray(labels) && Array.isArray(data) && labels.length > 0 && data.some(valor => valorDiferenteDeZero(valor));
+
+      if(id === "graficoCustoPecas" && !temDadosValidos){
+          if(cardGrafico){
+              cardGrafico.style.display = 'none';
+          }
+          if(typeof salvar === "function"){
+              salvar(null);
+          }
+          return;
+      }
+
+      if(cardGrafico){
+          cardGrafico.style.display = 'block';
+      }
+
+      const opcoes = {
+          responsive:true,
+          plugins:{
+              legend:{display:false}
+          },
+          interaction:{
+              mode:'nearest',
+              axis:'x',
+              intersect:true
+          }
+      };
+
+      if(comClickable && typeof clickCallback === "function"){
+          opcoes.onClick = (event, elements, chart) => {
+              const pontos = chart.getElementsAtEventForMode(event, 'nearest', {intersect:true}, true);
+              if(pontos.length > 0){
+                  const index = pontos[0].index;
+                  const valor = labels[index];
+                  clickCallback(valor);
+              }
+          };
+      }
+
+      const novo = new Chart(document.getElementById(id),{
+          type:'bar',
+          data:{
+              labels:labels,
+              datasets:[{
+                  label:label,
+                  data:data
+              }]
+          },
+          options:opcoes
+      });
+
+      salvar(novo);
+  }
+
+  function criarGraficoPizza(totaisTipo){
+      if(graficoTipos){
+          graficoTipos.destroy();
+      }
+
+      const labels = Object.keys(totaisTipo);
+      const data = Object.values(totaisTipo);
+
+      graficoTipos = new Chart(document.getElementById("graficoTipos"),{
+          type:'bar',
+          data:{
+              labels:labels,
+              datasets:[{
+                  label: "Atendimentos",
+                  data:data,
+                  barPercentage: 0.9,
+                  categoryPercentage: 0.8,
+                  maxBarThickness: 80
+              }]
+          },
+          options:{
+              responsive:true,
+              maintainAspectRatio:false,
+              interaction:{
+                  mode:'nearest',
+                  axis:'x',
+                  intersect:false
+              },
+              plugins:{
+                  legend:{
+                      display:false
+                  }
+              },
+              scales:{
+                  y:{
+                      beginAtZero:true
+                  }
+              },
+              onClick: (event) => {
+                  const pontos = graficoTipos.getElementsAtEventForMode(event, 'nearest', {intersect:false}, true);
+                  if(pontos.length > 0){
+                      const index = pontos[0].index;
+                      const tipo = labels[index];
+                      filtrarPorTipo(tipo);
+                  }
+              }
+          }
+      });
+  }
+
+  function criarGraficoAbertura(programadores, tecnicos){
+
+    if(g7){
+        g7.destroy();
     }
 
-    criarGrafico("graficoTecnico","Atendimentos",Object.keys(totaisTecnico),Object.values(totaisTecnico),grafico,v=>grafico=v,true);
+    const total = programadores + tecnicos || 1;
 
-    criarGrafico("graficoTotalHoras","Horas",
-        ["Trabalhadas","Horas Úteis"],
-        [horasTrab, horasUteis],
-        g1,v=>g1=v,false
-    );
-
-    criarGrafico("graficoTrabalhadas","Horas Trabalhadas",["Total"],[horasTrab],g2,v=>g2=v,false);
-    criarGrafico("graficoAguardando","Horas Aguardando",["Total"],[horasAguard],g3,v=>g3=v,false);
-    criarGrafico("graficoDeslocamento","Horas Deslocamento",["Total"],[horasDesloc],g4,v=>g4=v,false);
-    criarGrafico("graficoMaquina","Máquina Parada",["Total"],[maquinaParada],g5,v=>g5=v,false);
-
-    btnLimpar.style.display = existeFiltroAtivo() ? "inline-block" : "none";
-}
-
-function criarGrafico(id,label,labels,data,graficoAtual,salvar,comClickable){
-
-    if(graficoAtual){
-        graficoAtual.destroy();
-    }
-
-    const opcoes = {
-        responsive:true,
-        plugins:{
-            legend:{display:false}
-        }
-    };
-
-    if(comClickable){
-        opcoes.onClick = (event, elements) => {
-            if(elements.length > 0){
-                const index = elements[0].index;
-                const tecnico = labels[index];
-                filtrarPorTecnico(tecnico);
-            }
-        };
-    }
-
-    const novo = new Chart(document.getElementById(id),{
-        type:'bar',
+    g7 = new Chart(document.getElementById("graficoAbertura"),{
+        type:"pie",
         data:{
-            labels:labels,
+            labels:[
+                `Programadores - ${programadores} (${((programadores/total)*100).toFixed(1)}%)`,
+                `Técnicos - ${tecnicos} (${((tecnicos/total)*100).toFixed(1)}%)`
+            ],
             datasets:[{
-                label:label,
-                data:data
+                data:[programadores, tecnicos],
+                backgroundColor:["#2563eb","#10b981"]
             }]
         },
-        options:opcoes
+        options:{
+            responsive:true,
+            plugins:{
+                legend:{
+                    position:"bottom"
+                }
+            }
+        }
     });
-
-    salvar(novo);
 }
 
-function criarGraficoPizza(totaisTipo){
-    if(graficoTipos){
-        graficoTipos.destroy();
+  function criarGraficoRevisitados(labels, data, temDados){
+
+    const graficoCard = document.querySelector('#graficoRevisitados')?.closest('.card');
+
+    if(!temDados){
+      if(g8){
+        g8.destroy();
+        g8 = null;
+      }
+      if(graficoCard){
+        graficoCard.style.display = 'none';
+      }
+      return;
     }
 
-    const labels = Object.keys(totaisTipo);
-    const data = Object.values(totaisTipo);
+    if(graficoCard){
+      graficoCard.style.display = 'block';
+    }
 
-    graficoTipos = new Chart(document.getElementById("graficoTipos"),{
+    if(g8){
+        g8.destroy();
+    }
+
+    g8 = new Chart(document.getElementById("graficoRevisitados"),{
         type:'bar',
         data:{
-            labels:labels,
+            labels: labels,
             datasets:[{
-                label: "Atendimentos",
-                data:data,
-                backgroundColor: '#34a853',
-                barPercentage: 0.9,
-                categoryPercentage: 0.8,
-                maxBarThickness: 80
+                label: 'Quantidade Atendimentos',
+                data: data,
+                backgroundColor: labels.map(() => 'rgba(14, 165, 233, 0.8)'),
+                borderColor: labels.map(() => 'rgba(14, 165, 233, 1)'),
+                borderWidth: 1
             }]
         },
         options:{
             responsive:true,
             maintainAspectRatio:false,
             plugins:{
-                legend:{
-                    display:false
-                }
+                legend:{ display:false },
+                tooltip:{ callbacks:{ label: context => `${context.parsed.y}` } }
             },
             scales:{
-                y:{
-                    beginAtZero:true
-                }
-            },
-            onClick: (event, elements) => {
-                if(elements.length > 0){
-                    const index = elements[0].index;
-                    const tipo = labels[index];
-                    filtrarPorTipo(tipo);
-                }
+                x:{ title:{ display:true, text:'TAG' } },
+                y:{ title:{ display:true, text:'Quantidade Atendimentos' }, beginAtZero:true, ticks:{ precision:0 } }
             }
         }
     });
 }
 
+  function filtrarPorTecnico(tecnico){
+      marcarFiltroUnico("filtroTecnico", tecnico);
+      aplicarFiltros();
+  }
 
-function filtrarPorTecnico(tecnico){
-    marcarFiltroUnico("filtroTecnico", tecnico);
-    aplicarFiltros();
-}
+  function filtrarPorCliente(cliente){
+      marcarFiltroUnico("filtroCliente", cliente);
+      aplicarFiltros();
+  }
 
-function filtrarPorTipo(tipo){
-    marcarFiltroUnico("filtroTipo", tipo);
-    aplicarFiltros();
-}
+  function filtrarPorTipo(tipo){
+      marcarFiltroUnico("filtroTipo", tipo);
+      aplicarFiltros();
+  }
 
-function existeFiltroAtivo(){
-    return getSelecionados("filtroTecnico").length > 0 ||
-           getSelecionados("filtroTipo").length > 0 ||
-           getSelecionados("filtroEquipamento").length > 0 ||
-           getSelecionados("filtroMarca").length > 0 ||
-           getSelecionados("filtroModelo").length > 0;
-}
+  function existeFiltroAtivo(){
+      const existeBuscaAtiva = Array.from(document.querySelectorAll(".filtro-busca"))
+          .some(input => input.value.trim() !== "");
 
-function limparFiltros(){
-    document.querySelectorAll(".filtro-checkboxes input").forEach(input => {
-        input.checked = false;
-    });
+      return getSelecionados("filtroTecnico").length > 0 ||
+            getSelecionados("filtroTipo").length > 0 ||
+            getSelecionados("filtroCliente").length > 0 ||
+            getSelecionados("filtroEquipamento").length > 0 ||
+            getSelecionados("filtroMarca").length > 0 ||
+            getSelecionados("filtroModelo").length > 0 ||
+            existeBuscaAtiva;
+  }
 
-    document.querySelectorAll(".filtro-busca").forEach(input => {
-        input.value = "";
-    });
+  function atualizarVisibilidadeBotaoLimpar(){
+      if(!btnLimpar) return;
+      if(existeFiltroAtivo()){
+          btnLimpar.classList.remove("hidden");
+      } else {
+          btnLimpar.classList.add("hidden");
+      }
+  }
 
-    atualizarFiltrosOptions();
-    calcularTotais(dadosGlobais);
-    salvarEstadoPagina();
-}
+  function limparFiltros(){
+      document.querySelectorAll(".filtro-checkboxes input").forEach(input => {
+          input.checked = false;
+      });
 
-function toggleMenu() {
-    const menu = document.getElementById("menu");
-    if (menu) {
-        menu.classList.toggle("active");
-    }
-}
+      document.querySelectorAll(".filtro-busca").forEach(input => {
+          input.value = "";
+      });
 
-function logout() {
+      atualizarFiltrosOptions();
+      calcularTotais(dadosGlobais);
+      salvarEstadoPagina();
+      atualizarVisibilidadeBotaoLimpar();
+  }
+
+  function toggleMenu() {
+      const menu = document.getElementById("menu");
+      if (menu) {
+          menu.classList.toggle("active");
+      }
+  }
+
+  function logout() {
+    try { localStorage.removeItem('indicadores_financeiro_estado'); sessionStorage.removeItem('indicadores_financeiro_estado'); } catch(e) {}
     sessionStorage.clear();
     localStorage.removeItem("usuarioLogado");
     localStorage.removeItem("logado");
     localStorage.removeItem("isLoggedIn");
-    window.location.href = "login.html";
-}
+    window.location.replace("index.html");
+  }
 
-window.logout = logout;
+  window.logout = logout;
 
-window.addEventListener("DOMContentLoaded", restaurarEstadoPagina);
+  window.addEventListener("DOMContentLoaded", restaurarEstadoPagina);
 
-</script>
+  </script>
 
-<footer class="footer">
-    <div class="footer-container">
-        <div class="footer-col">
-            <h3>Tractorbel Equipamentos</h3>
-            <p>BR-040, 8245 - KM 523 - Chácaras Boa Vista, Contagem - MG, 32150-193</p>
-            <p>programacaorental04@tractorbel.com.br</p>
-        </div>
+  <footer class="footer">
+      <div class="footer-container">
+          <div class="footer-col">
+              <h3>Tractorbel Equipamentos</h3>
+              <p>BR-040, 8245 - KM 523 - Chácaras Boa Vista, Contagem - MG, 32150-193</p>
+              <p>programacaorental04@tractorbel.com.br</p>
+          </div>
 
-        <div class="footer-col">
-            <h3>Contato</h3>
-            <div class="footer-social">
-                <a href="https://br.linkedin.com/company/tractorbel-equipamentos" target="_blank">
-                    <img src="png/logo-linkedin.png" alt="">
-                </a>
-                <a href="https://api.whatsapp.com/send/?phone=558008801422" target="_blank">
-                    <img src="png/logo-whatsapp.png" alt="">
-                </a>
-                <a href="https://www.instagram.com/tractorbelequip/" target="_blank">
-                    <img src="png/logo-instagram.png" alt="">
-                </a>
-            </div>
-            <p>© 2026 Tractorbel Equipamentos - Todos os direitos reservados</p>
-            <p>Desenvolvido por Tâmmer Leonel</p>
-        </div>
-    </div>
-</footer>
+          <div class="footer-col">
+              <h3>Contato</h3>
+              <div class="footer-social">
+                  <a href="https://br.linkedin.com/company/tractorbel-equipamentos" target="_blank" rel="noopener noreferrer" title="LinkedIn Tractorbel">
+                    <img src="png/logo-linkedin.png" alt="LinkedIn">
+                  </a>
+                  <a href="https://api.whatsapp.com/send/?phone=558008801422" target="_blank" rel="noopener noreferrer" title="WhatsApp Tractorbel">
+                    <img src="png/logo-whatsapp.png" alt="WhatsApp">
+                  </a>
+                  <a href="https://www.instagram.com/tractorbelequip/" target="_blank" rel="noopener noreferrer" title="Instagram Tractorbel">
+                    <img src="png/logo-instagram.png" alt="Instagram">
+                  </a>
+              </div>
+              <p>© 2026 Tractorbel Equipamentos - Todos os direitos reservados</p>
+              <p>Desenvolvido por Tâmmer Leonel</p>
+          </div>
+      </div>
+  </footer>
 
-<script type="module" src="login.js"></script>
-</body>
-</html>
+  </div>
+  </div>
+
+  <script type="module" src="login.js"></script>
+  </body>
+  <script src="app-router.js"></script>
+  </html>

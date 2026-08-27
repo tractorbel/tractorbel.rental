@@ -5,8 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>documentacao-de-apoio-rental</title>
+    <link rel="prefetch" href="documentos.html" as="document">
+    <link rel="icon" type="image/png" href="icon.png">
     <link rel="stylesheet" href="index.css">
     <script type="module" src="login.js"></script>
+    <script src="app-router.js"></script>
     <style>
         #login {
         flex-direction: column;
@@ -29,7 +32,7 @@
 
         #login input {
             width: 100%;
-            max-width: 300px;
+            max-width: 400px;
             padding: 10px 5px;
             margin-bottom: 14px;
             border: 2px solid rgba(255,255,255,0.3);
@@ -60,10 +63,10 @@
 
         .login-container {
             background: rgba(255,255,255,0.95);
-            padding: 30px;
+            padding: 35px;
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-            max-width: 400px;            
+            max-width: 420px;            
         }
       
         .login-container input {
@@ -95,11 +98,11 @@
 <body>
 
 <!-- LOGIN -->
-<div id="login">
+<div id="login" class="hidden">
     <div class="login-container">
-        <div class="logo-topo" style="margin-bottom: 20px; margin-top: 0;">
-          <img src="png/logo.png" alt="Logo Tractorbel" />
-        </div>
+                <div class="logo-topo">
+                    <img src="png/logo-tractorbel.png" alt="Logo Tractorbel" />
+                </div>
         <h2>Área Restrita</h2>
         <input type="email" id="email" placeholder="Email"><br>
         <input type="password" id="senha" placeholder="Senha"><br>
@@ -108,38 +111,47 @@
 </div>
 
 <!-- CONTEÚDO PROTEGIDO -->
-<div id="conteudo" style="display:none;">
+<div id="conteudo" class="hidden">
 
     <!-- MENU (SÓ APÓS LOGIN) -->
-<nav class="navbar">
-    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-    <ul id="menu">
-        <li><a href="index.html">INICIO</a></li>
-        <li><a href="documentos.html">DOCUMENTOS</a></li>
-        <li><a href="indicadores.html">KPI MANUT.</a></li>
-        <li><a href="indicadores-resultado.html">KPI FINAN.</a></li>
-        <li><a href="veiculos.html">KPI VEICULOS</a></li>
-        <li><a href="#" onclick="logout(); return false;" class="logout-btn">SAIR</a></li>
-    </ul>
-</nav>
-<div class="logo-topo">
-  <img src="png/logo.png" alt="Logo" />
-</div>
+    <nav class="navbar">
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+        <div class="navbar-logo">
+            <img src="png/logo-tractorbel.png" alt="Logo Tractorbel">
+        </div>
+        <ul id="menu">
+            <li><a href="index.html" aria-current="page" onclick="document.getElementById('menu').classList.remove('active');">INICIO</a></li>
+            <li><a href="documentos.html">DOCUMENTOS</a></li>
+            <li><a href="indicadores.html">KPI MANUT.</a></li>
+            <li><a href="indicadores-resultado.html">KPI FINAN.</a></li>
+            <li><a href="#" onclick="logout(); return false;" class="logout-btn">SAIR</a></li>
+        </ul>
+    </nav>
 
-    <div class="container">
-        <header style="background: white; border-bottom: 2px solid #ccc;">
-                    <!-- TEXTO CENTRALIZADO EM BLOCO -->
-            <div class="texto-container">
-                <h3 class="texto-apresentacao">
-📂 <strong>Organização de Documentos</strong><br>
-Esta página foi criada para centralizar os documentos operacionais da Tractorbel, facilitando a execução, evitando erros e sanando dúvidas tornando mais fácil a compreensão e execução das tarefas.<br>
-📊 <strong>Análise de dados</strong><br>
-Permite analisar de forma clara os dados de atendimento técnico e custos operacionais, facilitando a tomada de decisões.<br>
-                </h3>
+    <div id="page-content">
+    <main class="container">
+       
+            <div class="cards">
+                <article class="card">
+                    <span class="card-icon">📁</span>
+                    <h2>Portal do Colaborador</h2>
+                    <p>Esta página foi criada para centralizar os documentos de apoio e operacionais da Tractorbel, facilitando a execução, evitando erros e sanando dúvidas.</p>
+                    <div class="card-actions">
+                        <a href="documentos.html" class="btn btn-primary">Acessar Documentos</a>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <span class="card-icon">📊</span>
+                    <h2>Análise de dados</h2>
+                    <p>Permite analisar de forma clara os dados de atendimento técnico e custos operacionais, facilitando a tomada de decisões.</p>
+                    <div class="card-actions">
+                        <a href="indicadores.html" class="btn btn-secondary">KPI Manutenção</a>
+                        <a href="indicadores-resultado.html" class="btn btn-secondary">KPI Financeiro</a>
+                    </div>
+                </article>
             </div>
-        </header>
-
-        
+        </section>
 
         <!-- RODAPÉ -->
         <footer class="footer">
@@ -153,14 +165,14 @@ Permite analisar de forma clara os dados de atendimento técnico e custos operac
                 <div class="footer-col">
                     <h3>Contato</h3>
                     <div class="footer-social">
-                        <a href="https://br.linkedin.com/company/tractorbel-equipamentos" target="_blank">
-                            <img src="png/logo-linkedin.png" alt="">
+                        <a href="https://br.linkedin.com/company/tractorbel-equipamentos" target="_blank" rel="noopener noreferrer" title="LinkedIn Tractorbel">
+                            <img src="png/logo-linkedin.png" alt="LinkedIn">
                         </a>
-                        <a href="https://api.whatsapp.com/send/?phone=558008801422" target="_blank">
-                            <img src="png/logo-whatsapp.png" alt="">
+                        <a href="https://api.whatsapp.com/send/?phone=558008801422" target="_blank" rel="noopener noreferrer" title="WhatsApp Tractorbel">
+                            <img src="png/logo-whatsapp.png" alt="WhatsApp">
                         </a>
-                        <a href="https://www.instagram.com/tractorbelequip/" target="_blank">
-                            <img src="png/logo-instagram.png" alt="">
+                        <a href="https://www.instagram.com/tractorbelequip/" target="_blank" rel="noopener noreferrer" title="Instagram Tractorbel">
+                            <img src="png/logo-instagram.png" alt="Instagram">
                         </a>
                     </div>
                     <p>© 2026 Tractorbel Equipamentos - Todos os direitos reservados</p>
@@ -169,6 +181,7 @@ Permite analisar de forma clara os dados de atendimento técnico e custos operac
             </div>
         </footer>
 
+    </main>
     </div>
 </div>
 
@@ -176,6 +189,13 @@ Permite analisar de forma clara os dados de atendimento técnico e custos operac
 function toggleMenu() {
     document.getElementById("menu").classList.toggle("active");
 }
+
+window.addEventListener("load", () => {
+    requestIdleCallback(() => {
+        fetch("documentos.html", { credentials: "same-origin" })
+            .catch(() => {});
+    });
+});
 </script>
 
 </body>

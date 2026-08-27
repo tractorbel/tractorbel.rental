@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Normalize documentos.json before commit
+NODE=$(command -v node || true)
+if [ -n "$NODE" ]; then
+  node "$(pwd)/scripts/normalize_documentos.js" || exit 1
+  git add documentos.json
+fi
+
+exit 0

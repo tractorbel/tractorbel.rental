@@ -1,0 +1,52 @@
+#!/usr/bin/env node
+import fs from 'fs';
+import path from 'path';
+
+const [, , basePath, ourPath, theirPath] = process.argv;
+
+function safeRead(p) {
+  try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch (e) { return []; }
+}
+
+function getTime(item) {
+  if (!item) return 0;
+  const t = item.updatedAt || item.createdAt || item._ts;
+  const v = Date.parse(t);
+  return isNaN(v) ? 0 : v;
+}
+
+function mergeArrays(base, ours, theirs) {
+  const map = new Map();
+  // start from base
+  for (const item of base || []) {
+    if (item && item.id) map.set(item.id, item);
+  }
+  // merge ours
+  for (const item of ours || []) {
+    if (!item || !item.id) continue;
+    if (!map.has(item.id) || getTime(item) >= getTime(map.get(item.id))) {
+      map.set(item.id, item);
+    }
+  }
+  // merge theirs
+  for (const item of theirs || []) {
+    if (!item || !item.id) continue;
+    if (!map.has(item.id) || getTime(item) >= getTime(map.get(item.id))) {
+      map.set(item.id, item);
+    }
+  }
+  const out = Array.from(map.values());
+  out.sort((a, b) => (a.id || '').localeCompare(b.id || ''));
+  return out;
+}
+
+function main() {
+  const base = safeRead(basePath);
+  const ours = safeRead(ourPath);
+  const theirs = safeRead(theirPath);
+  const merged = mergeArrays(base, ours, theirs);
+  fs.writeFileSync(ourPath, JSON.stringify(merged, null, 2) + '\n', 'utf8');
+  process.exit(0);
+}
+
+main();

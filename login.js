@@ -26,10 +26,13 @@ function mostrarConteudo(user){
   if(!login || !conteudo) return; // Só executar se os elementos existirem
   
   if(user){
-    login.style.display = "none";
+    login.classList.add("hidden");
+    conteudo.classList.remove("hidden");
     conteudo.style.display = "block";
   }else{
-    login.style.display = "block";
+    login.classList.remove("hidden");
+    login.style.display = "flex";
+    conteudo.classList.add("hidden");
     conteudo.style.display = "none";
   }
 }
@@ -40,9 +43,10 @@ function inicializarPagina(){
   const conteudo = document.getElementById("conteudo");
   if(!login || !conteudo) return; // Só executar se os elementos existirem
   
-  // Mostrar conteúdo por padrão para evitar "piscar" da tela de login
-  login.style.display = "none";
-  conteudo.style.display = "block";
+  // Manter ambos ocultos até que o Firebase confirme o estado de autenticação
+  login.classList.add("hidden");
+  conteudo.classList.add("hidden");
+  conteudo.style.display = "none";
 }
 
 window.login = function() {
@@ -54,23 +58,35 @@ window.login = function() {
 };
 
 window.logout = function() {
-  signOut(auth);
+    const isIndexPage = document.getElementById("login") && document.getElementById("conteudo");
+    const menu = document.getElementById("menu");
+    if(menu) menu.classList.remove("active");
+
+    signOut(auth).then(() => {
+        try { localStorage.removeItem('indicadores_financeiro_estado'); sessionStorage.removeItem('indicadores_financeiro_estado'); } catch(e) {}
+
+        if(isIndexPage) {
+            mostrarConteudo(null);
+        } else {
+            window.location.replace("index.html");
+        }
+    }).catch(()=>{});
 };
 
 // Só executar verificação de estado se os elementos existirem (página index.html)
 if(document.getElementById("login") && document.getElementById("conteudo")) {
-  // Inicializar mostrando conteúdo para evitar "piscar"
+  // Inicializar mostrando login ate a validacao do Firebase terminar
   inicializarPagina();
   
   // Verificar estado de autenticação
   onAuthStateChanged(auth, user => mostrarConteudo(user));
 } else {
-  // Para outras páginas, verificar se usuário está logado e redirecionar se não estiver
-  onAuthStateChanged(auth, user => {
-    if(!user) {
-      window.location.href = "index.html";
-    }
-  });
+    // Para outras páginas, verificar se usuário está logado e redirecionar ao login se não estiver
+    onAuthStateChanged(auth, user => {
+        if(!user) {
+            window.location.href = "index.html";
+        }
+    });
 }
 
 // ------------------- VARIÁVEIS GLOBAIS -------------------
@@ -285,8 +301,11 @@ function gerarGraficos(dados){
 }
 
 // ------------------- EVENTOS -------------------
-dataInicio.addEventListener("change", gerarRelatorio);
-dataFim.addEventListener("change", gerarRelatorio);
-document.getElementById("btnCarregar").addEventListener("click", carregarDados);
-document.getElementById("btnRelatorio").addEventListener("click", gerarRelatorio);
+if(dataInicio) dataInicio.addEventListener("change", gerarRelatorio);
+if(dataFim) dataFim.addEventListener("change", gerarRelatorio);
 
+const btnCarregar = document.getElementById("btnCarregar");
+const btnRelatorio = document.getElementById("btnRelatorio");
+
+if(btnCarregar) btnCarregar.addEventListener("click", carregarDados);
+if(btnRelatorio) btnRelatorio.addEventListener("click", gerarRelatorio);
