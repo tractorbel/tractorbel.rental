@@ -29,8 +29,6 @@ h1 { margin: 0 0 6px; font-size: 28px; color: #132b46; }
 .sector-card span { font-size: 28px; }
 .sector-card strong { font-size: 18px; }
 .sector-card small { color: #64748b; font-size: 14px; }
-.editing-note { margin-top: 20px; padding: 18px 20px; background: #f0fdf4; border-left: 4px solid #0b7a3e; color: #334155; line-height: 1.5; }
-.editing-note p { margin: 6px 0 0; }
 code { padding: 2px 4px; background: #dcfce7; border-radius: 4px; }
 .sector-page .page-heading { margin-bottom: 20px; }
 .back-link { display: inline-block; margin-top: 12px; color: #087a45; font-weight: 700; }

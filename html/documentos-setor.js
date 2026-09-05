@@ -4,7 +4,6 @@
   let sector = new URLSearchParams(window.location.search).get("setor") || "";
   const cards = [...document.querySelectorAll(".doc-card")];
   const title = document.querySelector(".panel-heading h1");
-  const description = document.querySelector(".panel-heading p");
   const links = [...document.querySelectorAll(".sector-link")];
 
   links.forEach((link) => {
@@ -26,9 +25,6 @@
       link.classList.toggle("active", linkSector === sector);
     });
     if (title) title.textContent = sector || "Todos os Documentos";
-    if (description) description.textContent = sector
-      ? `Documentos cadastrados no setor ${sector}.`
-      : "Catálogo completo de documentos e materiais de apoio.";
   }
 
   window.filtrarDocumentos = (value) => {
