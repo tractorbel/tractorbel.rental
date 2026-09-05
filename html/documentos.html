@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentos | Tractorbel</title>
+  <link rel="icon" type="image/png" href="../icon.png">
+  <link rel="stylesheet" href="documentos-setor.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a class="navbar-logo" href="index.html"><img src="../png/logo-tractorbel.png" alt="Tractorbel"></a>
+    <button class="menu-toggle" type="button" onclick="document.getElementById('menu').classList.toggle('active')">☰</button>
+    <ul id="menu">
+      <li><a href="index.html">INÍCIO</a></li>
+      <li><a class="active" href="documentos.html">DOCUMENTOS</a></li>
+      <li><a href="indicadores.html">KPI MANUT.</a></li>
+      <li><a href="indicadores-resultado.html">KPI FINAN.</a></li>
+      <li><a href="#" onclick="logout(); return false;" class="logout-btn">SAIR</a></li>
+    </ul>
+  </nav>
+  <main id="page-content" class="documentos-page">
+    <input id="document-search" class="document-search" type="search" placeholder="🔎 Buscar documento..." aria-label="Buscar documento" oninput="filtrarDocumentos(this.value)" onkeyup="filtrarDocumentos(this.value)">
+    <div class="documents-layout">
+      <aside class="sector-sidebar"><h2>SETORES</h2><a class="sector-link active" data-setor="" href="documentos.html">📁 <span>Todos os Documentos</span><b class="sector-count">0</b></a><a class="sector-link" data-setor="Documentos Técnicos" href="documentos.html?setor=Documentos%20T%C3%A9cnicos">📁 <span>Documentos Técnicos</span><b class="sector-count">0</b></a><a class="sector-link" data-setor="Almoxarifado" href="documentos.html?setor=Almoxarifado">📁 <span>Almoxarifado</span><b class="sector-count">0</b></a><a class="sector-link" data-setor="Ass. Técnica Rental" href="documentos.html?setor=Ass.%20T%C3%A9cnica%20Rental">📁 <span>Ass. Técnica Rental</span><b class="sector-count">0</b></a><a class="sector-link" data-setor="Compras" href="documentos.html?setor=Compras">📁 <span>Compras</span><b class="sector-count">0</b></a><a class="sector-link" data-setor="Recursos Humanos" href="documentos.html?setor=Recursos%20Humanos">📁 <span>Recursos Humanos</span><b class="sector-count">0</b></a><a class="sector-link" data-setor="Técnicos" href="documentos.html?setor=T%C3%A9cnicos">📁 <span>Técnicos</span><b class="sector-count">0</b></a></aside>
+      <section class="documents-panel"><header class="panel-heading"><span class="page-icon">📁</span><div><h1>Todos os Documentos</h1><p>Catálogo completo de documentos e materiais de apoio.</p></div></header><div class="doc-grid" aria-label="Todos os documentos">
+        <article class="doc-card" data-setor="Documentos Técnicos"><span class="doc-icon"><img src="../Icone-pdf.png" alt="PDF"></span><a href="../pdf/ORGANOGRAMA RENTAL POUSO ALEGRE - PA.pdf" target="_blank">Organograma Rental Pouso Alegre</a><small>Documentos Técnicos · PDF</small></article>
+        <article class="doc-card" data-setor="Documentos Técnicos"><span class="doc-icon"><img src="../Icone-pdf.png" alt="PDF"></span><a href="../pdf/FLUXOGRAMA DE TRANSFERÊNCIA CONTRATO MESMA FILIAL.pdf" target="_blank">Fluxograma de transferência na mesma filial</a><small>Documentos Técnicos · PDF</small></article>
+        <article class="doc-card" data-setor="Documentos Técnicos"><span class="doc-icon"><img src="../Icone-pdf.png" alt="PDF"></span><a href="../pdf/FLUXOGRAMA DE TRANSFERÊNCIA CONTRATO FILIAIS DIFERENTE.pdf" target="_blank">Fluxograma de transferência entre filiais</a><small>Documentos Técnicos · PDF</small></article>
+        <article class="doc-card" data-setor="Documentos Técnicos"><span class="doc-icon"><img src="../Icone-pdf.png" alt="PDF"></span><a href="../pdf/FLUXOGRAMA DE PEDIDO VENDA CASADA FÁBRICA.pdf" target="_blank">Fluxograma de pedido de venda casada</a><small>Documentos Técnicos · PDF</small></article>
+        <article class="doc-card" data-setor="Almoxarifado"><span class="doc-icon"><img src="../Icone-pdf.png" alt="PDF"></span><a href="../pdf/SENIOR Transferência entre depósito.pdf" target="_blank">SENIOR: transferência entre depósito</a><small>Almoxarifado · PDF</small></article>
+        <article class="doc-card" data-setor="Almoxarifado"><span class="doc-icon"><img src="../Icone-pdf.png" alt="PDF"></span><a href="../pdf/SISMETRO Cadastro de Patrimônio Acessórios.pdf" target="_blank">SISMETRO: cadastro de patrimônio e acessórios</a><small>Almoxarifado · PDF</small></article>
+        <article class="doc-card" data-setor="Almoxarifado"><span class="doc-icon"><img src="../Icone-pdf.png" alt="PDF"></span><a href="../pdf/SISLOC Solicitação de compra.pdf" target="_blank">SISLOC: solicitação de compra</a><small>Almoxarifado · PDF</small></article>
+        <article class="doc-card" data-setor="Almoxarifado"><span class="doc-icon"><img src="../Icone-pdf.png" alt="PDF"></span><a href="../pdf/SISLOC Solicitação de compra vinculado a OM.pdf" target="_blank">SISLOC: solicitação vinculada a OM</a><small>Almoxarifado · PDF</small></article>
+        <article class="doc-card" data-setor="Ass. Técnica Rental"><span class="doc-icon"><img src="../Icone-pdf.png" alt="PDF"></span><a href="../pdf/SISLOC Histórico de manutenção.pdf" target="_blank">SISLOC: histórico de manutenção</a><small>Ass. Técnica Rental · PDF</small></article>
+        <article class="doc-card" data-setor="Ass. Técnica Rental"><span class="doc-icon"><img src="../Icone-pdf.png" alt="PDF"></span><a href="../pdf/SISLOC Orçamento de avaria.pdf" target="_blank">SISLOC: orçamento de avaria</a><small>Ass. Técnica Rental · PDF</small></article>
+        <article class="doc-card" data-setor="Ass. Técnica Rental"><span class="doc-icon"><img src="../Icone-pdf.png" alt="PDF"></span><a href="../pdf/SISMETRO Orientação de utilização técnicos.pdf" target="_blank">SISMETRO: orientação para técnicos</a><small>Ass. Técnica Rental · PDF</small></article>
+        <article class="doc-card" data-setor="Ass. Técnica Rental"><span class="doc-icon"><img src="../Icone-pdf.png" alt="PDF"></span><a href="../pdf/SISMETRO Procedimento equipamentos vendidos.pdf" target="_blank">SISMETRO: equipamentos vendidos</a><small>Ass. Técnica Rental · PDF</small></article>
+        <article class="doc-card" data-setor="Ass. Técnica Rental"><span class="doc-icon"><img src="../Icone-pdf.png" alt="PDF"></span><a href="../pdf/SISLOC + GESTÃO X Aprovação avaria e solicitação faturamento.pdf" target="_blank">Aprovação de avaria e faturamento</a><small>Ass. Técnica Rental · PDF</small></article>
+        <article class="doc-card" data-setor="Compras"><span class="doc-icon"><img src="../Icone-pdf.png" alt="PDF"></span><a href="../pdf/GESTÃO X Solicitação de cadastro de produtos.pdf" target="_blank">Gestão X: cadastro de produtos</a><small>Compras · PDF</small></article>
+        <article class="doc-card" data-setor="Compras"><span class="doc-icon"><img src="../Icone-pdf.png" alt="PDF"></span><a href="../pdf/GESTÃO X Solicitação de emissão nota fiscal remessa para concerto.pdf" target="_blank">Gestão X: nota fiscal de remessa</a><small>Compras · PDF</small></article>
+        <article class="doc-card" data-setor="Compras"><span class="doc-icon"><img src="../Icone-pdf.png" alt="PDF"></span><a href="../pdf/GV + GESTÃO X Pedido de venda e solicitação NF consumo.pdf" target="_blank">GV + Gestão X: pedido de venda e NF</a><small>Compras · PDF</small></article>
+        <article class="doc-card" data-setor="Compras"><span class="doc-icon"><img src="../Icone-pdf.png" alt="PDF"></span><a href="../pdf/FLUIG Consulta de peças fluig.pdf" target="_blank">FLUIG: consulta de peças</a><small>Compras · PDF</small></article>
+        <article class="doc-card" data-setor="Técnicos"><span class="doc-icon"><img src="../Icone-pdf.png" alt="PDF"></span><a href="../pdf/Cartilha de orientação para o técnico.pdf" target="_blank">Cartilha de orientação para o técnico</a><small>Técnicos · PDF</small></article>
+        <article class="doc-card" data-setor="Técnicos"><span class="doc-icon"><img src="../Icone-pdf.png" alt="PDF"></span><a href="../pdf/APRENDIZ Orientações de arquivamento relatórios.pdf" target="_blank">Orientações de arquivamento de relatórios</a><small>Técnicos · PDF</small></article>
+      </div></section>
+    </div>
+    <aside class="editing-note">
+      <strong>Como adicionar um PDF ou vídeo</strong>
+      <p>Para adicionar um arquivo, copie um cartão neste HTML. Para PDF, use <code>../pdf/arquivo.pdf</code>. Para vídeo, use <code>../videos/arquivo.mp4</code> ou um link externo.</p>
+    </aside>
+  </main>
+  <footer class="footer">© 2026 Tractorbel Equipamentos</footer>
+  <script src="../app-router.js"></script>
+  <script type="module" src="../login.js"></script>
+  <script src="documentos-setor.js"></script>
+</body>
+</html>
