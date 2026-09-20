@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="../index.css">
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
       *  
@@ -262,6 +263,30 @@
       .btn-google:hover {
         background-color: #34a853;
         color: white;
+      }
+
+      .btn-export-pdf {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #fff;
+        border: 1px solid #22c55e;
+        color: #15803d;
+        padding: 10px 16px;
+        border-radius: 999px;
+        cursor: pointer;
+        font-weight: 600;
+        margin-left: auto;
+      }
+
+      .btn-export-pdf:hover {
+        background: #f0fdf4;
+      }
+
+      .btn-export-pdf svg {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
       }
 
       .btn-google:active {
@@ -528,6 +553,10 @@
       <label for="upload" class="sr-only">Upload de planilha</label>
       <input type="file" id="upload" accept=".xls,.xlsx" class="hidden" aria-label="Upload de planilha">
       <button id="btnLimpar" class="btn-google hidden">Limpar Filtros</button>
+      <button id="btnExportPdfSolicitantes" class="btn-export-pdf" type="button" title="Clientes À definir">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm8 1.5V8h5.5L14 3.5zM8 12h8v2H8v-2zm0 4h8v2H8v-2z"/></svg>
+        Lista de solicitantes À definir
+      </button>
     </div>
   </div>
 
@@ -629,6 +658,11 @@
   </div>
 
   <div class="card grafico-card">
+  <h3>Atendimento x Programador</h3>
+  <canvas id="graficoProgramador"></canvas>
+  </div>
+
+  <div class="card grafico-card">
       <h3>Top 10 Patrimônios com Maior Custo de Peças</h3>
       <canvas id="graficoCustoPecas"></canvas>
   </div>
@@ -658,13 +692,144 @@
   <script>
 
   let dadosGlobais = [];
-  let grafico, graficoTipos, g1, g2, g3, g4, g5, g6, g7, g8, g9;
+  let grafico, graficoTipos, g1, g2, g3, g4, g5, g6, g7, g8, g9, gProgramador;
   let uploadDialogOpen = false; /* prevent duplicate file picker opens */
 
   const STORAGE_KEY = "indicadores_ss_estado";
+
+  const PROGRAMADORES = {
+    RENATO: ["335317", "333269"],
+    CRISTIANE: ["346676"],
+    MATHEUS: ["605274"]
+  };
+
+  function getValorColunaR(linha){
+      const chaves = [
+          "R",
+          "ID SOLICITANTE",
+          "ID DO SOLICITANTE",
+          "SOLICITANTE ID",
+          "SOLICITANTE",
+          "ID DO PROGRAMADOR",
+          "PROGRAMADOR ID"
+      ];
+
+      for (const chave of chaves) {
+          if (linha && Object.prototype.hasOwnProperty.call(linha, chave)) {
+              return linha[chave];
+          }
+      }
+
+      return linha && linha[17] !== undefined ? linha[17] : "";
+  }
+
+  function normalizarIdSolicitante(valor){
+      if (valor === null || valor === undefined) return "";
+      const texto = String(valor).trim();
+      if (!texto) return "";
+
+      const apenasNumeros = texto.replace(/\s+/g, "").replace(/[()]/g, "");
+      const numero = Number(apenasNumeros.replace('.', '').replace(',', ''));
+
+      if (!Number.isNaN(numero) && String(apenasNumeros).match(/[0-9]+([.,][0-9]+)?/)) {
+          return String(Math.trunc(numero));
+      }
+
+      return apenasNumeros.replace(/[^0-9]/g, "");
+  }
+
   const btnLimpar = document.getElementById("btnLimpar");
 
+  const btnExportPdfSolicitantes = document.getElementById("btnExportPdfSolicitantes");
+
   btnLimpar.classList.add("hidden");
+
+  function gerarListaUnicaSolicitantes(){
+      const mapa = new Map();
+      const chavesR = ["R", "ID SOLICITANTE", "ID DO SOLICITANTE", "SOLICITANTE ID", "ID DO PROGRAMADOR", "PROGRAMADOR ID"];
+      const chavesS = ["S", "SOLICITANTE", "NOME SOLICITANTE", "NOME DO SOLICITANTE"];
+
+      dadosGlobais.forEach(linha => {
+          let id = "";
+          let nome = "";
+
+          for (const chave of chavesR) {
+              if (Object.prototype.hasOwnProperty.call(linha, chave) && linha[chave] !== undefined && linha[chave] !== null && String(linha[chave]).trim() !== "") {
+                  id = String(linha[chave]).trim();
+                  break;
+              }
+          }
+
+          for (const chave of chavesS) {
+              if (Object.prototype.hasOwnProperty.call(linha, chave) && linha[chave] !== undefined && linha[chave] !== null && String(linha[chave]).trim() !== "") {
+                  nome = String(linha[chave]).trim();
+                  break;
+              }
+          }
+
+          if (!id && !nome) return;
+
+          const idNormalizado = normalizarIdSolicitante(id || nome);
+          if (!idNormalizado && !nome) return;
+
+          const chave = idNormalizado || nome || "À definir";
+          if (!mapa.has(chave)) {
+              mapa.set(chave, {
+                  id: id || idNormalizado || "À definir",
+                  solicitante: nome || "À definir"
+              });
+          }
+      });
+
+      return Array.from(mapa.values()).sort((a, b) => {
+          const aId = String(a.id || "").trim();
+          const bId = String(b.id || "").trim();
+          if (aId === "À definir" && bId !== "À definir") return 1;
+          if (bId === "À definir" && aId !== "À definir") return -1;
+          return aId.localeCompare(bId, "pt-BR", { numeric: true, sensitivity: "base" });
+      });
+  }
+
+  function exportarSolicitantesPdf(){
+      if (!dadosGlobais.length) return;
+
+      const dados = gerarListaUnicaSolicitantes();
+      if (!dados.length) return;
+
+      if (typeof window.jspdf === "undefined") {
+          alert("Biblioteca PDF não carregada.");
+          return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+
+      pdf.setFontSize(14);
+      pdf.text("Solicitantes únicos", 14, 16);
+
+      const tabela = dados.map(item => [
+          String(item.id || "À definir"),
+          String(item.solicitante || "À definir")
+      ]);
+
+      let y = 26;
+      pdf.setFontSize(10);
+      pdf.text("ID do Solicitante", 14, y);
+      pdf.text("Solicitante", 90, y);
+      y += 7;
+
+      tabela.forEach(([id, solicitante]) => {
+          if (y > 270) {
+              pdf.addPage();
+              y = 16;
+          }
+          pdf.text(String(id), 14, y);
+          pdf.text(String(solicitante), 90, y);
+          y += 6;
+      });
+
+      pdf.save("solicitantes-unicos.pdf");
+  }
 
   function getEstadoFiltros(){
       return {
@@ -813,6 +978,7 @@
   });
 
   btnLimpar.addEventListener("click", limparFiltros);
+  btnExportPdfSolicitantes.addEventListener("click", exportarSolicitantesPdf);
 
   function popularFiltro(dados){
       atualizarFiltrosOptions();
@@ -1272,6 +1438,7 @@ dados.forEach(linha => {
       const totaisTipo = {};
       const totaisTecnico = {};
       const totaisCliente = {};
+      const totaisProgramador = {};
 
       let totalHoras = 0;
       let horasTrab = 0;
@@ -1291,6 +1458,16 @@ dados.forEach(linha => {
 
           const cliente = String(linha["SOLICITANTE"] || "Não informado").trim() || "Não informado";
           totaisCliente[cliente] = (totaisCliente[cliente] || 0) + 1;
+
+          const solicitanteId = normalizarIdSolicitante(getValorColunaR(linha));
+          let nomeProgramador = "À definir";
+          for (const [programador, ids] of Object.entries(PROGRAMADORES)) {
+            if (ids.map(normalizarIdSolicitante).includes(solicitanteId)) {
+              nomeProgramador = programador;
+              break;
+            }
+          }
+          totaisProgramador[nomeProgramador] = (totaisProgramador[nomeProgramador] || 0) + 1;
 
           totalHoras += toHoras(linha["TOTAL DE HORAS"]);
           horasTrab += toHoras(linha["HORAS TRABALHADAS"]);
@@ -1340,6 +1517,11 @@ dados.forEach(linha => {
           .sort((a,b) => totaisCliente[b] - totaisCliente[a] || a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
       const totCliente = clientesOrdenados.map(cliente => totaisCliente[cliente]);
       criarGrafico("graficoCliente","Atendimentos por Cliente",clientesOrdenados,totCliente,g6,v=>g6=v,true, filtrarPorCliente);
+
+      const programadoresOrdenados = Object.keys(totaisProgramador)
+          .sort((a,b) => totaisProgramador[b] - totaisProgramador[a] || a.localeCompare(b, "pt-BR", {numeric:true, sensitivity:'base'}));
+      const totProgramador = programadoresOrdenados.map(programador => totaisProgramador[programador]);
+      criarGrafico("graficoProgramador","Atendimentos por Programador",programadoresOrdenados,totProgramador,gProgramador,v=>gProgramador=v,false);
 
       const custoPecasPorTag = {};
       dados.forEach(linha => {
