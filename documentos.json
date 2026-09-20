@@ -110,6 +110,116 @@
     "updatedAt": "2026-05-23T03:37:58.071Z"
   },
   {
+    "id": "sismetro-video-abrir-nova-ss",
+    "title": "Como abrir uma nova SS = Solicitação de serviço",
+    "filePath": "Vídeo/0 - Vídeo de como abrir uma nova SS = Solicitação de serviço.mp4",
+    "fileName": "0 - Vídeo de como abrir uma nova SS = Solicitação de serviço.mp4",
+    "iconPath": "png/sismetro.png",
+    "notes": "",
+    "sector": "Sismetro",
+    "createdAt": "2026-05-23T03:37:58.071Z",
+    "updatedAt": "2026-05-23T03:37:58.071Z"
+  },
+  {
+    "id": "sismetro-video-sincronizacao-diaria",
+    "title": "Como realizar sincronização diária",
+    "filePath": "Vídeo/1 - Vídeo de como realizar sincronização diária.mp4",
+    "fileName": "1 - Vídeo de como realizar sincronização diária.mp4",
+    "iconPath": "png/sismetro.png",
+    "notes": "",
+    "sector": "Sismetro",
+    "createdAt": "2026-05-23T03:37:58.071Z",
+    "updatedAt": "2026-05-23T03:37:58.071Z"
+  },
+  {
+    "id": "sismetro-video-editar-ss",
+    "title": "Como editar SS = Solicitação de serviço",
+    "filePath": "Vídeo/2 - Vídeo de como editar SS = Solicitação de serviço.mp4",
+    "fileName": "2 - Vídeo de como editar SS = Solicitação de serviço.mp4",
+    "iconPath": "png/sismetro.png",
+    "notes": "",
+    "sector": "Sismetro",
+    "createdAt": "2026-05-23T03:37:58.071Z",
+    "updatedAt": "2026-05-23T03:37:58.071Z"
+  },
+  {
+    "id": "sismetro-video-inserir-fotos-ss",
+    "title": "Como inserir fotos na SS = Solicitação de serviço",
+    "filePath": "Vídeo/3 - Vídeo de como inserir Fotos na SS = Solicitação de serviço.mp4",
+    "fileName": "3 - Vídeo de como inserir Fotos na SS = Solicitação de serviço.mp4",
+    "iconPath": "png/sismetro.png",
+    "notes": "",
+    "sector": "Sismetro",
+    "createdAt": "2026-05-23T03:37:58.071Z",
+    "updatedAt": "2026-05-23T03:37:58.071Z"
+  },
+  {
+    "id": "sismetro-video-lancamento-horas",
+    "title": "Como realizar lançamento de Horas Trabalhadas, Deslocamento ou Aguardando",
+    "filePath": "Vídeo/4 - Vídeo de como realizar lançamento de Horas Trabalhadas, Deslocamento ou Aguardando.mp4",
+    "fileName": "4 - Vídeo de como realizar lançamento de Horas Trabalhadas, Deslocamento ou Aguardando.mp4",
+    "iconPath": "png/sismetro.png",
+    "notes": "",
+    "sector": "Sismetro",
+    "createdAt": "2026-05-23T03:37:58.071Z",
+    "updatedAt": "2026-05-23T03:37:58.071Z"
+  },
+  {
+    "id": "sismetro-video-horimetro-dentro-ss",
+    "title": "Como lançar Horimetro-Controle dentro da SS",
+    "filePath": "Vídeo/5 - Vídeo de como lançar Horimetro-Controle dentro da SS.mp4",
+    "fileName": "5 - Vídeo de como lançar Horimetro-Controle dentro da SS.mp4",
+    "iconPath": "png/sismetro.png",
+    "notes": "",
+    "sector": "Sismetro",
+    "createdAt": "2026-05-23T03:37:58.071Z",
+    "updatedAt": "2026-05-23T03:37:58.071Z"
+  },
+  {
+    "id": "sismetro-video-coletar-assinatura-ss",
+    "title": "Como coletar assinatura na SS",
+    "filePath": "Vídeo/6 - Vídeo como coletar assinatura na SS.mp4",
+    "fileName": "6 - Vídeo como coletar assinatura na SS.mp4",
+    "iconPath": "png/sismetro.png",
+    "notes": "",
+    "sector": "Sismetro",
+    "createdAt": "2026-05-23T03:37:58.071Z",
+    "updatedAt": "2026-05-23T03:37:58.071Z"
+  },
+  {
+    "id": "sismetro-video-horimetro-fora-ss",
+    "title": "Como lançar Horimetro-Controle fora da SS",
+    "filePath": "Vídeo/7 - Vídeo de como lançar Horimetro-Controle fora da SS.mp4",
+    "fileName": "7 - Vídeo de como lançar Horimetro-Controle fora da SS.mp4",
+    "iconPath": "png/sismetro.png",
+    "notes": "",
+    "sector": "Sismetro",
+    "createdAt": "2026-05-23T03:37:58.071Z",
+    "updatedAt": "2026-05-23T03:37:58.071Z"
+  },
+  {
+    "id": "sismetro-video-sincronizacao-produtos-wifi",
+    "title": "Como realizar sincronização dos produtos quando estiver no WIFI",
+    "filePath": "Vídeo/8 - Vídeo de como realizar sincronização dos produtos fazer quando estiver no WIFI.mp4",
+    "fileName": "8 - Vídeo de como realizar sincronização dos produtos fazer quando estiver no WIFI.mp4",
+    "iconPath": "png/sismetro.png",
+    "notes": "",
+    "sector": "Sismetro",
+    "createdAt": "2026-05-23T03:37:58.071Z",
+    "updatedAt": "2026-05-23T03:37:58.071Z"
+  },
+  {
+    "id": "sismetro-video-km-rodado",
+    "title": "Como lançar KM Rodado",
+    "filePath": "Vídeo/9 - Vídeo de como lançar KM Rodado.mp4",
+    "fileName": "9 - Vídeo de como lançar KM Rodado.mp4",
+    "iconPath": "png/sismetro.png",
+    "notes": "",
+    "sector": "Sismetro",
+    "createdAt": "2026-05-23T03:37:58.071Z",
+    "updatedAt": "2026-05-23T03:37:58.071Z"
+  },
+  {
     "id": "sisloc-gestao-x-aprovacao-avaria-e-solicitacao-faturamento-pdf",
     "title": "SISLOC + GESTÃO X Aprovação avaria e solicitação faturamento",
     "filePath": "pdf/SISLOC + GESTÃO X Aprovação avaria e solicitação faturamento.pdf",
