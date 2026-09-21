@@ -58,8 +58,8 @@
 
       .topo-controles {
         display: grid;
-        grid-template-columns: repeat(7, minmax(120px, 1fr));
-        gap: 6px;
+        grid-template-columns: repeat(7, minmax(150px, 1fr));
+        gap: 10px;
         align-items: start;
         margin-bottom: 14px;
       }
@@ -76,11 +76,12 @@
         flex-direction: column;
         border: 1px solid #d8e8da;
         border-radius: 12px;
-        padding: 8px;
+        padding: 10px 10px 8px;
         background: #fff;
         box-shadow: 0 2px 8px rgba(46, 125, 50, 0.08);
         min-width: 0;
         width: 100%;
+        box-sizing: border-box;
       }
 
       /* reduzir altura padrão dos cards nesta página */
@@ -175,7 +176,7 @@
         font-size: 13px;
         font-weight: 700;
         color: #2e7d32;
-        margin: 0 0 6px 0;
+        margin: 0 0 8px 0;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -214,7 +215,7 @@
   }
 
   .filtro-checkboxes {
-    max-height: 130px;
+    max-height: 138px;
     overflow-y: auto;
     border: 1px solid #cfd8dc;
     border-radius: 10px;
@@ -709,9 +710,9 @@
   const STORAGE_KEY = "indicadores_ss_estado";
 
   const PROGRAMADORES = {
-    RENATO: ["335317", "333269"],
-    CRISTIANE: ["346676"],
-    MATHEUS: ["605274"]
+    RENATO: ["335317", "333269","332367","332841","332960","333853","337747"],
+    CRISTIANE: ["346676","310674","344913"],
+    MATHEUS: ["605274", "254954","332364"]
   };
 
   function getValorColunaR(linha){
@@ -810,13 +811,15 @@
               }
           }
 
-          const idFinal = id || "À definir";
+          const idNormalizado = normalizarIdSolicitante(id);
+          const nomeProgramador = obterNomeProgramadorPorId(idNormalizado);
+          const idFinal = idNormalizado || "À definir";
           const nomeFinal = nome || "À definir";
+          const ehIndefinido = valorIndefinido(id) || valorIndefinido(nome) || !id || !nome || nomeProgramador === "À definir";
 
-          const ehIndefinido = valorIndefinido(id) || valorIndefinido(nome) || !id || !nome;
           if (!ehIndefinido) return;
 
-          const chave = (normalizarIdSolicitante(id) || idFinal) + "::" + nomeFinal;
+          const chave = (idNormalizado || idFinal) + "::" + nomeFinal;
           if (!mapa.has(chave)) {
               mapa.set(chave, {
                   id: idFinal,
@@ -875,7 +878,25 @@
           y += 6;
       });
 
-      pdf.save("solicitantes-unicos.pdf");
+      try {
+          pdf.save("solicitantes-unicos.pdf");
+      } catch (erroSalvar) {
+          try {
+              const blob = pdf.output("blob");
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement("a");
+              link.href = url;
+              link.download = "solicitantes-unicos.pdf";
+              document.body.appendChild(link);
+              link.click();
+              link.remove();
+              setTimeout(() => URL.revokeObjectURL(url), 1000);
+          } catch (erroBlob) {
+              console.error("Erro ao exportar PDF de solicitantes:", erroBlob);
+              alert("Não foi possível exportar o PDF.");
+          }
+      }
+
       mostrarBotaoClientesDefinir();
   }
 
