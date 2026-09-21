@@ -710,7 +710,7 @@
   const STORAGE_KEY = "indicadores_ss_estado";
 
   const PROGRAMADORES = {
-    RENATO: ["335317", "333269","332367","332841","332960","333853","337747"],
+    RENATO: ["335317", "333269","332367","332841","332960","333853","337747","337918","338116","338896","341610","341651","342293","343091"],
     CRISTIANE: ["346676","310674","344913"],
     MATHEUS: ["605274", "254954","332364"]
   };
@@ -788,6 +788,43 @@
       btnExportPdfSolicitantes.classList.toggle("hidden", !(dadosDefinidos.length || existeProgramadorIndefinido));
   }
 
+  function getValorColunaCidade(linha){
+      const chaves = [
+          "U",
+          "CIDADE DO SOLICITANTE",
+          "CIDADE SOLICITANTE",
+          "CIDADE",
+          "CIDADE CLIENTE"
+      ];
+
+      for (const chave of chaves) {
+          if (linha && Object.prototype.hasOwnProperty.call(linha, chave)) {
+              return linha[chave];
+          }
+      }
+
+      return linha && linha[20] !== undefined ? linha[20] : "";
+  }
+
+  function getValorColunaLocalizacao(linha){
+      const chaves = [
+          "V",
+          "LOCALIZACAO",
+          "LOCALIZAÇÃO",
+          "LOCALIZAÇÃO DO SOLICITANTE",
+          "LOCALIZACAO DO SOLICITANTE",
+          "LOCALIZACAO CLIENTE"
+      ];
+
+      for (const chave of chaves) {
+          if (linha && Object.prototype.hasOwnProperty.call(linha, chave)) {
+              return linha[chave];
+          }
+      }
+
+      return linha && linha[21] !== undefined ? linha[21] : "";
+  }
+
   function gerarListaUnicaSolicitantes(){
       const mapa = new Map();
       const chavesR = ["R", "ID SOLICITANTE", "ID DO SOLICITANTE", "SOLICITANTE ID", "ID DO PROGRAMADOR", "PROGRAMADOR ID"];
@@ -796,6 +833,8 @@
       dadosGlobais.forEach(linha => {
           let id = "";
           let nome = "";
+          let cidade = "";
+          let localizacao = "";
 
           for (const chave of chavesR) {
               if (Object.prototype.hasOwnProperty.call(linha, chave) && !valorIndefinido(linha[chave])) {
@@ -811,10 +850,15 @@
               }
           }
 
+          cidade = String(getValorColunaCidade(linha) ?? "").trim();
+          localizacao = String(getValorColunaLocalizacao(linha) ?? "").trim();
+
           const idNormalizado = normalizarIdSolicitante(id);
           const nomeProgramador = obterNomeProgramadorPorId(idNormalizado);
           const idFinal = idNormalizado || "À definir";
           const nomeFinal = nome || "À definir";
+          const cidadeFinal = cidade || "À definir";
+          const localizacaoFinal = localizacao || "À definir";
           const ehIndefinido = valorIndefinido(id) || valorIndefinido(nome) || !id || !nome || nomeProgramador === "À definir";
 
           if (!ehIndefinido) return;
@@ -823,7 +867,9 @@
           if (!mapa.has(chave)) {
               mapa.set(chave, {
                   id: idFinal,
-                  solicitante: nomeFinal
+                  solicitante: nomeFinal,
+                  cidade: cidadeFinal,
+                  localizacao: localizacaoFinal
               });
           }
       });
@@ -853,29 +899,74 @@
 
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const margem = 7;
+      const maxY = 285;
+      const colunas = [
+          { x: 8, largura: 26, titulo: "ID do Solicitante" },
+          { x: 36, largura: 56, titulo: "Solicitante" },
+          { x: 93, largura: 46, titulo: "Cidade" },
+          { x: 141, largura: 58, titulo: "Localização" }
+      ];
 
-      pdf.setFontSize(14);
-      pdf.text("Solicitantes únicos", 14, 16);
+      const normalizarValorPdf = valor => {
+          const texto = String(valor ?? "").trim();
+          if (!texto || texto.toLowerCase() === "à definir" || texto.toLowerCase() === "a definir") {
+              return "";
+          }
+          return texto;
+      };
 
       const tabela = dados.map(item => [
-          String(item.id || "À definir"),
-          String(item.solicitante || "À definir")
+          normalizarValorPdf(item.id),
+          normalizarValorPdf(item.solicitante),
+          normalizarValorPdf(item.cidade),
+          normalizarValorPdf(item.localizacao)
       ]);
 
-      let y = 26;
-      pdf.setFontSize(10);
-      pdf.text("ID do Solicitante", 14, y);
-      pdf.text("Solicitante", 90, y);
-      y += 7;
+      pdf.setFontSize(14);
+      pdf.text("Solicitantes únicos", margem, 14);
 
-      tabela.forEach(([id, solicitante]) => {
-          if (y > 270) {
+      let y = 21;
+      pdf.setFontSize(8.5);
+      colunas.forEach(coluna => {
+          pdf.text(String(coluna.titulo), coluna.x, y);
+      });
+      y += 6;
+
+      tabela.forEach(([id, solicitante, cidade, localizacao]) => {
+          const linhasPorColuna = colunas.map((coluna, indice) => {
+              const valor = [id, solicitante, cidade, localizacao][indice] || "";
+              if (!valor) return [];
+              return pdf.splitTextToSize(valor, coluna.largura - 1.5);
+          });
+
+          const linhasNecessarias = Math.max(...linhasPorColuna.map(lista => lista.length || 1), 1);
+          const alturaLinha = 4.1;
+          const alturaBloco = linhasNecessarias * alturaLinha;
+
+          if (y + alturaBloco > maxY) {
               pdf.addPage();
-              y = 16;
+              y = 14;
+              pdf.setFontSize(8.5);
+              colunas.forEach(coluna => {
+                  pdf.text(String(coluna.titulo), coluna.x, y);
+              });
+              y += 6;
           }
-          pdf.text(String(id), 14, y);
-          pdf.text(String(solicitante), 90, y);
-          y += 6;
+
+          colunas.forEach((coluna, indice) => {
+              const linhas = linhasPorColuna[indice] || [];
+              if (!linhas.length) return;
+
+              const xTexto = coluna.x;
+              const inicioY = y;
+
+              linhas.forEach((linha, linhaIndex) => {
+                  pdf.text(String(linha), xTexto, inicioY + (linhaIndex * alturaLinha));
+              });
+          });
+
+          y += alturaBloco + 1.2;
       });
 
       try {
