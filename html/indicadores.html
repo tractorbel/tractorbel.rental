@@ -513,6 +513,17 @@
     color:#fff;
   }
 
+  .btn-export-pdf-regioes{
+    margin:0 0 0 auto;
+    padding:6px 10px;
+    font-size:12px;
+  }
+
+  .btn-export-pdf-regioes svg{
+    width:16px;
+    height:16px;
+  }
+
   .grupo-graficos{display:none}
   .grupo-graficos.ativo{display:contents}
   .grupo-graficos.ativo .grafico-card{display:block}
@@ -703,7 +714,7 @@
       <label for="upload" class="sr-only">Upload de planilha</label>
       <input type="file" id="upload" accept=".xls,.xlsx" class="hidden" aria-label="Upload de planilha">
       <div class="seletor-visao-graficos" id="seletorVisaoGraficos" role="group" aria-label="Selecionar visão dos gráficos">
-        <button type="button" class="btn-visao-graficos" data-visao="tecnicos" aria-controls="graficosTecnicos" aria-pressed="true">Visão Técnicos</button>
+        <button type="button" class="btn-visao-graficos" data-visao="tecnicos" aria-controls="graficosTecnicos" aria-pressed="false">Visão Técnicos</button>
         <button type="button" class="btn-visao-graficos" data-visao="programadores" aria-controls="graficosProgramadores" aria-pressed="false">Visão Programador</button>
       </div>
       <button id="btnLimpar" class="btn-google btn-limpar-compacto hidden">Limpar Filtros</button>
@@ -739,6 +750,10 @@
     <button type="button" class="btn-regiao" data-regiao="UB" aria-pressed="false">UB</button>
     <button type="button" class="btn-regiao" data-regiao="BA" aria-pressed="false">BA</button>
     <button type="button" class="btn-regiao" data-regiao-limpar aria-pressed="true">Todas</button>
+    <button id="btnExportPdfRegioes" class="btn-export-pdf btn-export-pdf-regioes hidden" type="button" title="Solicitantes sem região cadastrada">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm8 1.5V8h5.5L14 3.5zM8 12h8v2H8v-2zm0 4h8v2H8v-2z"/></svg>
+      IDs sem região
+    </button>
   </div>
 
   <div class="topo-controles">
@@ -813,7 +828,7 @@
 
   </div>
 
-  <section class="grupo-graficos ativo" id="graficosTecnicos" data-visao-graficos="tecnicos" aria-label="Gráficos da visão Técnicos">
+  <section class="grupo-graficos" id="graficosTecnicos" data-visao-graficos="tecnicos" aria-label="Gráficos da visão Técnicos">
     <div class="card grafico-card">
       <h3>Atendimento x Técnico</h3>
       <canvas id="graficoTecnico"></canvas>
@@ -884,6 +899,7 @@
   const seletorRegioes = document.getElementById("seletorRegioes");
   const botoesRegiao = Array.from(seletorRegioes.querySelectorAll("[data-regiao]"));
   const botaoLimparRegiao = seletorRegioes.querySelector("[data-regiao-limpar]");
+  const btnExportPdfRegioes = document.getElementById("btnExportPdfRegioes");
 
   const PROGRAMADORES = {
     RENATO: ["567352","345416","332484","332399","383984","343990","335353","596925","596924","346309","346157","338646","332080","344939","346358","576029","606898","580726","580725","346239","346028","345612","345427","345322","335317", "333269","332367","332841","332960","333853","337747","337918","338116","338896","341610","341651","342293","343091","345120"],
@@ -900,6 +916,15 @@
       UB: [],
       BA: []
   };
+
+  function obterRegiaoPorId(idSolicitante){
+      const idNormalizado = normalizarIdSolicitante(idSolicitante);
+      if(!idNormalizado) return "";
+
+      return Object.entries(REGIOES).find(([, ids]) =>
+          ids.some(id => normalizarIdSolicitante(id) === idNormalizado)
+      )?.[0] || "";
+  }
 
   function getValorColunaR(linha){
       const chaves = [
@@ -972,6 +997,11 @@
           Number(totaisProgramadorAtuais["À definir"]) > 0;
 
       btnExportPdfSolicitantes.classList.toggle("hidden", !(dadosDefinidos.length || existeProgramadorIndefinido));
+      mostrarBotaoRegioesDefinir();
+  }
+
+  function mostrarBotaoRegioesDefinir(){
+      btnExportPdfRegioes.classList.toggle("hidden", gerarListaSolicitantesSemRegiao().length === 0);
   }
 
   function getValorColunaCidade(linha){
@@ -1011,23 +1041,16 @@
       return linha && linha[21] !== undefined ? linha[21] : "";
   }
 
-  function gerarListaUnicaSolicitantes(){
+  function gerarListaUnicaSolicitantes(criterio = "programador"){
       const mapa = new Map();
-      const chavesR = ["R", "ID SOLICITANTE", "ID DO SOLICITANTE", "SOLICITANTE ID", "ID DO PROGRAMADOR", "PROGRAMADOR ID"];
       const chavesS = ["S", "SOLICITANTE", "NOME SOLICITANTE", "NOME DO SOLICITANTE"];
 
       dadosGlobais.forEach(linha => {
-          let id = "";
+          const valorId = getValorColunaR(linha);
+          const id = valorIndefinido(valorId) ? "" : String(valorId).trim();
           let nome = "";
           let cidade = "";
           let localizacao = "";
-
-          for (const chave of chavesR) {
-              if (Object.prototype.hasOwnProperty.call(linha, chave) && !valorIndefinido(linha[chave])) {
-                  id = String(linha[chave]).trim();
-                  break;
-              }
-          }
 
           for (const chave of chavesS) {
               if (Object.prototype.hasOwnProperty.call(linha, chave) && !valorIndefinido(linha[chave])) {
@@ -1045,7 +1068,11 @@
           const nomeFinal = nome || "À definir";
           const cidadeFinal = cidade || "À definir";
           const localizacaoFinal = localizacao || "À definir";
-          const ehIndefinido = valorIndefinido(id) || valorIndefinido(nome) || !id || !nome || nomeProgramador === "À definir";
+          const semDadosSolicitante = valorIndefinido(id) || valorIndefinido(nome) || !id || !nome;
+          const naoPrevisto = criterio === "regiao"
+              ? !obterRegiaoPorId(idNormalizado)
+              : nomeProgramador === "À definir";
+          const ehIndefinido = semDadosSolicitante || naoPrevisto;
 
           if (!ehIndefinido) return;
 
@@ -1069,6 +1096,10 @@
       });
   }
 
+  function gerarListaSolicitantesSemRegiao(){
+      return gerarListaUnicaSolicitantes("regiao");
+  }
+
   function exportarSolicitantesPdf(){
       if (!dadosGlobais.length) return;
 
@@ -1078,6 +1109,22 @@
           return;
       }
 
+      exportarListaSolicitantesPdf(dados, "Solicitantes únicos", "solicitantes-unicos.pdf", mostrarBotaoClientesDefinir);
+  }
+
+  function exportarSolicitantesSemRegiaoPdf(){
+      if (!dadosGlobais.length) return;
+
+      const dados = gerarListaSolicitantesSemRegiao();
+      if (!dados.length) {
+          mostrarBotaoRegioesDefinir();
+          return;
+      }
+
+      exportarListaSolicitantesPdf(dados, "Solicitantes sem região cadastrada", "solicitantes-sem-regiao.pdf", mostrarBotaoRegioesDefinir);
+  }
+
+  function exportarListaSolicitantesPdf(dados, titulo, nomeArquivo, atualizarBotao){
       if (typeof window.jspdf === "undefined") {
           alert("Biblioteca PDF não carregada.");
           return;
@@ -1110,7 +1157,7 @@
       ]);
 
       pdf.setFontSize(14);
-      pdf.text("Solicitantes únicos", margem, 14);
+      pdf.text(titulo, margem, 14);
 
       let y = 21;
       pdf.setFontSize(8.5);
@@ -1156,25 +1203,25 @@
       });
 
       try {
-          pdf.save("solicitantes-unicos.pdf");
+          pdf.save(nomeArquivo);
       } catch (erroSalvar) {
           try {
               const blob = pdf.output("blob");
               const url = URL.createObjectURL(blob);
               const link = document.createElement("a");
               link.href = url;
-              link.download = "solicitantes-unicos.pdf";
+              link.download = nomeArquivo;
               document.body.appendChild(link);
               link.click();
               link.remove();
               setTimeout(() => URL.revokeObjectURL(url), 1000);
           } catch (erroBlob) {
-              console.error("Erro ao exportar PDF de solicitantes:", erroBlob);
+              console.error(`Erro ao exportar ${nomeArquivo}:`, erroBlob);
               alert("Não foi possível exportar o PDF.");
           }
       }
 
-      mostrarBotaoClientesDefinir();
+      atualizarBotao();
   }
 
   function getEstadoFiltros(){
@@ -1369,6 +1416,7 @@
 
       aplicarFiltros();
   });
+  btnExportPdfRegioes.addEventListener("click", exportarSolicitantesSemRegiaoPdf);
 
   function popularFiltro(dados){
       atualizarFiltrosOptions();
@@ -1510,9 +1558,7 @@
       if(regioesSelecionadas.length){
           dados = dados.filter(linha => {
               const idSolicitante = normalizarIdSolicitante(getValorColunaR(linha));
-              return regioesSelecionadas.some(regiao =>
-                  REGIOES[regiao].some(id => normalizarIdSolicitante(id) === idSolicitante)
-              );
+              return regioesSelecionadas.includes(obterRegiaoPorId(idSolicitante));
           });
       }
 
