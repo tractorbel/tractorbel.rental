@@ -169,8 +169,53 @@
 
       /* quando o upload estiver compacto ao lado do período */
       .periodo-cabecalho{display:none}
-      .periodo-cabecalho.show{display:flex;align-items:center;gap:8px}
+      .periodo-cabecalho.show{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
       .periodo-cabecalho .upload-area--small{margin:0 0 0 8px;}
+      .periodo-data-controle{position:relative;display:inline-flex;align-items:center;gap:4px}
+      .periodo-cabecalho input[type="text"]{
+        border:1px solid #cfd8dc;
+        border-radius:6px;
+        padding:6px 8px;
+        color:#222;
+        background:#fff;
+        font:inherit;
+        font-weight:500;
+        width:100px;
+        text-align:center;
+      }
+      .periodo-cabecalho input[type="text"]:focus{
+        outline:2px solid rgba(52,168,83,.2);
+        border-color:#34a853;
+      }
+      .periodo-cabecalho input[type="text"]:disabled,
+      .periodo-calendario-btn:disabled{
+        opacity:.55;
+      }
+      .periodo-calendario-btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        width:32px;
+        height:32px;
+        padding:5px;
+        border:1px solid #cfd8dc;
+        border-radius:6px;
+        background:#fff;
+        color:#2e7d32;
+        cursor:pointer;
+      }
+      .periodo-calendario-btn:hover:not(:disabled){background:#f0fdf4}
+      .periodo-calendario-btn svg{width:18px;height:18px;fill:currentColor}
+      .periodo-calendario-nativo{
+        position:absolute;
+        top:0;
+        right:0;
+        z-index:2;
+        width:32px;
+        height:32px;
+        opacity:0;
+        cursor:pointer;
+      }
 
       .filtro-box label.titulo-filtro {
         font-size: 13px;
@@ -551,7 +596,24 @@
     <h2>Análise de Atendimento SS</h2>
 
     <div class="periodo-cabecalho" id="periodoAnalisado">
-      Período analisado: -
+      <span id="periodoResumo">Período analisado:</span>
+      <span class="periodo-data-controle">
+        <label class="sr-only" for="dataInicioPeriodoTexto">Data inicial do período (dd/mm/aaaa)</label>
+        <input type="text" id="dataInicioPeriodoTexto" placeholder="dd/mm/aaaa" inputmode="numeric" maxlength="10" aria-label="Data inicial do período, formato dia/mês/ano" disabled>
+        <button type="button" class="periodo-calendario-btn" id="btnCalendarioInicio" aria-label="Abrir calendário da data inicial" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 0 1 1-1Zm12 8H5v9h14v-9ZM7 6H5v2h14V6h-2v1a1 1 0 1 1-2 0V6H9v1a1 1 0 1 1-2 0V6Z"/></svg>
+        </button>
+        <input type="date" id="dataInicioPeriodo" class="periodo-calendario-nativo" aria-hidden="true" tabindex="-1" disabled>
+      </span>
+      <span aria-hidden="true">a</span>
+      <span class="periodo-data-controle">
+        <label class="sr-only" for="dataFimPeriodoTexto">Data final do período (dd/mm/aaaa)</label>
+        <input type="text" id="dataFimPeriodoTexto" placeholder="dd/mm/aaaa" inputmode="numeric" maxlength="10" aria-label="Data final do período, formato dia/mês/ano" disabled>
+        <button type="button" class="periodo-calendario-btn" id="btnCalendarioFim" aria-label="Abrir calendário da data final" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 0 1 1-1Zm12 8H5v9h14v-9ZM7 6H5v2h14V6h-2v1a1 1 0 1 1-2 0V6H9v1a1 1 0 1 1-2 0V6Z"/></svg>
+        </button>
+        <input type="date" id="dataFimPeriodo" class="periodo-calendario-nativo" aria-hidden="true" tabindex="-1" disabled>
+      </span>
     </div>
 
     <div class="acoes-cabecalho">
@@ -706,8 +768,17 @@
   let grafico, graficoTipos, g1, g2, g3, g4, g5, g6, g7, g8, g9, gProgramador;
   let totaisProgramadorAtuais = {};
   let uploadDialogOpen = false; /* prevent duplicate file picker opens */
+  let periodoMinimo = "";
+  let periodoMaximo = "";
 
   const STORAGE_KEY = "indicadores_ss_estado";
+  const dataInicioPeriodo = document.getElementById("dataInicioPeriodo");
+  const dataFimPeriodo = document.getElementById("dataFimPeriodo");
+  const dataInicioPeriodoTexto = document.getElementById("dataInicioPeriodoTexto");
+  const dataFimPeriodoTexto = document.getElementById("dataFimPeriodoTexto");
+  const btnCalendarioInicio = document.getElementById("btnCalendarioInicio");
+  const btnCalendarioFim = document.getElementById("btnCalendarioFim");
+  const periodoResumo = document.getElementById("periodoResumo");
 
   const PROGRAMADORES = {
     RENATO: ["567352","345416","332484","332399","383984","343990","335353","596925","596924","346309","346157","338646","332080","344939","346358","576029","606898","580726","580725","346239","346028","345612","345427","345322","335317", "333269","332367","332841","332960","333853","337747","337918","338116","338896","341610","341651","342293","343091","345120"],
@@ -1021,7 +1092,11 @@
       try {
           sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
               dados: dadosGlobais,
-              filtros: getEstadoFiltros()
+              filtros: getEstadoFiltros(),
+              periodo: {
+                  inicio: dataInicioPeriodo.value,
+                  fim: dataFimPeriodo.value
+              }
           }));
       } catch (erro) {
           console.warn("Nao foi possivel salvar o estado da pagina no navegador:", erro);
@@ -1039,6 +1114,7 @@
           if(!estado.dados || !estado.dados.length) return;
 
           dadosGlobais = estado.dados;
+          inicializarPeriodo(dadosGlobais, estado.periodo);
 
           document.querySelector(".cards").style.display = "grid";
           document.querySelectorAll(".grafico-card").forEach(card => {
@@ -1105,6 +1181,7 @@
           );
 
           dadosGlobais = json;
+          inicializarPeriodo(json);
           const topo = document.querySelector(".topo-controles");
           if(topo) topo.style.display = "grid";
           document.querySelector(".cards").style.display = "grid";
@@ -1124,7 +1201,7 @@
             if(periodoEl){ periodoEl.classList.add('show'); }
           }
           popularFiltro(json);
-          calcularTotais(json);
+          calcularTotais(filtrarDados());
           mostrarBotaoClientesDefinir();
           salvarEstadoPagina();
           uploadDialogOpen = false; /* mark dialog as closed after loading */
@@ -1143,6 +1220,12 @@
 
   btnLimpar.addEventListener("click", limparFiltros);
   btnExportPdfSolicitantes.addEventListener("click", exportarSolicitantesPdf);
+  dataInicioPeriodo.addEventListener("change", aplicarAlteracaoPeriodo);
+  dataFimPeriodo.addEventListener("change", aplicarAlteracaoPeriodo);
+  dataInicioPeriodoTexto.addEventListener("change", aplicarDataDigitada);
+  dataFimPeriodoTexto.addEventListener("change", aplicarDataDigitada);
+  btnCalendarioInicio.addEventListener("click", () => abrirCalendario(dataInicioPeriodo));
+  btnCalendarioFim.addEventListener("click", () => abrirCalendario(dataFimPeriodo));
 
   function popularFiltro(dados){
       atualizarFiltrosOptions();
@@ -1228,6 +1311,16 @@
 
   function filtrarDados(excluirFiltroId = null){
       let dados = dadosGlobais;
+      const inicioPeriodo = dataInicioPeriodo.value;
+      const fimPeriodo = dataFimPeriodo.value;
+      const periodoCompleto = inicioPeriodo === periodoMinimo && fimPeriodo === periodoMaximo;
+
+      if(inicioPeriodo && fimPeriodo && !periodoCompleto){
+          dados = dados.filter(linha => {
+              const data = dataParaISO(linha["DATA DE ENCERRAMENTO"]);
+              return data && data >= inicioPeriodo && data <= fimPeriodo;
+          });
+      }
 
       const tecnicosSelecionados = getSelecionados("filtroTecnico");
       const tiposSelecionados = getSelecionados("filtroTipo");
@@ -1424,6 +1517,156 @@
 
       const d = new Date(valor);
       return isNaN(d) ? null : d;
+  }
+
+  function dataParaISO(valor){
+      const data = excelDateToJS(valor);
+      if(!data || Number.isNaN(data.getTime())) return "";
+
+      const ano = data.getUTCFullYear();
+      const mes = String(data.getUTCMonth() + 1).padStart(2, "0");
+      const dia = String(data.getUTCDate()).padStart(2, "0");
+      return `${ano}-${mes}-${dia}`;
+  }
+
+  function dataLocalDeISO(valor){
+      if(!valor) return null;
+      const [ano, mes, dia] = valor.split("-").map(Number);
+      return new Date(ano, mes - 1, dia);
+  }
+
+  function formatarDataBR(valor){
+      if(!valor) return "";
+      const [ano, mes, dia] = valor.split("-");
+      return `${dia}/${mes}/${ano}`;
+  }
+
+  function converterDataBRParaISO(valor){
+      const partes = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(valor.trim());
+      if(!partes) return "";
+
+      const dia = Number(partes[1]);
+      const mes = Number(partes[2]);
+      const ano = Number(partes[3]);
+      const data = new Date(Date.UTC(ano, mes - 1, dia));
+
+      if(data.getUTCFullYear() !== ano || data.getUTCMonth() !== mes - 1 || data.getUTCDate() !== dia){
+          return "";
+      }
+
+      return `${ano}-${String(mes).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
+  }
+
+  function aplicarDataDigitada(evento){
+      const campoTexto = evento.currentTarget;
+      const campoData = campoTexto === dataInicioPeriodoTexto ? dataInicioPeriodo : dataFimPeriodo;
+      const data = converterDataBRParaISO(campoTexto.value);
+
+      if(!data || data < periodoMinimo || data > periodoMaximo){
+          campoTexto.setCustomValidity("Informe uma data válida no formato dd/mm/aaaa, dentro do período da planilha.");
+          campoTexto.reportValidity();
+          campoTexto.value = formatarDataBR(campoData.value);
+          campoTexto.setCustomValidity("");
+          return;
+      }
+
+      campoTexto.setCustomValidity("");
+      campoData.value = data;
+      aplicarAlteracaoPeriodo({target: campoData});
+  }
+
+  function abrirCalendario(campoData){
+      if(typeof campoData.showPicker === "function"){
+          campoData.showPicker();
+      } else {
+          campoData.click();
+      }
+  }
+
+  function atualizarLimitesPeriodo(){
+      if(!periodoMinimo || !periodoMaximo){
+          dataInicioPeriodo.value = "";
+          dataFimPeriodo.value = "";
+          dataInicioPeriodo.disabled = true;
+          dataFimPeriodo.disabled = true;
+          dataInicioPeriodoTexto.value = "";
+          dataFimPeriodoTexto.value = "";
+          dataInicioPeriodoTexto.disabled = true;
+          dataFimPeriodoTexto.disabled = true;
+          btnCalendarioInicio.disabled = true;
+          btnCalendarioFim.disabled = true;
+          return;
+      }
+
+      dataInicioPeriodo.disabled = false;
+      dataFimPeriodo.disabled = false;
+      dataInicioPeriodoTexto.disabled = false;
+      dataFimPeriodoTexto.disabled = false;
+      btnCalendarioInicio.disabled = false;
+      btnCalendarioFim.disabled = false;
+      dataInicioPeriodo.min = periodoMinimo;
+      dataInicioPeriodo.max = dataFimPeriodo.value || periodoMaximo;
+      dataFimPeriodo.min = dataInicioPeriodo.value || periodoMinimo;
+      dataFimPeriodo.max = periodoMaximo;
+      dataInicioPeriodoTexto.value = formatarDataBR(dataInicioPeriodo.value);
+      dataFimPeriodoTexto.value = formatarDataBR(dataFimPeriodo.value);
+  }
+
+  function atualizarResumoPeriodo(){
+      if(!periodoMinimo || !periodoMaximo){
+          periodoResumo.textContent = "Período analisado: -";
+          return;
+      }
+
+      periodoResumo.textContent = "Período analisado:";
+  }
+
+  function inicializarPeriodo(dados, periodoSalvo = null){
+      const datas = dados
+          .map(linha => dataParaISO(linha["DATA DE ENCERRAMENTO"]))
+          .filter(Boolean)
+          .sort();
+
+      periodoMinimo = datas[0] || "";
+      periodoMaximo = datas[datas.length - 1] || "";
+
+      const inicioSalvo = periodoSalvo && typeof periodoSalvo.inicio === "string"
+          ? periodoSalvo.inicio
+          : "";
+      const fimSalvo = periodoSalvo && typeof periodoSalvo.fim === "string"
+          ? periodoSalvo.fim
+          : "";
+      const periodoSalvoValido = inicioSalvo >= periodoMinimo &&
+          fimSalvo <= periodoMaximo &&
+          inicioSalvo <= fimSalvo &&
+          periodoMinimo &&
+          periodoMaximo;
+
+      dataInicioPeriodo.value = periodoSalvoValido ? inicioSalvo : periodoMinimo;
+      dataFimPeriodo.value = periodoSalvoValido ? fimSalvo : periodoMaximo;
+      atualizarLimitesPeriodo();
+      atualizarResumoPeriodo();
+  }
+
+  function aplicarAlteracaoPeriodo(evento){
+      if(!dataInicioPeriodo.value) dataInicioPeriodo.value = periodoMinimo;
+      if(!dataFimPeriodo.value) dataFimPeriodo.value = periodoMaximo;
+
+      const inicio = dataInicioPeriodo.value;
+      const fim = dataFimPeriodo.value;
+
+      if(inicio && fim && inicio > fim){
+          if(evento.target === dataInicioPeriodo){
+              dataFimPeriodo.value = inicio;
+          } else {
+              dataInicioPeriodo.value = fim;
+          }
+      }
+
+      dataInicioPeriodoTexto.value = formatarDataBR(dataInicioPeriodo.value);
+      dataFimPeriodoTexto.value = formatarDataBR(dataFimPeriodo.value);
+      atualizarLimitesPeriodo();
+      aplicarFiltros();
   }
 
   function calcularDiasUteis(dataInicio, dataFim){
@@ -1635,8 +1878,6 @@ dados.forEach(linha => {
       let horasDesloc = 0;
       let maquinaParada = 0;
 
-      let datas = [];
-
       dados.forEach(linha => {
 
           const tipo = linha["TIPO DA SS"];
@@ -1663,41 +1904,17 @@ dados.forEach(linha => {
           horasAguard += toHoras(linha["HORAS AGUARDANDO"]);
           horasDesloc += toHoras(linha["HORAS DESLOCAMENTO"]);
           maquinaParada += toHoras(linha["TOTAL DE MÁQUINA PARADA"]);
-
-          const data = excelDateToJS(linha["DATA DE ENCERRAMENTO"]);
-          if(data) datas.push(data);
       });
 
       criarGraficoPizza(totaisTipo);
 
       let horasUteis = 0;
+      atualizarResumoPeriodo();
 
-      const periodoEl = document.getElementById("periodoAnalisado");
-      periodoEl.innerText = "Período analisado: -";
-
-      if(datas.length){
-
-        datas.sort((a,b)=>a-b);
-
-        const dataMin = datas[0];
-        const dataMax = datas[datas.length-1];
-
-        periodoEl.innerText = `Período analisado: ${dataMin.toLocaleDateString("pt-BR")} a ${dataMax.toLocaleDateString("pt-BR")}`;
-
-        // mostrar o período e manter o ícone compacto no cabeçalho
-        periodoEl.classList.add('show');
-        const ua = document.getElementById('uploadArea');
-        const acoesCabecalho = document.querySelector('.acoes-cabecalho');
-        if(ua){
-          ua.classList.remove('upload-area--large');
-          ua.classList.add('upload-area--small');
-          ua.style.display = 'flex';
-          if(acoesCabecalho && !acoesCabecalho.contains(ua)) acoesCabecalho.appendChild(ua);
-        }
-
-        const diasUteis = calcularDiasUteis(dataMin, dataMax);
-
-        horasUteis = diasUteis * 8.8;
+      const inicioPeriodo = dataLocalDeISO(dataInicioPeriodo.value);
+      const fimPeriodo = dataLocalDeISO(dataFimPeriodo.value);
+      if(inicioPeriodo && fimPeriodo){
+          horasUteis = calcularDiasUteis(inicioPeriodo, fimPeriodo) * 8.8;
       }
 
       criarGrafico("graficoTecnico","Atendimentos",Object.keys(totaisTecnico),Object.values(totaisTecnico),grafico,v=>grafico=v,true, filtrarPorTecnico);
@@ -1972,6 +2189,8 @@ dados.forEach(linha => {
   function existeFiltroAtivo(){
       const existeBuscaAtiva = Array.from(document.querySelectorAll(".filtro-busca"))
           .some(input => input.value.trim() !== "");
+      const periodoAtivo = periodoMinimo && periodoMaximo &&
+          (dataInicioPeriodo.value !== periodoMinimo || dataFimPeriodo.value !== periodoMaximo);
 
       return getSelecionados("filtroTecnico").length > 0 ||
             getSelecionados("filtroTipo").length > 0 ||
@@ -1980,6 +2199,7 @@ dados.forEach(linha => {
             getSelecionados("filtroEquipamento").length > 0 ||
             getSelecionados("filtroMarca").length > 0 ||
             getSelecionados("filtroModelo").length > 0 ||
+            periodoAtivo ||
             existeBuscaAtiva;
   }
 
@@ -2001,10 +2221,12 @@ dados.forEach(linha => {
           input.value = "";
       });
 
+      inicializarPeriodo(dadosGlobais);
       atualizarFiltrosOptions();
-      calcularTotais(dadosGlobais);
+      calcularTotais(filtrarDados());
       mostrarBotaoClientesDefinir();
       salvarEstadoPagina();
+      atualizarVisibilidadeGraficoTotalHoras();
       atualizarVisibilidadeBotaoLimpar();
   }
 
