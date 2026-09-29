@@ -473,6 +473,46 @@
     color:#fff;
   }
 
+  .seletor-regioes{
+    display:none;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:7px;
+    margin:0 0 12px;
+    padding:10px 12px;
+    border:1px solid #d8e8da;
+    border-radius:12px;
+    background:#fff;
+    box-shadow:0 2px 8px rgba(46,125,50,.08);
+  }
+
+  .seletor-regioes.visivel{display:flex}
+
+  .titulo-seletor-regioes{
+    margin-right:4px;
+    color:#2e7d32;
+    font-size:13px;
+    font-weight:700;
+  }
+
+  .btn-regiao{
+    border:1px solid #34a853;
+    border-radius:18px;
+    padding:5px 11px;
+    background:#fff;
+    color:#2e7d32;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    transition:background-color .2s ease,color .2s ease;
+  }
+
+  .btn-regiao:hover,
+  .btn-regiao[aria-pressed="true"]{
+    background:#2e7d32;
+    color:#fff;
+  }
+
   .grupo-graficos{display:none}
   .grupo-graficos.ativo{display:contents}
   .grupo-graficos.ativo .grafico-card{display:block}
@@ -690,6 +730,17 @@
     </div>
   </div>
 
+  <div class="seletor-regioes" id="seletorRegioes" role="group" aria-label="Filtrar por região">
+    <span class="titulo-seletor-regioes">Região</span>
+    <button type="button" class="btn-regiao" data-regiao="PA" aria-pressed="false">PA</button>
+    <button type="button" class="btn-regiao" data-regiao="CT" aria-pressed="false">CT</button>
+    <button type="button" class="btn-regiao" data-regiao="ES" aria-pressed="false">ES</button>
+    <button type="button" class="btn-regiao" data-regiao="RJ" aria-pressed="false">RJ</button>
+    <button type="button" class="btn-regiao" data-regiao="UB" aria-pressed="false">UB</button>
+    <button type="button" class="btn-regiao" data-regiao="BA" aria-pressed="false">BA</button>
+    <button type="button" class="btn-regiao" data-regiao-limpar aria-pressed="true">Todas</button>
+  </div>
+
   <div class="topo-controles">
     <div class="filtro-box">
       <label class="titulo-filtro">Técnico</label>
@@ -830,11 +881,24 @@
   const periodoResumo = document.getElementById("periodoResumo");
   const seletorVisaoGraficos = document.getElementById("seletorVisaoGraficos");
   const botoesVisaoGraficos = Array.from(seletorVisaoGraficos.querySelectorAll("[data-visao]"));
+  const seletorRegioes = document.getElementById("seletorRegioes");
+  const botoesRegiao = Array.from(seletorRegioes.querySelectorAll("[data-regiao]"));
+  const botaoLimparRegiao = seletorRegioes.querySelector("[data-regiao-limpar]");
 
   const PROGRAMADORES = {
     RENATO: ["567352","345416","332484","332399","383984","343990","335353","596925","596924","346309","346157","338646","332080","344939","346358","576029","606898","580726","580725","346239","346028","345612","345427","345322","335317", "333269","332367","332841","332960","333853","337747","337918","338116","338896","341610","341651","342293","343091","345120"],
     CRISTIANE: ["311199","346834","345517","310749","342921","343399","343897","345038","405785","421661","605987","596553","596360","346996","346284","346211","346099","346676","310674","344913","345122"],
     MATHEUS: ["343572","349898","383693","572822","605274", "254954","332364"]
+  };
+
+  // Preencha cada lista com os IDs da coluna R correspondentes à região.
+  const REGIOES = {
+      PA: [],
+      CT: [],
+      ES: [],
+      RJ: [],
+      UB: [],
+      BA: []
   };
 
   function getValorColunaR(linha){
@@ -1148,7 +1212,8 @@
                   inicio: dataInicioPeriodo.value,
                   fim: dataFimPeriodo.value
               },
-              visaoGraficos: obterVisaoGraficosAtual()
+              visaoGraficos: obterVisaoGraficosAtual(),
+              regioes: obterRegioesSelecionadas()
           }));
       } catch (erro) {
           console.warn("Nao foi possivel salvar o estado da pagina no navegador:", erro);
@@ -1170,7 +1235,9 @@
 
           document.querySelector(".cards").style.display = "grid";
           seletorVisaoGraficos.classList.add("visivel");
+          seletorRegioes.classList.add("visivel");
           selecionarVisaoGraficos(estado.visaoGraficos === "programadores" ? "programadores" : "tecnicos");
+          aplicarEstadoRegioes(estado.regioes);
 
           const topo = document.querySelector(".topo-controles");
           if(topo) topo.style.display = "grid";
@@ -1237,7 +1304,9 @@
           if(topo) topo.style.display = "grid";
           document.querySelector(".cards").style.display = "grid";
           seletorVisaoGraficos.classList.add("visivel");
+          seletorRegioes.classList.add("visivel");
           selecionarVisaoGraficos("tecnicos");
+          aplicarEstadoRegioes([]);
           try{ btnLimpar.classList.remove("hidden"); }catch(e){}
           mostrarBotaoClientesDefinir();
           // reduzir área de upload para ícone disponível após upload e mantê-lo no cabeçalho
@@ -1283,6 +1352,23 @@
       selecionarVisaoGraficos(botao.dataset.visao);
       salvarEstadoPagina();
   });
+  seletorRegioes.addEventListener("click", evento => {
+      const botao = evento.target.closest("[data-regiao], [data-regiao-limpar]");
+      if(!botao || !seletorRegioes.contains(botao)) return;
+
+      if(botao.hasAttribute("data-regiao-limpar")){
+          aplicarEstadoRegioes([]);
+      } else {
+          const selecionadas = obterRegioesSelecionadas();
+          const regiao = botao.dataset.regiao;
+          const proximasRegioes = selecionadas.includes(regiao)
+              ? selecionadas.filter(item => item !== regiao)
+              : [...selecionadas, regiao];
+          aplicarEstadoRegioes(proximasRegioes);
+      }
+
+      aplicarFiltros();
+  });
 
   function popularFiltro(dados){
       atualizarFiltrosOptions();
@@ -1290,6 +1376,23 @@
 
   function obterVisaoGraficosAtual(){
       return seletorVisaoGraficos.querySelector('[aria-pressed="true"]')?.dataset.visao || "tecnicos";
+  }
+
+  function obterRegioesSelecionadas(){
+      return botoesRegiao
+          .filter(botao => botao.getAttribute("aria-pressed") === "true")
+          .map(botao => botao.dataset.regiao);
+  }
+
+  function aplicarEstadoRegioes(regioes){
+      const selecionadas = Array.isArray(regioes)
+          ? regioes.filter(regiao => Object.prototype.hasOwnProperty.call(REGIOES, regiao))
+          : [];
+
+      botoesRegiao.forEach(botao => {
+          botao.setAttribute("aria-pressed", String(selecionadas.includes(botao.dataset.regiao)));
+      });
+      botaoLimparRegiao.setAttribute("aria-pressed", String(selecionadas.length === 0));
   }
 
   function selecionarVisaoGraficos(visao){
@@ -1400,6 +1503,16 @@
           dados = dados.filter(linha => {
               const data = dataParaISO(linha["DATA DE ENCERRAMENTO"]);
               return data && data >= inicioPeriodo && data <= fimPeriodo;
+          });
+      }
+
+      const regioesSelecionadas = obterRegioesSelecionadas();
+      if(regioesSelecionadas.length){
+          dados = dados.filter(linha => {
+              const idSolicitante = normalizarIdSolicitante(getValorColunaR(linha));
+              return regioesSelecionadas.some(regiao =>
+                  REGIOES[regiao].some(id => normalizarIdSolicitante(id) === idSolicitante)
+              );
           });
       }
 
@@ -2280,6 +2393,7 @@ dados.forEach(linha => {
             getSelecionados("filtroEquipamento").length > 0 ||
             getSelecionados("filtroMarca").length > 0 ||
             getSelecionados("filtroModelo").length > 0 ||
+            obterRegioesSelecionadas().length > 0 ||
             periodoAtivo ||
             existeBuscaAtiva;
   }
@@ -2302,6 +2416,7 @@ dados.forEach(linha => {
           input.value = "";
       });
 
+      aplicarEstadoRegioes([]);
       inicializarPeriodo(dadosGlobais);
       atualizarFiltrosOptions();
       calcularTotais(filtrarDados());
