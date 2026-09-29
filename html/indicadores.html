@@ -67,7 +67,8 @@
       /* Inicialmente mantenha a interface limpa: mostrar apenas o upload até o usuário carregar uma planilha */
       .topo-controles,
       .cards,
-      .grafico-card {
+      .grafico-card,
+      .seletor-visao-graficos {
         display: none;
       }
 
@@ -315,6 +316,14 @@
         color: white;
       }
 
+      .btn-google.btn-limpar-compacto {
+        padding: 6px 11px;
+        border-width: 1px;
+        font-size: 12px;
+        line-height: 1.2;
+        white-space: nowrap;
+      }
+
       .btn-export-pdf {
         display: inline-flex;
         align-items: center;
@@ -433,6 +442,40 @@
     display: none;
     min-width: 0;
   }
+
+  .seletor-visao-graficos{
+    display:none;
+    align-items:center;
+    gap:6px;
+    margin:0;
+    flex:0 0 auto;
+  }
+
+  .seletor-visao-graficos.visivel{display:flex}
+
+  .btn-visao-graficos{
+    border:1px solid #34a853;
+    border-radius:24px;
+    padding:6px 11px;
+    background:#fff;
+    color:#2e7d32;
+    font-size:12px;
+    line-height:1.2;
+    font-weight:600;
+    white-space:nowrap;
+    cursor:pointer;
+    transition:background-color .2s ease,color .2s ease;
+  }
+
+  .btn-visao-graficos:hover,
+  .btn-visao-graficos[aria-pressed="true"]{
+    background:#2e7d32;
+    color:#fff;
+  }
+
+  .grupo-graficos{display:none}
+  .grupo-graficos.ativo{display:contents}
+  .grupo-graficos.ativo .grafico-card{display:block}
 
   .grafico-row {
     display: grid;
@@ -619,7 +662,11 @@
     <div class="acoes-cabecalho">
       <label for="upload" class="sr-only">Upload de planilha</label>
       <input type="file" id="upload" accept=".xls,.xlsx" class="hidden" aria-label="Upload de planilha">
-      <button id="btnLimpar" class="btn-google hidden">Limpar Filtros</button>
+      <div class="seletor-visao-graficos" id="seletorVisaoGraficos" role="group" aria-label="Selecionar visão dos gráficos">
+        <button type="button" class="btn-visao-graficos" data-visao="tecnicos" aria-controls="graficosTecnicos" aria-pressed="true">Visão Técnicos</button>
+        <button type="button" class="btn-visao-graficos" data-visao="programadores" aria-controls="graficosProgramadores" aria-pressed="false">Visão Programador</button>
+      </div>
+      <button id="btnLimpar" class="btn-google btn-limpar-compacto hidden">Limpar Filtros</button>
       <button id="btnExportPdfSolicitantes" class="btn-export-pdf hidden" type="button" title="Clientes À Definir">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm8 1.5V8h5.5L14 3.5zM8 12h8v2H8v-2zm0 4h8v2H8v-2z"/></svg>
         Clientes À Definir
@@ -715,50 +762,52 @@
 
   </div>
 
-  <div class="card grafico-card">
-  <h3>Atendimento x Técnico</h3>
-  <canvas id="graficoTecnico"></canvas>
-  </div>
-
-  <div class="card grafico-card">
-  <h3>Atendimento x Tipo</h3>
-  <canvas id="graficoTipos"></canvas>
-  </div>
-
-  <div class="card grafico-card">
-  <h3>Atendimento x Cliente</h3>
-  <canvas id="graficoCliente"></canvas>
-  </div>
-
-  <div class="card grafico-card">
-  <h3>Atendimento x Programador</h3>
-  <canvas id="graficoProgramador"></canvas>
-  </div>
-
-  <div class="card grafico-card">
-      <h3>Top 10 Patrimônios com Maior Custo de Peças</h3>
-      <canvas id="graficoCustoPecas"></canvas>
-  </div>
-
-  <div class="card grafico-card">
-      <h3>Top 10 Patrimônios com Maior Reincidência</h3>
-      <canvas id="graficoRevisitados"></canvas>
-  </div>
-
-  <div class="grafico-row">
+  <section class="grupo-graficos ativo" id="graficosTecnicos" data-visao-graficos="tecnicos" aria-label="Gráficos da visão Técnicos">
     <div class="card grafico-card">
-      <h3>Abertura SS: Técnicos x Programadores</h3>
-      <canvas id="graficoAbertura"></canvas>
+      <h3>Atendimento x Técnico</h3>
+      <canvas id="graficoTecnico"></canvas>
+    </div>
+
+    <div class="card grafico-card">
+      <h3>Atendimento x Tipo</h3>
+      <canvas id="graficoTipos"></canvas>
+    </div>
+
+    <div class="card grafico-card">
+      <h3>Atendimento x Cliente</h3>
+      <canvas id="graficoCliente"></canvas>
+    </div>
+
+    <div class="card grafico-card">
+        <h3>Top 10 Patrimônios com Maior Custo de Peças</h3>
+        <canvas id="graficoCustoPecas"></canvas>
+    </div>
+
+    <div class="card grafico-card">
+        <h3>Top 10 Patrimônios com Maior Reincidência</h3>
+        <canvas id="graficoRevisitados"></canvas>
     </div>
 
     <div class="card grafico-card">
       <h3>Tempo Total de Máquina Parada</h3>
       <canvas id="graficoMaquina"></canvas>
     </div>
-  </div>
 
-  <div class="card grafico-card"><h3>Total de Horas x Horas Úteis</h3><canvas id="graficoTotalHoras"></canvas></div>
-  <div class="card grafico-card"><h3>Distribuição das Horas</h3><canvas id="graficoHoras"></canvas></div>
+    <div class="card grafico-card"><h3>Total de Horas x Horas Úteis</h3><canvas id="graficoTotalHoras"></canvas></div>
+    <div class="card grafico-card"><h3>Distribuição das Horas</h3><canvas id="graficoHoras"></canvas></div>
+  </section>
+
+  <section class="grupo-graficos" id="graficosProgramadores" data-visao-graficos="programadores" aria-label="Gráficos da visão Programador">
+    <div class="card grafico-card">
+      <h3>Atendimento x Programador</h3>
+      <canvas id="graficoProgramador"></canvas>
+    </div>
+
+    <div class="card grafico-card">
+      <h3>Abertura SS: Técnicos x Programadores</h3>
+      <canvas id="graficoAbertura"></canvas>
+    </div>
+  </section>
 
   </div>
 
@@ -779,6 +828,8 @@
   const btnCalendarioInicio = document.getElementById("btnCalendarioInicio");
   const btnCalendarioFim = document.getElementById("btnCalendarioFim");
   const periodoResumo = document.getElementById("periodoResumo");
+  const seletorVisaoGraficos = document.getElementById("seletorVisaoGraficos");
+  const botoesVisaoGraficos = Array.from(seletorVisaoGraficos.querySelectorAll("[data-visao]"));
 
   const PROGRAMADORES = {
     RENATO: ["567352","345416","332484","332399","383984","343990","335353","596925","596924","346309","346157","338646","332080","344939","346358","576029","606898","580726","580725","346239","346028","345612","345427","345322","335317", "333269","332367","332841","332960","333853","337747","337918","338116","338896","341610","341651","342293","343091","345120"],
@@ -1096,7 +1147,8 @@
               periodo: {
                   inicio: dataInicioPeriodo.value,
                   fim: dataFimPeriodo.value
-              }
+              },
+              visaoGraficos: obterVisaoGraficosAtual()
           }));
       } catch (erro) {
           console.warn("Nao foi possivel salvar o estado da pagina no navegador:", erro);
@@ -1117,9 +1169,8 @@
           inicializarPeriodo(dadosGlobais, estado.periodo);
 
           document.querySelector(".cards").style.display = "grid";
-          document.querySelectorAll(".grafico-card").forEach(card => {
-              card.style.display = "block";
-          });
+          seletorVisaoGraficos.classList.add("visivel");
+          selecionarVisaoGraficos(estado.visaoGraficos === "programadores" ? "programadores" : "tecnicos");
 
           const topo = document.querySelector(".topo-controles");
           if(topo) topo.style.display = "grid";
@@ -1185,9 +1236,8 @@
           const topo = document.querySelector(".topo-controles");
           if(topo) topo.style.display = "grid";
           document.querySelector(".cards").style.display = "grid";
-          document.querySelectorAll(".grafico-card").forEach(card => {
-            card.style.display = "block";
-          });
+          seletorVisaoGraficos.classList.add("visivel");
+          selecionarVisaoGraficos("tecnicos");
           try{ btnLimpar.classList.remove("hidden"); }catch(e){}
           mostrarBotaoClientesDefinir();
           // reduzir área de upload para ícone disponível após upload e mantê-lo no cabeçalho
@@ -1226,9 +1276,40 @@
   dataFimPeriodoTexto.addEventListener("change", aplicarDataDigitada);
   btnCalendarioInicio.addEventListener("click", () => abrirCalendario(dataInicioPeriodo));
   btnCalendarioFim.addEventListener("click", () => abrirCalendario(dataFimPeriodo));
+  seletorVisaoGraficos.addEventListener("click", evento => {
+      const botao = evento.target.closest("[data-visao]");
+      if(!botao || !seletorVisaoGraficos.contains(botao)) return;
+
+      selecionarVisaoGraficos(botao.dataset.visao);
+      salvarEstadoPagina();
+  });
 
   function popularFiltro(dados){
       atualizarFiltrosOptions();
+  }
+
+  function obterVisaoGraficosAtual(){
+      return seletorVisaoGraficos.querySelector('[aria-pressed="true"]')?.dataset.visao || "tecnicos";
+  }
+
+  function selecionarVisaoGraficos(visao){
+      const visaoValida = visao === "programadores" ? "programadores" : "tecnicos";
+
+      document.querySelectorAll("[data-visao-graficos]").forEach(grupo => {
+          grupo.classList.toggle("ativo", grupo.dataset.visaoGraficos === visaoValida);
+      });
+
+      botoesVisaoGraficos.forEach(botao => {
+          botao.setAttribute("aria-pressed", String(botao.dataset.visao === visaoValida));
+      });
+
+      const grupoAtivo = document.querySelector(`[data-visao-graficos="${visaoValida}"]`);
+      if(grupoAtivo && typeof Chart !== "undefined"){
+          grupoAtivo.querySelectorAll("canvas").forEach(canvas => {
+              const graficoCanvas = Chart.getChart(canvas);
+              if(graficoCanvas) graficoCanvas.resize();
+          });
+      }
   }
 
   // Permite clicar na área de upload (ícone pequeno) para selecionar novo arquivo
