@@ -45,6 +45,13 @@ code { padding: 2px 4px; background: #dcfce7; border-radius: 4px; }
 .doc-card a:hover { text-decoration: underline; }
 .doc-card small { margin-top: auto; color: #64748b; }
 .footer { padding: 22px; text-align: center; color: #64748b; font-size: 13px; }
+.technician-view .sector-sidebar { display:none; }
+.technician-view .documents-layout { grid-template-columns:minmax(0,1fr); }
+.technician-view #menu li[hidden] { display:none; }
+@media (max-width: 767px) {
+  .documents-layout { grid-template-columns:1fr; }
+  .sector-sidebar { display:none; }
+}
 @media (max-width: 400px) {
   .navbar { justify-content: space-between; gap: 10px; padding: 8px 14px; }
   .menu-toggle { display: block; margin-right: 6px; }
@@ -53,5 +60,4 @@ code { padding: 2px 4px; background: #dcfce7; border-radius: 4px; }
   .navbar ul li { text-align: center; padding: 10px 0; }
   .navbar-logo { margin-right: 0; flex: 1 1 auto; justify-content: center; position: relative; z-index: 10000; }
   .navbar-logo img { max-height: 34px; max-width: 110px; padding: 3px 6px; }
-  .documents-layout { grid-template-columns:1fr; }
 }

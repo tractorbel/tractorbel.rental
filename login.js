@@ -18,6 +18,16 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const technicianEmail = "programacaorental04@tractorbel.com.br";
+
+function isTechnicianUser(user){
+  return user?.email?.trim().toLowerCase() === technicianEmail;
+}
+
+function aplicarPerfilTecnico(){
+  document.documentElement.dataset.accessProfile = "tecnicos";
+  window.dispatchEvent(new Event("tecnicos:perfil"));
+}
 
 // ------------------- AUTENTICAÇÃO -------------------
 function mostrarConteudo(user){
@@ -53,7 +63,13 @@ window.login = function() {
   const email = document.getElementById("email").value;
   const senha = document.getElementById("senha").value;
   signInWithEmailAndPassword(auth, email, senha)
-    .then(()=> mostrarConteudo(true))
+    .then(({user}) => {
+      if(isTechnicianUser(user)){
+        window.location.replace("documentos.html");
+        return;
+      }
+      mostrarConteudo(user);
+    })
     .catch(()=> alert("Usuário ou senha incorretos"));
 };
 
@@ -79,12 +95,25 @@ if(document.getElementById("login") && document.getElementById("conteudo")) {
   inicializarPagina();
   
   // Verificar estado de autenticação
-  onAuthStateChanged(auth, user => mostrarConteudo(user));
+  onAuthStateChanged(auth, user => {
+    if(isTechnicianUser(user)){
+      window.location.replace("documentos.html");
+      return;
+    }
+    mostrarConteudo(user);
+  });
 } else {
     // Para outras páginas, verificar se usuário está logado e redirecionar ao login se não estiver
     onAuthStateChanged(auth, user => {
         if(!user) {
             window.location.href = "index.html";
+        } else if(isTechnicianUser(user)){
+            const isDocumentsPage = window.location.pathname.toLowerCase().endsWith("/documentos.html");
+            if(isDocumentsPage){
+                aplicarPerfilTecnico();
+            } else {
+                window.location.replace("documentos.html");
+            }
         }
     });
 }

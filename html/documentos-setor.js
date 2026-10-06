@@ -5,6 +5,7 @@
   const cards = [...document.querySelectorAll(".doc-card")];
   const title = document.querySelector(".panel-heading h1");
   const links = [...document.querySelectorAll(".sector-link")];
+  let technicianOnly = document.documentElement.dataset.accessProfile === "tecnicos";
 
   links.forEach((link) => {
     const linkSector = link.dataset.setor || "";
@@ -14,6 +15,7 @@
   });
 
   function applyFilters() {
+    if (technicianOnly) sector = "Técnicos";
     const query = search.value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
     cards.forEach((card) => {
       const matchesSector = !sector || card.dataset.setor === sector;
@@ -25,6 +27,23 @@
       link.classList.toggle("active", linkSector === sector);
     });
     if (title) title.textContent = sector || "Todos os Documentos";
+  }
+
+  function applyTechnicianView() {
+    technicianOnly = true;
+    sector = "Técnicos";
+    document.body.classList.add("technician-view");
+
+    document.querySelectorAll("#menu li").forEach((item) => {
+      const link = item.querySelector("a");
+      const isDocumentsLink = link?.getAttribute("href") === "documentos.html";
+      const isLogoutLink = link?.classList.contains("logout-btn");
+      item.hidden = !isDocumentsLink && !isLogoutLink;
+    });
+
+    const logo = document.querySelector(".navbar-logo");
+    if (logo?.tagName === "A") logo.setAttribute("href", "documentos.html");
+    applyFilters();
   }
 
   window.filtrarDocumentos = (value) => {
@@ -49,8 +68,10 @@
   search.addEventListener("keyup", () => applyFilters());
   search.addEventListener("search", () => applyFilters());
   window.addEventListener("popstate", () => {
-    sector = new URLSearchParams(window.location.search).get("setor") || "";
+    sector = technicianOnly ? "Técnicos" : new URLSearchParams(window.location.search).get("setor") || "";
     applyFilters();
   });
+  window.addEventListener("tecnicos:perfil", applyTechnicianView);
+  if (technicianOnly) applyTechnicianView();
   applyFilters();
 })();

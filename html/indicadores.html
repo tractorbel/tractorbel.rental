@@ -1337,6 +1337,8 @@
                   }
               });
 
+              obj.__MODELO_Y = linha[24];
+              obj.__SOLICITANTE_S = linha[18];
               obj.__TAG_AC = linha[28];
               obj.__PREVENTIVA_BG = linha[58];
 
@@ -1984,6 +1986,30 @@
       }
   }
 
+  function registrarMetadadosPorTag(metadadosPorTag, tag, linha){
+      if(!metadadosPorTag[tag]){
+          metadadosPorTag[tag] = { modelos: new Set(), solicitantes: new Set() };
+      }
+
+      const modelo = String(linha["MODELO"] ?? linha.__MODELO_Y ?? "").trim();
+      const solicitante = String(linha["SOLICITANTE"] ?? linha.__SOLICITANTE_S ?? "").trim();
+
+      if(modelo) metadadosPorTag[tag].modelos.add(modelo);
+      if(solicitante) metadadosPorTag[tag].solicitantes.add(solicitante);
+  }
+
+  function linhasTooltipMetadados(metadados){
+      if(!metadados) return ["Não informado", "Não informado"];
+
+      const modelos = [...metadados.modelos];
+      const solicitantes = [...metadados.solicitantes];
+
+      return [
+          modelos.length ? modelos.join(", ") : "Não informado",
+          solicitantes.length ? solicitantes.join(", ") : "Não informado"
+      ];
+  }
+
   function calcularTotais(dados){
 
       const totalAtendimentos = dados.length;
@@ -2012,6 +2038,7 @@
   ]);
 
   const ocorrenciasTAG = {};
+  const metadadosReincidenciaPorTag = {};
 
   let programadores = 0;
   let tecnicos = 0;
@@ -2076,6 +2103,7 @@ dados.forEach(linha => {
 
         if (tag) {
             ocorrenciasTAG[tag] = (ocorrenciasTAG[tag] || 0) + 1;
+            registrarMetadadosPorTag(metadadosReincidenciaPorTag, tag, linha);
         }
     }
 
@@ -2170,6 +2198,7 @@ dados.forEach(linha => {
       criarGrafico("graficoProgramador","Atendimentos por Programador",programadoresOrdenados,totProgramador,gProgramador,v=>gProgramador=v,true, filtrarPorProgramador);
 
       const custoPecasPorTag = {};
+      const metadadosCustoPecasPorTag = {};
       dados.forEach(linha => {
           const tag = String(linha["TAG"] || "").trim();
           const valorPecasBruto = linha["TOTAL DE PEÇAS"];
@@ -2183,6 +2212,7 @@ dados.forEach(linha => {
           }
 
           custoPecasPorTag[tag] = (custoPecasPorTag[tag] || 0) + valorPecas;
+          registrarMetadadosPorTag(metadadosCustoPecasPorTag, tag, linha);
       });
 
       const tagsCustoPecas = Object.entries(custoPecasPorTag)
@@ -2191,7 +2221,10 @@ dados.forEach(linha => {
           .slice(0, 10)
           .map(([tag]) => tag);
       const valoresCustoPecas = tagsCustoPecas.map(tag => Number(custoPecasPorTag[tag].toFixed(2)));
-      criarGrafico("graficoCustoPecas","Custo de Peças",tagsCustoPecas,valoresCustoPecas,g9,v=>g9=v,false);
+      const metadadosTopCustoPecas = Object.fromEntries(
+          tagsCustoPecas.map(tag => [tag, metadadosCustoPecasPorTag[tag]])
+      );
+      criarGrafico("graficoCustoPecas","Custo de Peças",tagsCustoPecas,valoresCustoPecas,g9,v=>g9=v,false,null,metadadosTopCustoPecas);
 
       const tecnicosSelecionados = getSelecionados("filtroTecnico");
       if(tecnicosSelecionados.length === 1){
@@ -2209,12 +2242,15 @@ dados.forEach(linha => {
 
       criarGrafico("graficoHoras","Horas",["Trabalhadas", "Aguardando", "Deslocamento"],[horasTrab, horasAguard, horasDesloc],g2,v => g2 = v,false);
       criarGrafico("graficoMaquina","Máquina Parada",["Total"],[maquinaParada],g5,v=>g5=v,false);
-      criarGraficoRevisitados(revisitadoTags, revisitadoContagens, revisitadoTemDados);
+      const metadadosTopRevisitados = Object.fromEntries(
+          revisitadoTags.map(tag => [tag, metadadosReincidenciaPorTag[tag]])
+      );
+      criarGraficoRevisitados(revisitadoTags, revisitadoContagens, revisitadoTemDados, metadadosTopRevisitados);
       criarGraficoAbertura(programadores, tecnicos);
       atualizarVisibilidadeCards();
   }
 
-  function criarGrafico(id,label,labels,data,graficoAtual,salvar,comClickable,clickCallback){
+  function criarGrafico(id,label,labels,data,graficoAtual,salvar,comClickable,clickCallback,metadadosPorLabel){
 
       if(graficoAtual){
           graficoAtual.destroy();
@@ -2240,7 +2276,14 @@ dados.forEach(linha => {
       const opcoes = {
           responsive:true,
           plugins:{
-              legend:{display:false}
+              legend:{display:false},
+              ...(metadadosPorLabel ? {
+                  tooltip:{
+                      callbacks:{
+                          afterLabel: context => linhasTooltipMetadados(metadadosPorLabel[labels[context.dataIndex]])
+                      }
+                  }
+              } : {})
           },
           interaction:{
               mode:'nearest',
@@ -2356,7 +2399,7 @@ dados.forEach(linha => {
     });
 }
 
-  function criarGraficoRevisitados(labels, data, temDados){
+  function criarGraficoRevisitados(labels, data, temDados, metadadosPorLabel){
 
     const graficoCard = document.querySelector('#graficoRevisitados')?.closest('.card');
 
@@ -2396,7 +2439,12 @@ dados.forEach(linha => {
             maintainAspectRatio:false,
             plugins:{
                 legend:{ display:false },
-                tooltip:{ callbacks:{ label: context => `${context.parsed.y}` } }
+                tooltip:{
+                    callbacks:{
+                        label: context => `${context.parsed.y}`,
+                        afterLabel: context => linhasTooltipMetadados(metadadosPorLabel[labels[context.dataIndex]])
+                    }
+                }
             },
             scales:{
                 x:{ title:{ display:true, text:'TAG' } },
