@@ -380,6 +380,24 @@
         text-align: center;
       }
 
+      #cardTotalRevisitados {
+        cursor: pointer;
+        transition: box-shadow .2s ease, transform .2s ease;
+      }
+
+      #cardTotalRevisitados:hover,
+      #cardTotalRevisitados:focus-visible {
+        box-shadow: 0 4px 12px rgba(46, 125, 50, 0.22);
+        transform: translateY(-2px);
+        outline: none;
+      }
+
+      #cardTotalRevisitados[aria-pressed="true"] {
+        background: #f0fdf4;
+        border-left-color: #15803d;
+        box-shadow: 0 0 0 2px rgba(21, 128, 61, 0.2);
+      }
+
       .card h3,
       .card h4 {
         margin: 0 0 8px 0;
@@ -821,7 +839,7 @@
   <div class="total" id="totalAvarias">0</div>
   </div>
 
-  <div class="card" id="cardTotalRevisitados">
+  <div class="card" id="cardTotalRevisitados" role="button" tabindex="0" aria-pressed="false" aria-label="Filtrar equipamentos reincidentes">
     <h3>Equipamentos Reincidentes</h3>
     <div class="total" id="totalRevisitados">0</div>
   </div>
@@ -885,6 +903,12 @@
   let uploadDialogOpen = false; /* prevent duplicate file picker opens */
   let periodoMinimo = "";
   let periodoMaximo = "";
+  let filtroReincidentesAtivo = false;
+
+  const TIPOS_REINCIDENTES = new Set([
+      "CORRETIVA PLANEJADA",
+      "CORRETIVA EMERGENCIAL"
+  ]);
 
   const STORAGE_KEY = "indicadores_ss_estado";
   const dataInicioPeriodo = document.getElementById("dataInicioPeriodo");
@@ -1232,14 +1256,17 @@
           filtroCliente: getSelecionados("filtroCliente"),
           filtroEquipamento: getSelecionados("filtroEquipamento"),
           filtroMarca: getSelecionados("filtroMarca"),
-          filtroModelo: getSelecionados("filtroModelo")
+          filtroModelo: getSelecionados("filtroModelo"),
+          filtroReincidentesAtivo
       };
   }
 
   function aplicarEstadoFiltros(filtros){
       if(!filtros) return;
+      filtroReincidentesAtivo = filtros.filtroReincidentesAtivo === true;
 
       Object.keys(filtros).forEach(id => {
+          if(id === "filtroReincidentesAtivo") return;
           const valores = filtros[id] || [];
 
           document.querySelectorAll(`#${id} input`).forEach(input => {
@@ -1281,6 +1308,7 @@
           inicializarPeriodo(dadosGlobais, estado.periodo);
 
           document.querySelector(".cards").style.display = "grid";
+          atualizarEstadoCardReincidentes();
           seletorVisaoGraficos.classList.add("visivel");
           seletorRegioes.classList.add("visivel");
           selecionarVisaoGraficos(estado.visaoGraficos === "programadores" ? "programadores" : "tecnicos");
@@ -1387,6 +1415,13 @@
   });
 
   btnLimpar.addEventListener("click", limparFiltros);
+  const cardTotalRevisitados = document.getElementById("cardTotalRevisitados");
+  cardTotalRevisitados.addEventListener("click", alternarFiltroReincidentes);
+  cardTotalRevisitados.addEventListener("keydown", evento => {
+      if(evento.key !== "Enter" && evento.key !== " ") return;
+      evento.preventDefault();
+      alternarFiltroReincidentes();
+  });
   btnExportPdfSolicitantes.addEventListener("click", exportarSolicitantesPdf);
   dataInicioPeriodo.addEventListener("change", aplicarAlteracaoPeriodo);
   dataFimPeriodo.addEventListener("change", aplicarAlteracaoPeriodo);
@@ -1616,6 +1651,29 @@
           );
       }
 
+      if(filtroReincidentesAtivo){
+          const ocorrenciasPorTag = {};
+          dados.forEach(linha => {
+              const tipo = String(linha["TIPO DA SS"] || "").trim().toUpperCase();
+              const tag = String(linha["AD"] || linha["TAG"] || "").trim();
+              if(TIPOS_REINCIDENTES.has(tipo) && tag){
+                  ocorrenciasPorTag[tag] = (ocorrenciasPorTag[tag] || 0) + 1;
+              }
+          });
+
+          const tagsReincidentes = new Set(
+              Object.entries(ocorrenciasPorTag)
+                  .filter(([, ocorrencias]) => ocorrencias > 1)
+                  .map(([tag]) => tag)
+          );
+
+          dados = dados.filter(linha => {
+              const tipo = String(linha["TIPO DA SS"] || "").trim().toUpperCase();
+              const tag = String(linha["AD"] || linha["TAG"] || "").trim();
+              return TIPOS_REINCIDENTES.has(tipo) && tagsReincidentes.has(tag);
+          });
+      }
+
       return dados;
   }
 
@@ -1687,6 +1745,17 @@
       atualizarVisibilidadeGraficoTotalHoras();
       atualizarVisibilidadeBotaoLimpar();
       salvarEstadoPagina();
+  }
+
+  function atualizarEstadoCardReincidentes(){
+      const card = document.getElementById("cardTotalRevisitados");
+      if(card) card.setAttribute("aria-pressed", String(filtroReincidentesAtivo));
+  }
+
+  function alternarFiltroReincidentes(){
+      filtroReincidentesAtivo = !filtroReincidentesAtivo;
+      atualizarEstadoCardReincidentes();
+      aplicarFiltros();
   }
 
   function toHoras(valor){
@@ -2032,10 +2101,7 @@
           return tipoSS === "AVARIA";
       }).length;
 
-  const tiposValidos = new Set([
-      "CORRETIVA PLANEJADA",
-      "CORRETIVA EMERGENCIAL"
-  ]);
+  const tiposValidos = TIPOS_REINCIDENTES;
 
   const ocorrenciasTAG = {};
   const metadadosReincidenciaPorTag = {};
@@ -2488,6 +2554,7 @@ dados.forEach(linha => {
             getSelecionados("filtroMarca").length > 0 ||
             getSelecionados("filtroModelo").length > 0 ||
             obterRegioesSelecionadas().length > 0 ||
+            filtroReincidentesAtivo ||
             periodoAtivo ||
             existeBuscaAtiva;
   }
@@ -2502,6 +2569,8 @@ dados.forEach(linha => {
   }
 
   function limparFiltros(){
+      filtroReincidentesAtivo = false;
+      atualizarEstadoCardReincidentes();
       document.querySelectorAll(".filtro-checkboxes input").forEach(input => {
           input.checked = false;
       });
