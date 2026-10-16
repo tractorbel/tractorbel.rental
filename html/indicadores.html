@@ -834,6 +834,11 @@
   <div class="total" id="totalCorretivas">0</div>
   </div>
 
+  <div class="card" id="cardTotalPreditiva">
+  <h3>PREDITIVA</h3>
+  <div class="total" id="totalPreditiva">0</div>
+  </div>
+
   <div class="card" id="cardTotalAvarias">
   <h3>Avarias</h3>
   <div class="total" id="totalAvarias">0</div>
@@ -1539,7 +1544,13 @@
       const busca = getTextoBuscaFiltro(container.id);
 
       const valoresFiltrados = busca
-          ? valores.filter(valor => valor.toLowerCase().includes(busca))
+          ? valores.filter(valor => {
+              const textoExibido = container.id === "filtroTipo" &&
+                  String(valor).trim().toUpperCase() === "CORRETIVA PLANEJADA"
+                  ? "PREDITIVA"
+                  : valor;
+              return valor.toLowerCase().includes(busca) || textoExibido.toLowerCase().includes(busca);
+          })
           : valores;
 
       const valoresFinais = [
@@ -1565,7 +1576,10 @@
 
           const texto = document.createElement("span");
           texto.className = "filtro-checkbox-text";
-          texto.textContent = valor;
+          texto.textContent = container.id === "filtroTipo" &&
+              String(valor).trim().toUpperCase() === "CORRETIVA PLANEJADA"
+              ? "PREDITIVA"
+              : valor;
           label.appendChild(texto);
 
           container.appendChild(label);
@@ -2027,6 +2041,7 @@
           {elemento: 'totalAtendimento', card: 'cardTotalAtendimento'},
           {elemento: 'totalPreventivas', card: 'cardTotalPreventivas'},
           {elemento: 'totalCorretivas', card: 'cardTotalCorretivas'},
+          {elemento: 'totalPreditiva', card: 'cardTotalPreditiva'},
           {elemento: 'totalAvarias', card: 'cardTotalAvarias'},
           {elemento: 'totalRevisitados', card: 'cardTotalRevisitados'}
       ];
@@ -2093,7 +2108,12 @@
 
       const totalCorretivas = dados.filter(linha => {
           const tipoSS = String(linha["TIPO DA SS"] || "").trim().toUpperCase();
-          return tipoSS === "CORRETIVA EMERGENCIAL" || tipoSS === "CORRETIVA PLANEJADA";
+          return tipoSS === "CORRETIVA EMERGENCIAL";
+      }).length;
+
+      const totalPreditiva = dados.filter(linha => {
+          const tipoSS = String(linha["TIPO DA SS"] || "").trim().toUpperCase();
+          return tipoSS === "CORRETIVA PLANEJADA";
       }).length;
 
       const totalAvarias = dados.filter(linha => {
@@ -2198,6 +2218,7 @@ dados.forEach(linha => {
   document.getElementById("totalRevisitados").innerText = formatTotalComPercentual(equipamentosRevisitados, totalAtendimentos);
       
       document.getElementById("totalCorretivas").innerText = formatTotalComPercentual(totalCorretivas, totalAtendimentos);
+      document.getElementById("totalPreditiva").innerText = formatTotalComPercentual(totalPreditiva, totalAtendimentos);
       document.getElementById("totalAvarias").innerText = formatTotalComPercentual(totalAvarias, totalAtendimentos);
 
       const totaisTipo = {};
@@ -2390,12 +2411,15 @@ dados.forEach(linha => {
       }
 
       const labels = Object.keys(totaisTipo);
+      const labelsExibidos = labels.map(tipo =>
+          String(tipo).trim().toUpperCase() === "CORRETIVA PLANEJADA" ? "PREDITIVA" : tipo
+      );
       const data = Object.values(totaisTipo);
 
       graficoTipos = new Chart(document.getElementById("graficoTipos"),{
           type:'bar',
           data:{
-              labels:labels,
+              labels:labelsExibidos,
               datasets:[{
                   label: "Atendimentos",
                   data:data,
