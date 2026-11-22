@@ -446,6 +446,14 @@
         display: block;
       }
 
+      .mttr-valor {
+        margin: 8px 0;
+        color: #2e7d32;
+        font-size: 30px;
+        font-weight: bold;
+        text-align: center;
+      }
+
       #graficoTecnico {
         cursor: pointer;
       }
@@ -884,6 +892,11 @@
 
     <div class="card grafico-card"><h3>Total de Horas x Horas Úteis</h3><canvas id="graficoTotalHoras"></canvas></div>
     <div class="card grafico-card"><h3>Distribuição das Horas</h3><canvas id="graficoHoras"></canvas></div>
+    <div class="card grafico-card" id="cardMttr">
+      <h3>MTTR - Tempo Médio de Reparo</h3>
+      <div class="mttr-valor" id="valorMttr">--</div>
+      <canvas id="graficoMttr"></canvas>
+    </div>
   </section>
 
   <section class="grupo-graficos" id="graficosProgramadores" data-visao-graficos="programadores" aria-label="Gráficos da visão Programador">
@@ -903,7 +916,7 @@
   <script>
 
   let dadosGlobais = [];
-  let grafico, graficoTipos, g1, g2, g3, g4, g5, g6, g7, g8, g9, gProgramador;
+  let grafico, graficoTipos, g1, g2, g3, g4, g5, g6, g7, g8, g9, gProgramador, gMttr;
   let totaisProgramadorAtuais = {};
   let uploadDialogOpen = false; /* prevent duplicate file picker opens */
   let periodoMinimo = "";
@@ -1789,6 +1802,116 @@
       return Number(valor.toString().replace(",", ".")) || 0;
   }
 
+  function obterHorasTrabalhadasValidas(valor){
+      if(valor === undefined || valor === null || String(valor).trim() === "") return null;
+
+      if(typeof valor === "number"){
+          return Number.isFinite(valor) ? toHoras(valor) : null;
+      }
+
+      const texto = String(valor).trim();
+      if(texto.includes(":")){
+          const partes = texto.match(/^(\d+):([0-5]?\d)$/);
+          if(!partes) return null;
+          return Number(partes[1]) + Number(partes[2]) / 60;
+      }
+
+      const numero = Number(texto.replace(",", "."));
+      return Number.isFinite(numero) ? numero : null;
+  }
+
+  function formatarHorasMttr(horas){
+      const minutos = Math.round(horas * 60);
+      return `${Math.floor(minutos / 60)}:${String(minutos % 60).padStart(2, "0")}`;
+  }
+
+  function calcularMediana(valores){
+      const ordenados = [...valores].sort((a, b) => a - b);
+      if(!ordenados.length) return null;
+
+      const meio = Math.floor(ordenados.length / 2);
+      return ordenados.length % 2
+          ? ordenados[meio]
+          : (ordenados[meio - 1] + ordenados[meio]) / 2;
+  }
+
+  function criarGraficoMttr(dados){
+      const card = document.getElementById("cardMttr");
+      const valorEl = document.getElementById("valorMttr");
+      const tiposSelecionados = getSelecionados("filtroTipo");
+      const deveExibir = tiposSelecionados.length > 0 &&
+          tiposSelecionados.every(tipo => String(tipo).trim().toUpperCase().startsWith("CORRETIVA"));
+
+      if(gMttr){
+          gMttr.destroy();
+          gMttr = null;
+      }
+
+      if(!deveExibir){
+          card.style.display = "none";
+          valorEl.textContent = "--";
+          return;
+      }
+
+      card.style.display = "block";
+      const horasPorModelo = new Map();
+      dados.forEach(linha => {
+          const horas = obterHorasTrabalhadasValidas(linha["HORAS TRABALHADAS"]);
+          if(horas === null || horas < 0) return;
+
+          const modelo = String(linha["MODELO"] ?? linha.__MODELO_Y ?? "").trim() || "Não informado";
+          if(!horasPorModelo.has(modelo)) horasPorModelo.set(modelo, []);
+          horasPorModelo.get(modelo).push(horas);
+      });
+
+      if(!horasPorModelo.size){
+          valorEl.textContent = "Sem dados";
+          document.getElementById("graficoMttr").style.display = "none";
+          return;
+      }
+
+      const medianasPorModelo = [...horasPorModelo.entries()]
+          .map(([modelo, horas]) => [modelo, calcularMediana(horas)])
+          .sort((a, b) => a[0].localeCompare(b[0], "pt-BR", {numeric:true, sensitivity:"base"}));
+      const medianaGeral = calcularMediana([...horasPorModelo.values()].flat());
+      valorEl.textContent = `Mediana geral: ${formatarHorasMttr(medianaGeral)}`;
+      const canvas = document.getElementById("graficoMttr");
+      canvas.style.display = "block";
+
+      gMttr = new Chart(canvas, {
+          type: "bar",
+          data: {
+              labels: medianasPorModelo.map(([modelo]) => modelo),
+              datasets: [{
+                  label: "MTTR por modelo",
+                  data: medianasPorModelo.map(([, mediana]) => mediana),
+                  backgroundColor: medianasPorModelo.map(() => "rgba(14, 165, 233, 0.8)"),
+                  borderColor: medianasPorModelo.map(() => "rgba(14, 165, 233, 1)"),
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              responsive: true,
+              plugins: {
+                  legend: { display: false },
+                  tooltip: {
+                      callbacks: {
+                          label: context => formatarHorasMttr(context.parsed.y)
+                      }
+                  }
+              },
+              scales: {
+                  y: {
+                      beginAtZero: true,
+                      ticks: {
+                          callback: valor => formatarHorasMttr(valor)
+                      }
+                  }
+              }
+          }
+      });
+  }
+
   function toNumber(valor){
       if(valor === undefined || valor === null || valor === "") return NaN;
       if(typeof valor === "number") return valor;
@@ -2328,6 +2451,7 @@ dados.forEach(linha => {
       atualizarVisibilidadeGraficoTotalHoras();
 
       criarGrafico("graficoHoras","Horas",["Trabalhadas", "Aguardando", "Deslocamento"],[horasTrab, horasAguard, horasDesloc],g2,v => g2 = v,false);
+      criarGraficoMttr(dados);
       criarGrafico("graficoMaquina","Máquina Parada",["Total"],[maquinaParada],g5,v=>g5=v,false);
       const metadadosTopRevisitados = Object.fromEntries(
           revisitadoTags.map(tag => [tag, metadadosReincidenciaPorTag[tag]])
